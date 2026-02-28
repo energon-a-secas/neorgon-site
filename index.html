@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neorgon — Tools for the Modern Engineer</title>
+  <meta name="description" content="Neorgon — a collection of tools and platforms for engineers. Skill roadmaps, infrastructure challenges, timezone converters, and more.">
+  <meta property="og:title" content="Neorgon — Tools for the Modern Engineer">
+  <meta property="og:description" content="A collection of tools and platforms for engineers. No cloud costs. No signup.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://neorgon.com/">
+  <meta property="og:site_name" content="Neorgon">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Neorgon — Tools for the Modern Engineer">
+  <meta name="twitter:description" content="A collection of tools and platforms for engineers. No cloud costs. No signup.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://neorgon.com/">
+  <meta name="theme-color" content="#000912">
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #000912;
+      --font: 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --text-primary: #f0f4ff;
+      --text-secondary: #8fa0c0;
+      --text-muted: rgba(143,160,192,.5);
+      --border: rgba(255,255,255,.08);
+      --border-glow: rgba(255,255,255,.15);
+      --surface: rgba(255,255,255,.03);
+      --surface-hover: rgba(255,255,255,.06);
+      --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Starfield canvas ────────────────────────────────────────────────── */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Ambient glow orbs ───────────────────────────────────────────────── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 { width: 600px; height: 600px; top: -200px; left: -100px; background: rgba(120,0,255,.12); }
+    .orb-2 { width: 500px; height: 500px; top: 30%; right: -150px; background: rgba(0,200,255,.08); }
+    .orb-3 { width: 400px; height: 400px; bottom: -100px; left: 30%; background: rgba(200,0,180,.07); }
+
+    /* ── Grid overlay ────────────────────────────────────────────────────── */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 20%, transparent 100%);
+    }
+
+    /* ── Page content ────────────────────────────────────────────────────── */
+    .page {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ──────────────────────────────────────────────────────────── */
+    .site-header {
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-img {
+      height: 30px;
+      filter: brightness(0) invert(1);
+      opacity: .9;
+      transition: transform 0.3s var(--ease-snap), opacity .2s;
+    }
+    .logo-wrap:hover .logo-img { transform: scale(1.1) rotate(-6deg); opacity: 1; }
+    .logo-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: var(--text-primary);
+    }
+
+    .header-links { display: flex; gap: 8px; align-items: center; }
+    .header-link {
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid transparent;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .header-link:hover {
+      color: var(--text-primary);
+      border-color: var(--border-glow);
+      background: var(--surface-hover);
+    }
+
+    /* ── Hero ────────────────────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 80px 40px 60px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: rgba(120,0,255,.12);
+      border: 1px solid rgba(160,80,255,.25);
+      color: #c084fc;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #c084fc;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(.7); }
+    }
+
+    .hero-heading {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+    .hero-heading .neon-word {
+      background: linear-gradient(90deg, #818cf8, #c084fc, #e879f9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── Sites grid ──────────────────────────────────────────────────────── */
+    .sites-section {
+      flex: 1;
+      padding: 0 40px 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .section-label {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .sites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── Site card ───────────────────────────────────────────────────────── */
+    .site-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: hidden;
+      transition: transform .2s ease, border-color .2s, box-shadow .3s;
+    }
+
+    /* Neon glow on hover via custom prop */
+    .site-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 17px;
+      background: linear-gradient(135deg, var(--card-glow, rgba(120,0,255,.3)), transparent 60%);
+      opacity: 0;
+      transition: opacity .3s;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .site-card:hover { transform: translateY(-4px); }
+    .site-card:hover::before { opacity: 1; }
+    .site-card:hover { border-color: var(--card-glow-border, rgba(255,255,255,.2)); }
+
+    /* Subtle inner glow strip at top */
+    .site-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 20px; right: 20px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--card-glow, rgba(160,80,255,.5)), transparent);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .site-card:hover::after { opacity: 1; }
+
+    .card-content { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .card-icon-wrap {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .card-arrow {
+      color: var(--text-muted);
+      opacity: 0;
+      transform: translate(-4px, 4px);
+      transition: opacity .2s, transform .2s;
+      flex-shrink: 0;
+    }
+    .site-card:hover .card-arrow { opacity: 1; transform: translate(0, 0); }
+
+    .card-domain {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--card-accent, #818cf8);
+      margin-top: 2px;
+    }
+    .card-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+    .card-desc {
+      font-size: .875rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      flex: 1;
+    }
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .card-tag {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 10px;
+      border: 1px solid;
+      color: var(--card-accent, #818cf8);
+      border-color: color-mix(in srgb, var(--card-accent, #818cf8) 30%, transparent);
+      background: color-mix(in srgb, var(--card-accent, #818cf8) 8%, transparent);
+    }
+
+    /* Featured card (larger, 2-col span on wide screens) */
+    .site-card.featured {
+      grid-column: span 2;
+      flex-direction: row;
+      align-items: center;
+      gap: 28px;
+    }
+    .site-card.featured .card-icon-wrap {
+      width: 60px; height: 60px;
+      border-radius: 16px;
+      font-size: 2rem;
+    }
+    .site-card.featured .card-name { font-size: 1.2rem; }
+
+    @media (max-width: 700px) {
+      .site-card.featured { grid-column: span 1; flex-direction: column; }
+    }
+
+    /* ── Footer ──────────────────────────────────────────────────────────── */
+    .site-footer {
+      text-align: center;
+      padding: 20px 40px 32px;
+      color: rgba(255,255,255,.18);
+      font-size: .78rem;
+      line-height: 1.8;
+      border-top: 1px solid rgba(255,255,255,.04);
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .site-header { padding: 16px 20px; }
+      .hero { padding: 60px 20px 40px; }
+      .sites-section { padding: 0 20px 60px; }
+      .sites-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Starfield -->
+<canvas id="starfield"></canvas>
+
+<!-- Ambient orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- Grid -->
+<div class="grid-bg"></div>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="site-header">
+    <a class="logo-wrap" href="https://ehq.cl/" target="_blank" rel="noopener noreferrer">
+      <img src="energon-classic-logo.png" class="logo-img" alt="Energon">
+      <span class="logo-name">Neorgon</span>
+    </a>
+    <nav class="header-links">
+      <a class="header-link" href="https://ehq.cl/" target="_blank" rel="noopener noreferrer">ehq.cl</a>
+      <a class="header-link" href="https://github.com/energon-a-secas" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Built by Engineers · For Engineers
+    </div>
+    <h1 class="hero-heading">
+      Tools that<br>
+      <span class="neon-word">actually work</span>
+    </h1>
+    <p class="hero-sub">
+      A collection of lightweight tools and platforms — no cloud costs, no signup, no friction.
+    </p>
+  </section>
+
+  <!-- Sites -->
+  <main class="sites-section">
+    <div class="section-label">Platforms &amp; Tools</div>
+    <div class="sites-grid">
+
+      <!-- ehq.cl — featured -->
+      <a class="site-card featured"
+         href="https://ehq.cl/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(99,102,241,.4); --card-glow-border: rgba(99,102,241,.4); --card-accent: #818cf8;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap">⚡</div>
+            <svg class="card-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">ehq.cl</div>
+          <div class="card-name">Energon HQ</div>
+          <div class="card-desc">Command center. Tools, resources, and everything Energon — all in one place.</div>
+          <div class="card-tags">
+            <span class="card-tag">Platform</span>
+            <span class="card-tag">Hub</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- cloud.ehq.cl — featured -->
+      <a class="site-card featured"
+         href="https://cloud.ehq.cl/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(6,182,212,.35); --card-glow-border: rgba(6,182,212,.4); --card-accent: #22d3ee;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap">☁️</div>
+            <svg class="card-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">cloud.ehq.cl</div>
+          <div class="card-name">Cloud</div>
+          <div class="card-desc">Cloud infrastructure, labs, and operations resources for the modern platform engineer.</div>
+          <div class="card-tags">
+            <span class="card-tag">Cloud</span>
+            <span class="card-tag">Infrastructure</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Local Drills -->
+      <a class="site-card"
+         href="https://localdrills.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #fbbf24;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap">🛠️</div>
+            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">localdrills.neorgon.com</div>
+          <div class="card-name">Local Drills</div>
+          <div class="card-desc">Near-real-world AWS, Kubernetes, and GitLab CI/CD troubleshooting challenges. No cloud costs.</div>
+          <div class="card-tags">
+            <span class="card-tag">AWS</span>
+            <span class="card-tag">Kubernetes</span>
+            <span class="card-tag">GitLab</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Skill Roadmap -->
+      <a class="site-card"
+         href="https://diagrams.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(167,139,250,.3); --card-glow-border: rgba(167,139,250,.35); --card-accent: #a78bfa;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap">🗺️</div>
+            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">diagrams.neorgon.com</div>
+          <div class="card-name">Skill Roadmap</div>
+          <div class="card-desc">Visually map skills, milestones, and learning paths with typed connections and dependency locking.</div>
+          <div class="card-tags">
+            <span class="card-tag">Learning</span>
+            <span class="card-tag">Diagrams</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Client Says -->
+      <a class="site-card"
+         href="https://clientsays.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(236,72,153,.3); --card-glow-border: rgba(236,72,153,.35); --card-accent: #f472b6;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap">🌍</div>
+            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">clientsays.neorgon.com</div>
+          <div class="card-name">Client Says</div>
+          <div class="card-desc">Timezone converter for remote teams + corporate jargon translator. Because "let's circle back" means something.</div>
+          <div class="card-tags">
+            <span class="card-tag">Timezone</span>
+            <span class="card-tag">Remote Work</span>
+            <span class="card-tag">Jargon</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Spin the Wheel -->
+      <a class="site-card"
+         href="https://wheel.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(52,211,153,.3); --card-glow-border: rgba(52,211,153,.35); --card-accent: #34d399;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap">🎡</div>
+            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">wheel.neorgon.com</div>
+          <div class="card-name">Spin the Wheel</div>
+          <div class="card-desc">A fully customizable decision wheel. Add options, icons, and custom messages — share via bookmark link.</div>
+          <div class="card-tags">
+            <span class="card-tag">Decision</span>
+            <span class="card-tag">Fun</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Neorgon · Tools for the Modern Engineer ·
+    <a href="https://ehq.cl/" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,.32);text-decoration:none">ehq.cl</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/energon-a-secas" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,.32);text-decoration:none">GitHub</a>
+  </footer>
+
+</div>
+
+<script>
+/* ── Starfield ─────────────────────────────────────────────────────────────── */
+(function () {
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  let W, H;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    stars = Array.from({ length: 200 }, () => ({
+      x:      Math.random() * W,
+      y:      Math.random() * H,
+      r:      Math.random() * 1.4 + 0.3,
+      base:   Math.random() * 0.6 + 0.1,
+      speed:  Math.random() * 0.015 + 0.004,
+      phase:  Math.random() * Math.PI * 2,
+    }));
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, W, H);
+    stars.forEach(s => {
+      s.phase += s.speed;
+      const opacity = s.base + 0.4 * Math.abs(Math.sin(s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200, 220, 255, ${opacity})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    requestAnimationFrame(draw);
+  } else {
+    /* Static stars for reduced-motion users */
+    draw(0);
+  }
+})();
+</script>
+</body>
+</html>
