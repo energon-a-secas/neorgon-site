@@ -551,9 +551,10 @@
       </a>
 
       <!-- Reference Matrix -->
-      <a class="site-card"
-         href="https://references.neorgon.com/" target="_blank" rel="noopener noreferrer"
-         style="--card-glow: rgba(244,114,182,.3); --card-glow-border: rgba(244,114,182,.35); --card-accent: #f472b6;">
+      <div class="site-card multi-tool"
+           data-href="https://references.neorgon.com/"
+           role="link" tabindex="0"
+           style="--card-glow: rgba(244,114,182,.3); --card-glow-border: rgba(244,114,182,.35); --card-accent: #f472b6;">
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/reference-matrix.svg" class="card-site-icon" alt="Reference Matrix"></div>
@@ -568,7 +569,17 @@
             <span class="card-tag">Regex</span>
           </div>
         </div>
-      </a>
+        <div class="card-subtool-popup">
+          <a class="subtool-item" href="https://references.neorgon.com/" target="_blank" rel="noopener noreferrer">
+            <span class="subtool-name">Reference Matrix</span>
+            <span class="subtool-desc">Browse all references with live regex playground</span>
+          </a>
+          <a class="subtool-item" href="https://github.com/energon-a-secas/reference-site/issues/new?template=new-reference.yml" target="_blank" rel="noopener noreferrer">
+            <span class="subtool-name">Submit a Reference</span>
+            <span class="subtool-desc">Propose one via GitHub — get credited on merge</span>
+          </a>
+        </div>
+      </div>
 
       <!-- JSON Studio -->
       <div class="site-card multi-tool"
