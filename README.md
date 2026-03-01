@@ -17,11 +17,12 @@ A minimal, neon-space landing page that links to every Neorgon site with a short
 | Site | Domain | Description |
 |------|--------|-------------|
 | Energon HQ | [ehq.cl](https://ehq.cl/) | Main platform and command center |
-| Cloud | [cloud.ehq.cl](https://cloud.ehq.cl/) | Cloud infrastructure and labs |
 | Local Drills | [localdrills.neorgon.com](https://localdrills.neorgon.com/) | AWS / Kubernetes / GitLab CI/CD challenges |
 | Skill Roadmap | [diagrams.neorgon.com](https://diagrams.neorgon.com/) | Visual skill and learning path builder |
 | Client Says | [clientsays.neorgon.com](https://clientsays.neorgon.com/) | Timezone converter + jargon translator |
 | Spin the Wheel | [wheel.neorgon.com](https://wheel.neorgon.com/) | Customizable decision wheel |
+| JSON Builder | [jsonbuilder.neorgon.com](https://jsonbuilder.neorgon.com/) | Visual JSON schema builder + JIRA adjuster |
+| Reference Matrix | [references.neorgon.com](https://references.neorgon.com/) | Enerbot meme references — live regex playground + JSON API |
 
 ---
 
