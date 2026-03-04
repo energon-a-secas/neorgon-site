@@ -17,10 +17,9 @@
   <link rel="canonical" href="https://neorgon.com/">
   <meta property="og:locale" content="en_US">
   <meta name="theme-color" content="#000912">
-  <!-- og:image: uncomment when social preview image is ready (1200x630 PNG)
-  <meta property="og:image" content="https://neorgon.com/og-preview.png">
+  <meta property="og:image" content="https://neorgon.com/og-preview.jpg">
   <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630"> -->
+  <meta property="og:image:height" content="630">
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -439,6 +438,27 @@
     .footer-link:focus-visible {
       color: rgba(255,255,255,.55);
       text-decoration: underline;
+    }
+
+    /* ── Button press feedback ──────────────────────────────────── */
+    button:active, .btn:active {
+      transform: scale(0.97);
+      transition-duration: 120ms;
+    }
+
+    /* ── Entrance animation ─────────────────────────────────────── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Skeleton loading ───────────────────────────────────────── */
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,.03) 25%, rgba(255,255,255,.06) 50%, rgba(255,255,255,.03) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+      border-radius: 10px;
     }
 
     @media (prefers-reduced-motion: reduce) {
