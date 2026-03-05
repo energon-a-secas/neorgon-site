@@ -1108,7 +1108,7 @@
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
         </div>
-        <a class="card-content ghost-revealed" href="https://github.com/energon-a-secas/autopilot-site" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
+        <a class="card-content ghost-revealed" href="autopilot.neorgon.com" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/autopilot.svg" class="card-site-icon" alt="Autopilot"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
@@ -1443,6 +1443,70 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   const history = [];
   let histIdx = -1;
 
+  /* ── Auth state ── */
+  let authedUser = null;
+
+  /* ── Convex HTTP client (lazy-loaded) ── */
+  const CONVEX_URL = 'https://quaint-cobra-151.convex.cloud';
+  let ConvexHttpClient = null;
+  let convex = null;
+
+  async function getConvex() {
+    if (convex) return convex;
+    if (!ConvexHttpClient) {
+      const mod = await import('https://esm.sh/convex@1.21.0/browser');
+      ConvexHttpClient = mod.ConvexHttpClient;
+    }
+    convex = new ConvexHttpClient(CONVEX_URL);
+    return convex;
+  }
+
+  /* ── Client-side rate limiter (prevents Convex calls = zero cost) ── */
+  const RL_KEY = 'neorgon-term-rl';
+  const LOCKOUT_TIERS = [
+    { threshold: 3, duration: 30_000 },
+    { threshold: 5, duration: 120_000 },
+    { threshold: 8, duration: 600_000 },
+    { threshold: 10, duration: 1_800_000 },
+  ];
+
+  function getRateLimit() {
+    try { return JSON.parse(localStorage.getItem(RL_KEY)) || { attempts: 0, lockedUntil: 0 }; }
+    catch { return { attempts: 0, lockedUntil: 0 }; }
+  }
+
+  function setRateLimit(data) {
+    localStorage.setItem(RL_KEY, JSON.stringify(data));
+  }
+
+  function clientLockoutDuration(attempts) {
+    let d = 0;
+    for (const t of LOCKOUT_TIERS) { if (attempts >= t.threshold) d = t.duration; }
+    return d;
+  }
+
+  function checkClientRateLimit() {
+    const rl = getRateLimit();
+    const now = Date.now();
+    if (rl.lockedUntil > now) {
+      const secs = Math.ceil((rl.lockedUntil - now) / 1000);
+      return { blocked: true, remaining: secs };
+    }
+    return { blocked: false };
+  }
+
+  function recordClientFailure() {
+    const rl = getRateLimit();
+    rl.attempts += 1;
+    rl.lockedUntil = Date.now() + clientLockoutDuration(rl.attempts);
+    setRateLimit(rl);
+  }
+
+  function resetClientRateLimit() {
+    setRateLimit({ attempts: 0, lockedUntil: 0 });
+  }
+
+  /* ── Terminal open/close ── */
   function isOpen() { return overlay.classList.contains('open'); }
 
   function openTerm() {
@@ -1454,7 +1518,6 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     overlay.classList.remove('open');
   }
 
-  /* Triple Esc to toggle */
   let escCount = 0;
   let escTimer = null;
 
@@ -1463,20 +1526,14 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       if (isOpen()) { closeTerm(); escCount = 0; return; }
       escCount++;
       clearTimeout(escTimer);
-      if (escCount >= 3) {
-        escCount = 0;
-        openTerm();
-      } else {
-        escTimer = setTimeout(() => { escCount = 0; }, 500);
-      }
+      if (escCount >= 3) { escCount = 0; openTerm(); }
+      else { escTimer = setTimeout(() => { escCount = 0; }, 500); }
     }
   });
 
-  /* Close on overlay background click */
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) closeTerm();
-  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeTerm(); });
 
+  /* ── Output helpers ── */
   function addLine(text, cls) {
     const inputRow = body.querySelector('.term-input-row');
     const line = document.createElement('div');
@@ -1486,17 +1543,32 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     body.scrollTop = body.scrollHeight;
   }
 
-  const commands = {
+  function updatePrompt() {
+    const prompt = body.querySelector('.term-prompt');
+    prompt.textContent = authedUser ? `${authedUser}@neorgon ❯ ` : '~ ❯ ';
+  }
+
+  /* ── Public commands (always available) ── */
+  const publicCommands = {
     help() {
-      addLine('Available commands:', 'sys');
-      addLine('  help        — show this message', 'sys');
-      addLine('  clear       — clear terminal', 'sys');
-      addLine('  warp        — engage warp drive', 'sys');
-      addLine('  tools       — list all tools', 'sys');
-      addLine('  goto <site> — open a tool site', 'sys');
-      addLine('  whoami      — who are you?', 'sys');
-      addLine('  date        — current date', 'sys');
-      addLine('  exit        — close terminal', 'sys');
+      addLine('Commands:', 'sys');
+      addLine('  help         — show this message', 'sys');
+      addLine('  clear        — clear terminal', 'sys');
+      addLine('  warp         — engage warp drive', 'sys');
+      addLine('  tools        — list all tools', 'sys');
+      addLine('  goto <site>  — open a tool site', 'sys');
+      addLine('  whoami       — who are you?', 'sys');
+      addLine('  date         — current date', 'sys');
+      addLine('  login <u> <p>— authenticate', 'sys');
+      addLine('  exit         — close terminal', 'sys');
+      if (authedUser) {
+        addLine('', 'sys');
+        addLine('Authenticated commands:', 'sys');
+        addLine('  status       — auth status', 'sys');
+        addLine('  unlock       — reveal secret section', 'sys');
+        addLine('  broadcast <m>— show toast on page', 'sys');
+        addLine('  logout       — end session', 'sys');
+      }
     },
     clear() {
       body.querySelectorAll('.term-line').forEach(l => l.remove());
@@ -1526,8 +1598,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     },
     goto(args) {
       const sites = {
-        'ehq': 'https://ehq.cl/',
-        'ehq.cl': 'https://ehq.cl/',
+        'ehq': 'https://ehq.cl/', 'ehq.cl': 'https://ehq.cl/',
         'infradrills': 'https://infradrills.neorgon.com/',
         'skillmap': 'https://skillmap.neorgon.com/',
         'clientsays': 'https://clientsays.neorgon.com/',
@@ -1542,40 +1613,136 @@ document.querySelectorAll('.ghost-card').forEach(card => {
         'ogstudio': 'https://ogstudio.neorgon.com/',
       };
       const key = (args || '').trim().toLowerCase();
-      if (sites[key]) {
-        addLine(`Opening ${key}...`, 'sys');
-        window.open(sites[key], '_blank');
-      } else {
-        addLine(`Unknown site: "${key}". Type "tools" for the list.`, 'err');
-      }
+      if (sites[key]) { addLine(`Opening ${key}...`, 'sys'); window.open(sites[key], '_blank'); }
+      else { addLine(`Unknown site: "${key}". Type "tools" for the list.`, 'err'); }
     },
     whoami() {
-      addLine('You are a visitor at neorgon.com', 'sys');
-      addLine('Clearance level: explorer', 'sys');
+      if (authedUser) {
+        addLine(`Logged in as: ${authedUser}`, 'sys');
+        addLine('Clearance level: admin', 'sys');
+      } else {
+        addLine('You are a visitor at neorgon.com', 'sys');
+        addLine('Clearance level: explorer', 'sys');
+      }
     },
-    date() {
-      addLine(new Date().toString(), 'sys');
-    },
-    exit() {
-      closeTerm();
+    date() { addLine(new Date().toString(), 'sys'); },
+    exit() { closeTerm(); },
+
+    async login(args) {
+      if (authedUser) {
+        addLine(`Already logged in as ${authedUser}. Use "logout" first.`, 'err');
+        return;
+      }
+
+      const parts = (args || '').trim().split(/\s+/);
+      if (parts.length < 2 || !parts[0]) {
+        addLine('Usage: login <username> <password>', 'err');
+        return;
+      }
+
+      const [username, ...passArr] = parts;
+      const password = passArr.join(' ');
+
+      const check = checkClientRateLimit();
+      if (check.blocked) {
+        addLine(`Too many attempts. Locked for ${check.remaining}s.`, 'err');
+        return;
+      }
+
+      if (CONVEX_URL === '%%CONVEX_URL%%') {
+        addLine('Auth backend not configured.', 'err');
+        return;
+      }
+
+      addLine('Authenticating...', 'sys');
+
+      try {
+        const client = await getConvex();
+        const result = await client.mutation('auth:login', { username, password });
+
+        if (result.ok) {
+          authedUser = result.username;
+          resetClientRateLimit();
+          updatePrompt();
+          addLine(`Welcome back, ${authedUser}.`, 'sys');
+          addLine('Type "help" to see new commands.', 'sys');
+        } else {
+          recordClientFailure();
+          addLine(result.error || 'Invalid credentials.', 'err');
+          if (result.locked) {
+            addLine(`Server lockout: ${result.remaining}s remaining.`, 'err');
+          }
+        }
+      } catch (err) {
+        recordClientFailure();
+        addLine('Connection failed.', 'err');
+      }
     },
   };
 
-  function exec(raw) {
+  /* ── Authenticated commands (require login) ── */
+  const authCommands = {
+    status() {
+      addLine(`User: ${authedUser}`, 'sys');
+      addLine(`Session: active`, 'sys');
+      addLine(`Clearance: admin`, 'sys');
+    },
+    unlock() {
+      addLine('Revealing hidden section...', 'sys');
+      const section = document.getElementById('secretSection');
+      const btn = document.getElementById('secretToggle');
+      if (section && !section.classList.contains('revealed')) {
+        section.classList.add('revealed');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+      document.querySelectorAll('.ghost-card').forEach(c => c.classList.add('unlocked'));
+      addLine('All sections unlocked.', 'sys');
+    },
+    broadcast(args) {
+      const msg = (args || '').trim();
+      if (!msg) { addLine('Usage: broadcast <message>', 'err'); return; }
+      const toast = document.getElementById('arrivalToast');
+      document.querySelector('.arrival-label').textContent = `${authedUser}`;
+      document.getElementById('arrivalDest').textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 4000);
+      addLine('Broadcast sent.', 'sys');
+    },
+    logout() {
+      addLine(`Goodbye, ${authedUser}.`, 'sys');
+      authedUser = null;
+      updatePrompt();
+    },
+  };
+
+  /* ── Command execution ── */
+  async function exec(raw) {
     const trimmed = raw.trim();
     if (!trimmed) return;
     history.push(trimmed);
     histIdx = history.length;
-    addLine(`~ ❯ ${trimmed}`, 'cmd');
+
+    const promptText = authedUser ? `${authedUser}@neorgon ❯ ` : '~ ❯ ';
+    addLine(`${promptText}${trimmed}`, 'cmd');
+
     const [cmd, ...rest] = trimmed.split(/\s+/);
-    const handler = commands[cmd.toLowerCase()];
-    if (handler) {
-      handler(rest.join(' '));
+    const key = cmd.toLowerCase();
+    const args = rest.join(' ');
+
+    if (publicCommands[key]) {
+      await publicCommands[key](args);
+    } else if (authCommands[key]) {
+      if (!authedUser) {
+        addLine(`"${key}" requires authentication. Use "login <user> <pass>".`, 'err');
+      } else {
+        await authCommands[key](args);
+      }
     } else {
       addLine(`command not found: ${cmd}`, 'err');
     }
   }
 
+  /* ── Input handling ── */
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       exec(input.value);
@@ -1590,7 +1757,6 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     }
   });
 
-  /* Keep focus on input when clicking inside terminal */
   body.addEventListener('click', () => input.focus());
 })();
 </script>
