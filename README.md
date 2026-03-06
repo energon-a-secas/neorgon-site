@@ -45,12 +45,20 @@ A minimal, neon-space landing page that links to every Neorgon site with a short
 | Site | Domain | Description |
 |------|--------|-------------|
 | Energon HQ | [ehq.cl](https://ehq.cl/) | Main platform and command center |
-| Local Drills | [localdrills.neorgon.com](https://localdrills.neorgon.com/) | AWS / Kubernetes / GitLab CI/CD challenges |
-| Skill Roadmap | [diagrams.neorgon.com](https://diagrams.neorgon.com/) | Visual skill and learning path builder |
+| Infra Drills | [infradrills.neorgon.com](https://infradrills.neorgon.com/) | AWS / Kubernetes / GitLab CI/CD challenges |
+| Skill Roadmap | [skillmap.neorgon.com](https://skillmap.neorgon.com/) | Visual skill and learning path builder |
 | Client Says | [clientsays.neorgon.com](https://clientsays.neorgon.com/) | Timezone converter + jargon translator |
-| Spin the Wheel | [wheel.neorgon.com](https://wheel.neorgon.com/) | Customizable decision wheel |
-| JSON Builder | [jsonbuilder.neorgon.com](https://jsonbuilder.neorgon.com/) | Visual JSON schema builder + JIRA adjuster |
-| Reference Matrix | [references.neorgon.com](https://references.neorgon.com/) | Enerbot meme references — live regex playground + JSON API |
+| Decision Wheel | [decisionwheel.neorgon.com](https://decisionwheel.neorgon.com/) | Customizable decision wheel |
+| JSON Studio | [jsonstudio.neorgon.com](https://jsonstudio.neorgon.com/) | Visual drag-and-drop JSON block editor |
+| Reference Matrix | [references.neorgon.com](https://references.neorgon.com/) | Enerbot meme references, live regex playground + JSON API |
+| Presentation Sage | [slides.neorgon.com](https://slides.neorgon.com/) | YAML-driven slide editor with PPTX/HTML/Marp export |
+| Pathfinder | [pathfinder.neorgon.com](https://pathfinder.neorgon.com/) | Visual strategy canvas with gap detection and AI prompt export |
+| Emoji Archive | [emojis.neorgon.com](https://emojis.neorgon.com/) | Searchable Slack emoji archive |
+| Meme Vault | [memes.neorgon.com](https://memes.neorgon.com/) | Browse, vote, and upload memes |
+| Vibe Check | [interviews.neorgon.com](https://interviews.neorgon.com/) | Behavioral interview scorecard |
+| OG Studio | [ogstudio.neorgon.com](https://ogstudio.neorgon.com/) | 1200x630 social preview image generator |
+| Autopilot | [autopilot.neorgon.com](https://autopilot.neorgon.com/) | Visual idle-schedule builder |
+| Character Sheet | [charactersheet.neorgon.com](https://charactersheet.neorgon.com/) | RPG-style personality interview + card export |
 
 ---
 
