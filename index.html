@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="X-Frame-Options" content="DENY">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Neorgon: Free Tools for Engineers</title>
   <meta name="description" content="Free engineering tools you'll actually use. Skill maps, infra challenges, timezone converters, slide builders. No signup, no cloud costs">
@@ -331,7 +332,7 @@
       background: color-mix(in srgb, var(--card-accent, #818cf8) 8%, transparent);
     }
 
-    /* Featured card (full-width) */
+    /* Featured card (full-width — first card in grid) */
     .site-card.featured {
       grid-column: 1 / -1;
       flex-direction: row;
@@ -343,6 +344,7 @@
       border-radius: 16px;
       font-size: 2rem;
     }
+    .site-card.featured .card-site-icon { width: 36px; height: 36px; }
     .site-card.featured .card-name { font-size: 1.2rem; }
 
     @media (max-width: 700px) {
@@ -367,7 +369,6 @@
       z-index: 10;
       justify-content: center;
     }
-    .site-card:hover .card-subtool-popup,
     .site-card.popup-open .card-subtool-popup { opacity: 1; pointer-events: auto; }
     .subtool-item {
       display: flex;
@@ -655,6 +656,25 @@
       .sites-grid { grid-template-columns: 1fr; }
     }
 
+    /* ── Drag-and-drop ──────────────────────────────────────────────────── */
+    .site-card.sortable-ghost {
+      opacity: .25;
+      border-color: rgba(160,80,255,.5);
+    }
+    .site-card.sortable-drag {
+      opacity: 1;
+      box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 2px rgba(160,80,255,.4);
+      transform: scale(1.03) rotate(1deg);
+      z-index: 100;
+    }
+    .site-card.sortable-chosen {
+      cursor: grabbing;
+    }
+    .sites-grid .site-card { cursor: grab; }
+    .sites-grid .site-card:active { cursor: grabbing; }
+    .sites-grid .site-card a,
+    .sites-grid .site-card .subtool-item { cursor: pointer; }
+
     /* ── Focus styles ───────────────────────────────────────────────────── */
     :focus-visible {
       outline: 2px solid #818cf8;
@@ -781,7 +801,7 @@
     <div class="sites-grid">
 
       <!-- ehq.cl: featured -->
-      <a class="site-card featured"
+      <a class="site-card featured" data-card-id="ehq"
          href="https://ehq.cl/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(99,102,241,.4); --card-glow-border: rgba(99,102,241,.4); --card-accent: #818cf8;">
         <div class="card-content">
@@ -800,7 +820,7 @@
       </a>
 
       <!-- Infra Drills -->
-      <a class="site-card"
+      <a class="site-card" data-card-id="infradrills"
          href="https://infradrills.neorgon.com/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #fbbf24;">
         <div class="card-content">
@@ -820,7 +840,7 @@
       </a>
 
       <!-- Skill Map -->
-      <a class="site-card"
+      <a class="site-card" data-card-id="skillmap"
          href="https://skillmap.neorgon.com/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(167,139,250,.3); --card-glow-border: rgba(167,139,250,.35); --card-accent: #a78bfa;">
         <div class="card-content">
@@ -839,7 +859,7 @@
       </a>
 
       <!-- Client Says -->
-      <div class="site-card multi-tool"
+      <div class="site-card multi-tool" data-card-id="clientsays"
            data-href="https://clientsays.neorgon.com/"
            role="link" tabindex="0"
            style="--card-glow: rgba(236,72,153,.3); --card-glow-border: rgba(236,72,153,.35); --card-accent: #f472b6;">
@@ -870,7 +890,7 @@
       </div>
 
       <!-- Decision Wheel -->
-      <div class="site-card multi-tool"
+      <div class="site-card multi-tool" data-card-id="decisionwheel"
            data-href="https://decisionwheel.neorgon.com/"
            role="link" tabindex="0"
            style="--card-glow: rgba(52,211,153,.3); --card-glow-border: rgba(52,211,153,.35); --card-accent: #34d399;">
@@ -900,7 +920,7 @@
       </div>
 
       <!-- Reference Matrix -->
-      <div class="site-card multi-tool"
+      <div class="site-card multi-tool" data-card-id="references"
            data-href="https://references.neorgon.com/"
            role="link" tabindex="0"
            style="--card-glow: rgba(244,114,182,.3); --card-glow-border: rgba(244,114,182,.35); --card-accent: #f472b6;">
@@ -931,7 +951,7 @@
       </div>
 
       <!-- JSON Studio -->
-      <div class="site-card multi-tool"
+      <div class="site-card multi-tool" data-card-id="jsonstudio"
            data-href="https://jsonstudio.neorgon.com/"
            role="link" tabindex="0"
            style="--card-glow: rgba(45,212,191,.3); --card-glow-border: rgba(45,212,191,.35); --card-accent: #2dd4bf;">
@@ -966,7 +986,7 @@
       </div>
 
       <!-- Presentation Sage -->
-      <a class="site-card"
+      <a class="site-card" data-card-id="slides"
          href="https://slides.neorgon.com/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(251,146,60,.3); --card-glow-border: rgba(251,146,60,.35); --card-accent: #fb923c;">
         <div class="card-content">
@@ -986,7 +1006,7 @@
       </a>
 
       <!-- Pathfinder -->
-      <a class="site-card"
+      <a class="site-card" data-card-id="pathfinder"
          href="https://pathfinder.neorgon.com/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(74,222,128,.3); --card-glow-border: rgba(74,222,128,.35); --card-accent: #4ade80;">
         <div class="card-content">
@@ -1006,7 +1026,7 @@
       </a>
 
       <!-- Emoji Archive -->
-      <div class="site-card multi-tool"
+      <div class="site-card multi-tool" data-card-id="emojis"
            data-href="https://emojis.neorgon.com/"
            role="link" tabindex="0"
            style="--card-glow: rgba(34,211,238,.3); --card-glow-border: rgba(34,211,238,.35); --card-accent: #22d3ee;">
@@ -1036,7 +1056,7 @@
       </div>
 
       <!-- Meme Vault -->
-      <a class="site-card"
+      <a class="site-card" data-card-id="memes"
          href="https://memes.neorgon.com/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(244,63,94,.3); --card-glow-border: rgba(244,63,94,.35); --card-accent: #f43f5e;">
         <div class="card-content">
@@ -1056,7 +1076,7 @@
       </a>
 
       <!-- Character Sheet -->
-      <a class="site-card"
+      <a class="site-card" data-card-id="charactersheet"
          href="https://charactersheet.neorgon.com/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(232,121,249,.3); --card-glow-border: rgba(232,121,249,.35); --card-accent: #e879f9;">
         <div class="card-content">
@@ -1076,7 +1096,7 @@
       </a>
 
       <!-- OG Studio -->
-      <a class="site-card"
+      <a class="site-card" data-card-id="ogstudio"
          href="https://ogstudio.neorgon.com/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(163,230,53,.3); --card-glow-border: rgba(163,230,53,.35); --card-accent: #a3e635;">
         <div class="card-content">
@@ -1595,6 +1615,8 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       addLine('  whoami       — who are you?', 'sys');
       addLine('  date         — current date', 'sys');
       addLine('  login <u> <p>— authenticate', 'sys');
+      addLine('  reset-layout — restore default card order', 'sys');
+      addLine('  export-layout— copy layout JSON to clipboard', 'sys');
       addLine('  exit         — close terminal', 'sys');
       if (authedUser) {
         addLine('', 'sys');
@@ -1664,6 +1686,25 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     },
     date() { addLine(new Date().toString(), 'sys'); },
     exit() { closeTerm(); },
+    'reset-layout'() {
+      if (window.resetCardOrder) {
+        window.resetCardOrder();
+        addLine('Card order reset to default.', 'sys');
+      } else {
+        addLine('Layout system not loaded.', 'err');
+      }
+    },
+    'export-layout'() {
+      if (window.exportCardOrder) {
+        const json = window.exportCardOrder();
+        navigator.clipboard.writeText(json).then(
+          () => addLine('Layout JSON copied to clipboard.', 'sys'),
+          () => { addLine(json, 'sys'); addLine('(Copy manually — clipboard blocked)', 'sys'); }
+        );
+      } else {
+        addLine('Layout system not loaded.', 'err');
+      }
+    },
 
     async login(args) {
       if (authedUser) {
@@ -1795,6 +1836,108 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   });
 
   body.addEventListener('click', () => input.focus());
+})();
+</script>
+
+<!-- SortableJS — drag-and-drop for card grid (mouse + touch) -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+<script>
+/* ── Card reorder system ──────────────────────────────────────────────────── */
+(function () {
+  const STORAGE_KEY = 'neorgon-card-order';
+  const grid = document.querySelector('.sites-section .sites-grid');
+  if (!grid || typeof Sortable === 'undefined') return;
+
+  const DEFAULT_ORDER = Array.from(grid.querySelectorAll('[data-card-id]'))
+    .map(c => c.dataset.cardId);
+
+  function getSavedOrder() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const order = JSON.parse(raw);
+      if (!Array.isArray(order)) return null;
+      const valid = order.every(id => DEFAULT_ORDER.includes(id));
+      if (!valid || order.length !== DEFAULT_ORDER.length) return null;
+      return order;
+    } catch { return null; }
+  }
+
+  function saveOrder(order) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
+  }
+
+  function applyOrder(order) {
+    order.forEach(id => {
+      const card = grid.querySelector(`[data-card-id="${id}"]`);
+      if (card) grid.appendChild(card);
+    });
+    updateFeatured();
+  }
+
+  function updateFeatured() {
+    const cards = grid.querySelectorAll('[data-card-id]');
+    cards.forEach((c, i) => {
+      if (i === 0) c.classList.add('featured');
+      else c.classList.remove('featured');
+    });
+  }
+
+  function getCurrentOrder() {
+    return Array.from(grid.querySelectorAll('[data-card-id]'))
+      .map(c => c.dataset.cardId);
+  }
+
+  /* Apply saved order on load */
+  const saved = getSavedOrder();
+  if (saved) applyOrder(saved);
+
+  /* Init SortableJS */
+  Sortable.create(grid, {
+    animation: 200,
+    ghostClass: 'sortable-ghost',
+    dragClass: 'sortable-drag',
+    chosenClass: 'sortable-chosen',
+    easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+    delay: 120,
+    delayOnTouchOnly: true,
+    touchStartThreshold: 5,
+    onEnd() {
+      const order = getCurrentOrder();
+      saveOrder(order);
+      updateFeatured();
+    },
+  });
+
+  /* Console API */
+  window.resetCardOrder = function () {
+    localStorage.removeItem(STORAGE_KEY);
+    applyOrder(DEFAULT_ORDER);
+    console.log('Card order reset to default.');
+  };
+
+  window.exportCardOrder = function () {
+    const order = getCurrentOrder();
+    const json = JSON.stringify(order, null, 2);
+    console.log('Current card order:', json);
+    return json;
+  };
+
+  window.importCardOrder = function (json) {
+    try {
+      const order = typeof json === 'string' ? JSON.parse(json) : json;
+      if (!Array.isArray(order)) throw new Error('Expected an array');
+      const valid = order.every(id => DEFAULT_ORDER.includes(id));
+      if (!valid || order.length !== DEFAULT_ORDER.length) {
+        throw new Error('Invalid card IDs or wrong count');
+      }
+      applyOrder(order);
+      saveOrder(order);
+      console.log('Card order imported and saved.');
+    } catch (e) {
+      console.error('Import failed:', e.message);
+    }
+  };
 })();
 </script>
 </body>
