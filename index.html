@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-ancestors 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Neorgon: Free Tools for Engineers</title>
   <meta name="description" content="Free engineering tools you'll actually use. Skill maps, infra challenges, timezone converters, slide builders. No signup, no cloud costs">
@@ -1840,7 +1841,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 </script>
 
 <!-- SortableJS — drag-and-drop for card grid (mouse + touch) -->
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
 <script>
 /* ── Card reorder system ──────────────────────────────────────────────────── */
 (function () {
