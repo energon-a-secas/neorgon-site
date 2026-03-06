@@ -1044,22 +1044,22 @@
         </div>
       </a>
 
-      <!-- Vibe Check -->
+      <!-- Character Sheet -->
       <a class="site-card"
-         href="https://interviews.neorgon.com/" target="_blank" rel="noopener noreferrer"
-         style="--card-glow: rgba(56,189,248,.3); --card-glow-border: rgba(56,189,248,.35); --card-accent: #38bdf8;">
+         href="https://charactersheet.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(232,121,249,.3); --card-glow-border: rgba(232,121,249,.35); --card-accent: #e879f9;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/vibe-check.svg" class="card-site-icon" alt="Vibe Check"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/character-sheet.svg" class="card-site-icon" alt="Character Sheet"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
-          <div class="card-domain">interviews.neorgon.com</div>
-          <div class="card-name">Vibe Check</div>
-          <div class="card-desc">Score candidates across 18 behavioral questions in 6 categories. Auto-detect team archetypes with the Core Five. Download markdown reports.</div>
+          <div class="card-domain">charactersheet.neorgon.com</div>
+          <div class="card-name">Character Sheet</div>
+          <div class="card-desc">RPG-style personality interview. Gaming, anime, movies, hobbies, and hot takes. Export your character card.</div>
           <div class="card-tags">
-            <span class="card-tag">Interviews</span>
-            <span class="card-tag">Scoring</span>
-            <span class="card-tag">Reports</span>
+            <span class="card-tag">RPG</span>
+            <span class="card-tag">Personality</span>
+            <span class="card-tag">Card</span>
           </div>
         </div>
       </a>
@@ -1110,7 +1110,7 @@
         </div>
         <a class="card-content ghost-revealed" href="https://interviews.neorgon.com/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/vibe-check.svg" class="card-site-icon" alt="Vibe Check"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/interviews.svg" class="card-site-icon" alt="Vibe Check"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">interviews.neorgon.com</div>
@@ -1617,6 +1617,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
         ['memes', 'Meme Vault'],
         ['interviews', 'Vibe Check'],
         ['ogstudio', 'OG Studio'],
+        ['charactersheet', 'Character Sheet'],
       ];
       tools.forEach(([key, name]) => addLine(`  ${key.padEnd(16)} ${name}`, 'sys'));
     },
@@ -1635,6 +1636,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
         'memes': 'https://memes.neorgon.com/',
         'interviews': 'https://interviews.neorgon.com/',
         'ogstudio': 'https://ogstudio.neorgon.com/',
+        'charactersheet': 'https://charactersheet.neorgon.com/',
       };
       const key = (args || '').trim().toLowerCase();
       if (sites[key]) { addLine(`Opening ${key}...`, 'sys'); window.open(sites[key], '_blank'); }
