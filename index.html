@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="color-scheme: dark;">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:">
@@ -55,6 +55,7 @@
       color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
+      touch-action: manipulation;
     }
 
     /* ── Starfield canvas ────────────────────────────────────────────────── */
@@ -525,6 +526,10 @@
     }
     @media (prefers-reduced-motion: reduce) {
       .card-preview { display: none; }
+      .sites-section:not(.secret-section) .site-card[data-card-id] {
+        animation: none;
+        opacity: 1;
+      }
     }
 
     /* ── Multi-tool card popup ───────────────────────────────────────────── */
@@ -1109,7 +1114,7 @@
       font-size: .7rem;
       font-weight: 700;
       color: rgba(255,255,255,.25);
-      transition: all .15s ease;
+      transition: color .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
       font-family: 'SF Mono', 'Fira Code', monospace;
     }
     .konami-key.hit {
@@ -1454,7 +1459,7 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-badge">
-      <span class="badge-dot"></span>
+      <span class="badge-dot" aria-hidden="true"></span>
       Built by Machines · For Our Overlords
     </div>
     <h1 class="hero-heading">
@@ -1465,8 +1470,8 @@
       Lightweight tools that solve real problems. Open source, no strings attached.
     </p>
     <div class="hero-search-wrap">
-      <input class="hero-search" id="heroSearch" type="text" placeholder="Search tools, tags, or keywords..." autocomplete="off" spellcheck="false">
-      <svg class="hero-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input class="hero-search" id="heroSearch" type="text" placeholder="Search tools, tags, or keywords…" aria-label="Search tools" autocomplete="off" spellcheck="false">
+      <svg class="hero-search-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       <button class="hero-search-clear" id="searchClear" aria-label="Clear search">&times;</button>
       <span class="search-hint">/</span>
     </div>
@@ -1489,7 +1494,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/pathfinder.svg" class="card-site-icon" alt="Pathfinder" width="36" height="36"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">pathfinder.neorgon.com</div>
           <h3 class="card-name">Pathfinder</h3>
@@ -1509,7 +1514,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/local-drills.svg" class="card-site-icon" alt="Infra Drills" width="28" height="28"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">infradrills.neorgon.com</div>
           <h3 class="card-name">Infra Drills</h3>
@@ -1529,7 +1534,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/skill-roadmap.svg" class="card-site-icon" alt="Skill Map" width="28" height="28"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">skillmap.neorgon.com</div>
           <h3 class="card-name">Skill Map</h3>
@@ -1549,7 +1554,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/client-says.svg" class="card-site-icon" alt="Client Says" width="28" height="28"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">clientsays.neorgon.com</div>
           <h3 class="card-name">Client Says</h3>
@@ -1580,7 +1585,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/spin-the-wheel.svg" class="card-site-icon" alt="Decision Wheel" width="28" height="28"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">decisionwheel.neorgon.com</div>
           <h3 class="card-name">Decision Wheel</h3>
@@ -1610,7 +1615,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/reference-matrix.svg" class="card-site-icon" alt="Reference Matrix" width="28" height="28"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">references.neorgon.com</div>
           <h3 class="card-name">Reference Matrix</h3>
@@ -1641,7 +1646,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/json-builder.svg" class="card-site-icon" alt="JSON Studio" width="28" height="28"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">jsonstudio.neorgon.com</div>
           <h3 class="card-name">JSON Studio</h3>
@@ -1675,7 +1680,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/presentation-sage.svg" class="card-site-icon" alt="Presentation Sage" width="28" height="28"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">slides.neorgon.com</div>
           <h3 class="card-name">Presentation Sage</h3>
@@ -1696,7 +1701,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/emojis.svg" class="card-site-icon" alt="Emoji Archive" width="28" height="28"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">emojis.neorgon.com</div>
           <h3 class="card-name">Emoji Archive</h3>
@@ -1725,7 +1730,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/memes.svg" class="card-site-icon" alt="Meme Vault" width="28" height="28" loading="lazy"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">memes.neorgon.com</div>
           <h3 class="card-name">Meme Vault</h3>
@@ -1745,7 +1750,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/character-sheet.svg" class="card-site-icon" alt="Character Sheet" width="28" height="28" loading="lazy"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">charactersheet.neorgon.com</div>
           <h3 class="card-name">Character Sheet</h3>
@@ -1765,7 +1770,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/og-studio.svg" class="card-site-icon" alt="OG Studio" width="28" height="28" loading="lazy"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">ogstudio.neorgon.com</div>
           <h3 class="card-name">OG Studio</h3>
@@ -1785,7 +1790,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/buyhacks.svg" class="card-site-icon" alt="BuyHacks" width="28" height="28" loading="lazy"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">buyhacks.neorgon.com</div>
           <h3 class="card-name">BuyHacks</h3>
@@ -1805,7 +1810,7 @@
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/snippets.svg" class="card-site-icon" alt="Snippets" width="28" height="28" loading="lazy"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">snippets.neorgon.com</div>
           <h3 class="card-name">Snippets</h3>
@@ -1824,8 +1829,8 @@
   <!-- Secret trigger -->
   <div class="secret-trigger">
     <button class="secret-btn" id="secretToggle" aria-label="Show more tools" aria-expanded="false" aria-controls="secretSection">
-      <span class="scanner-ring"></span>
-      <span class="discovery-burst"></span>
+      <span class="scanner-ring" aria-hidden="true"></span>
+      <span class="discovery-burst" aria-hidden="true"></span>
       <img class="icon-warning" src="assets/icons/warning.svg" alt="" width="22" height="22">
       <img class="icon-planet" src="assets/icons/earth.svg" alt="" width="32" height="32">
     </button>
@@ -1848,7 +1853,7 @@
         <a class="card-content ghost-revealed" href="https://interviews.neorgon.com/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/interviews.svg" class="card-site-icon" alt="Vibe Check" width="28" height="28" loading="lazy"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">interviews.neorgon.com</div>
           <h3 class="card-name">Vibe Check</h3>
@@ -1872,7 +1877,7 @@
         <a class="card-content ghost-revealed" href="https://autopilot.neorgon.com/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/autopilot.svg" class="card-site-icon" alt="Autopilot" width="28" height="28" loading="lazy"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">autopilot.neorgon.com</div>
           <h3 class="card-name">Autopilot</h3>
@@ -1896,7 +1901,7 @@
         <a class="card-content ghost-revealed" href="https://rushq.neorgon.com/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/rush-q-cards.svg" class="card-site-icon" alt="Rush Q Cards" width="28" height="28" loading="lazy"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">internal</div>
           <h3 class="card-name">Rush Q Cards</h3>
@@ -1920,7 +1925,7 @@
         <a class="card-content ghost-revealed" href="https://ehq.cl/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
           <div class="card-top">
             <div class="card-icon-wrap"><picture><source srcset="assets/icons/energon-logo.webp" type="image/webp"><img src="assets/icons/energon-logo.png" class="card-site-icon" alt="Energon" width="40" height="40" loading="lazy" style="width:40px;height:40px;"></picture></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">ehq.cl</div>
           <h3 class="card-name">Energon HQ</h3>
@@ -2003,7 +2008,7 @@
       <div class="term-line sys">Welcome to Neorgon Terminal. Type "help" for commands.</div>
       <div class="term-input-row">
         <span class="term-prompt">~ ❯ </span>
-        <input class="term-input" id="termInput" type="text" autocomplete="off" spellcheck="false" autofocus>
+        <input class="term-input" id="termInput" type="text" aria-label="Terminal command" autocomplete="off" spellcheck="false">
       </div>
     </div>
   </div>
@@ -2582,7 +2587,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       body.querySelectorAll('.term-line').forEach(l => l.remove());
     },
     warp() {
-      addLine('Initiating warp sequence...', 'sys');
+      addLine('Initiating warp sequence\u2026', 'sys');
       closeTerm();
       setTimeout(() => window.engageWarp(), 200);
     },
@@ -2623,7 +2628,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
         'charactersheet': 'https://charactersheet.neorgon.com/',
       };
       const key = (args || '').trim().toLowerCase();
-      if (sites[key]) { addLine(`Opening ${key}...`, 'sys'); window.open(sites[key], '_blank'); }
+      if (sites[key]) { addLine(`Opening ${key}\u2026`, 'sys'); window.open(sites[key], '_blank'); }
       else { addLine(`Unknown site: "${key}". Type "tools" for the list.`, 'err'); }
     },
     whoami() {
@@ -2698,7 +2703,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
         return;
       }
 
-      addLine('Authenticating...', 'sys');
+      addLine('Authenticating\u2026', 'sys');
 
       try {
         const client = await getConvex();
@@ -2734,7 +2739,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       addLine(`Clearance: admin`, 'sys');
     },
     unlock() {
-      addLine('Revealing hidden section...', 'sys');
+      addLine('Revealing hidden section\u2026', 'sys');
       const section = document.getElementById('secretSection');
       const btn = document.getElementById('secretToggle');
       if (section && !section.classList.contains('revealed')) {
