@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-Frame-Options" content="DENY">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-ancestors 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Neorgon: Free Tools for Engineers</title>
   <meta name="description" content="Free engineering tools you'll actually use. Skill maps, infra challenges, timezone converters, slide builders. No signup, no cloud costs">
@@ -127,7 +126,7 @@
     .header-link {
       font-size: .82rem;
       font-weight: 500;
-      color: var(--text-secondary);
+      color: rgba(255,255,255,.85);
       text-decoration: none;
       width: 40px;
       height: 40px;
@@ -139,7 +138,7 @@
       transition: color .2s, border-color .2s, background .2s;
     }
     .header-link:hover {
-      color: var(--text-primary);
+      color: #fff;
       border-color: var(--border-glow);
       background: var(--surface-hover);
     }
@@ -234,7 +233,7 @@
       flex-direction: column;
       gap: 12px;
       overflow: hidden;
-      transition: transform .2s ease, border-color .2s, box-shadow .3s;
+      transition: border-color .2s, box-shadow .3s;
     }
 
     /* Neon glow on hover via custom prop */
@@ -249,7 +248,6 @@
       z-index: 0;
       pointer-events: none;
     }
-    .site-card:hover { transform: translateY(-4px); }
     .site-card:hover::before { opacity: 1; }
     .site-card:hover { border-color: var(--card-glow-border, rgba(255,255,255,.2)); }
 
@@ -442,6 +440,14 @@
     .ghost-card:hover {
       opacity: 0.18;
     }
+    .ghost-card:focus-visible {
+      opacity: 0.22;
+      outline: 2px solid var(--card-accent, #818cf8);
+      outline-offset: 2px;
+    }
+    .ghost-card.unlocked:focus-visible {
+      opacity: 1;
+    }
     .ghost-card.unlocked {
       opacity: 1;
       border-style: solid;
@@ -616,6 +622,7 @@
       align-items: center;
       gap: 0;
       padding: 0;
+      margin-top: 8px;
       min-height: 1.7em;
     }
     .term-prompt {
@@ -655,6 +662,19 @@
       .hero { padding: 60px 20px 40px; }
       .sites-section { padding: 0 20px 60px; }
       .sites-grid { grid-template-columns: 1fr; }
+
+      /* Settings panel — full width on mobile */
+      .settings-panel { left: 12px; right: 12px; width: auto; }
+
+      /* Konami HUD — scale down */
+      .konami-hud { bottom: 72px; gap: 4px; padding: 8px 10px; }
+      .konami-key { width: 26px; height: 26px; font-size: .6rem; }
+      .konami-key svg { width: 11px; height: 11px; }
+
+      /* Music + settings buttons */
+      .music-toggle, .settings-btn { bottom: 14px; }
+      .music-toggle { left: 14px; }
+      .settings-btn { left: 54px; }
     }
 
     /* ── Drag-and-drop ──────────────────────────────────────────────────── */
@@ -723,6 +743,254 @@
       transition-duration: 120ms;
     }
 
+    /* ── Cursor glow ──────────────────────────────────────────────── */
+    .cursor-glow {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      background: radial-gradient(circle, rgba(130,80,255,.08) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: opacity .3s;
+      opacity: 0;
+    }
+    .cursor-glow.active { opacity: 1; }
+
+    /* ── Card entrance stagger (bottom-up like reverse Tetris) ── */
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(60px) scale(0.94); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .sites-section:not(.secret-section) .site-card[data-card-id] {
+      opacity: 0;
+      animation: cardEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* ── Hero typing cursor ────────────────────────────────────── */
+    .typing-cursor {
+      display: inline-block;
+      width: 3px;
+      height: 1em;
+      background: #e879f9;
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: blink 0.6s step-end infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0; }
+    }
+
+    /* ── Ambient music toggle ──────────────────────────────────── */
+    .music-toggle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 9998;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(4,7,20,.7);
+      backdrop-filter: blur(8px);
+      color: rgba(255,255,255,.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color .2s, border-color .2s, box-shadow .2s;
+      padding: 0;
+    }
+    .music-toggle:hover {
+      color: rgba(255,255,255,.6);
+      border-color: rgba(255,255,255,.2);
+    }
+    .music-toggle.playing {
+      color: #c084fc;
+      border-color: rgba(192,132,252,.3);
+      box-shadow: 0 0 12px rgba(192,132,252,.2);
+    }
+    .music-toggle svg { width: 16px; height: 16px; }
+
+    /* ── Konami input display ─────────────────────────────────── */
+    .konami-hud {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9998;
+      display: flex;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: rgba(4,7,20,.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.08);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s, transform .3s var(--ease-snap);
+      transform: translateX(-50%) translateY(10px);
+    }
+    .konami-hud.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .konami-key {
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .7rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.25);
+      transition: all .15s ease;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .konami-key.hit {
+      color: #c084fc;
+      border-color: rgba(192,132,252,.5);
+      background: rgba(192,132,252,.12);
+      box-shadow: 0 0 10px rgba(192,132,252,.25);
+      transform: scale(1.1);
+    }
+    .konami-key.miss {
+      color: #f43f5e;
+      border-color: rgba(244,63,94,.5);
+      background: rgba(244,63,94,.1);
+    }
+    .konami-key svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+    /* ── Settings panel ────────────────────────────────────────── */
+    .settings-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 64px;
+      z-index: 9998;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(4,7,20,.7);
+      backdrop-filter: blur(8px);
+      color: rgba(255,255,255,.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color .2s, border-color .2s, transform .3s;
+      padding: 0;
+    }
+    .settings-btn:hover {
+      color: rgba(255,255,255,.6);
+      border-color: rgba(255,255,255,.2);
+    }
+    .settings-btn.open { transform: rotate(90deg); }
+    .settings-btn svg { width: 16px; height: 16px; }
+
+    .settings-panel {
+      position: fixed;
+      bottom: 64px;
+      left: 20px;
+      z-index: 9997;
+      width: 260px;
+      background: rgba(4,7,20,.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 14px;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity .25s, transform .25s var(--ease-snap);
+    }
+    .settings-panel.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .settings-title {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      margin-bottom: 14px;
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-label {
+      font-size: .82rem;
+      color: var(--text-secondary);
+    }
+    .settings-toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255,255,255,.1);
+      cursor: pointer;
+      transition: background .2s;
+      padding: 0;
+    }
+    .settings-toggle.on { background: rgba(192,132,252,.4); }
+    .settings-toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.7);
+      transition: transform .2s;
+    }
+    .settings-toggle.on::after { transform: translateX(16px); }
+
+    .settings-divider {
+      height: 1px;
+      background: rgba(255,255,255,.06);
+      margin: 10px 0;
+    }
+    .settings-hint {
+      font-size: .7rem;
+      color: rgba(255,255,255,.2);
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+    .settings-hint kbd {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      font-family: 'SF Mono', monospace;
+      font-size: .65rem;
+    }
+
+    /* ── Matrix rain canvas ────────────────────────────────────── */
+    #matrixCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1s;
+    }
+    #matrixCanvas.active { opacity: 0.7; }
+
     /* ── Entrance animation ─────────────────────────────────────── */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
@@ -750,6 +1018,8 @@
 
 <!-- Starfield -->
 <canvas id="starfield"></canvas>
+<canvas id="matrixCanvas"></canvas>
+<div class="cursor-glow" id="cursorGlow"></div>
 <div class="warp-toast" id="warpToast">Warp Engaged</div>
 <div class="arrival-toast" id="arrivalToast">
   <div class="arrival-label">Now arriving at</div>
@@ -789,7 +1059,7 @@
     </div>
     <h1 class="hero-heading">
       Tools that<br>
-      <span class="neon-word">actually work</span>
+      <span class="neon-word" id="heroTyping"></span><span class="typing-cursor" id="typingCursor"></span>
     </h1>
     <p class="hero-sub">
       Lightweight tools that solve real problems. Open source, no strings attached.
@@ -801,21 +1071,22 @@
     <h2 class="section-label">Platforms &amp; Tools</h2>
     <div class="sites-grid">
 
-      <!-- ehq.cl: featured -->
-      <a class="site-card featured" data-card-id="ehq"
-         href="https://ehq.cl/" target="_blank" rel="noopener noreferrer"
-         style="--card-glow: rgba(99,102,241,.4); --card-glow-border: rgba(99,102,241,.4); --card-accent: #818cf8;">
+      <!-- Pathfinder (featured) -->
+      <a class="site-card" data-card-id="pathfinder"
+         href="https://pathfinder.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(74,222,128,.3); --card-glow-border: rgba(74,222,128,.35); --card-accent: #4ade80;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/energon-logo.png" class="card-site-icon" alt="Energon" style="width:40px;height:40px;"></div>
-            <svg class="card-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <div class="card-icon-wrap"><img src="assets/icons/pathfinder.svg" class="card-site-icon" alt="Pathfinder"></div>
+            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
-          <div class="card-domain">ehq.cl</div>
-          <h3 class="card-name">Energon HQ</h3>
-          <div class="card-desc">Command center for Energon tools, docs, and team resources.</div>
+          <div class="card-domain">pathfinder.neorgon.com</div>
+          <h3 class="card-name">Pathfinder</h3>
+          <div class="card-desc">Map goals, problems, risks, and gaps on an infinite canvas. Export a structured AI prompt with your entire plan baked in.</div>
           <div class="card-tags">
-            <span class="card-tag">Platform</span>
-            <span class="card-tag">Hub</span>
+            <span class="card-tag">Canvas</span>
+            <span class="card-tag">Planning</span>
+            <span class="card-tag">AI Prompt</span>
           </div>
         </div>
       </a>
@@ -1006,26 +1277,6 @@
         </div>
       </a>
 
-      <!-- Pathfinder -->
-      <a class="site-card" data-card-id="pathfinder"
-         href="https://pathfinder.neorgon.com/" target="_blank" rel="noopener noreferrer"
-         style="--card-glow: rgba(74,222,128,.3); --card-glow-border: rgba(74,222,128,.35); --card-accent: #4ade80;">
-        <div class="card-content">
-          <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/pathfinder.svg" class="card-site-icon" alt="Pathfinder"></div>
-            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-          </div>
-          <div class="card-domain">pathfinder.neorgon.com</div>
-          <h3 class="card-name">Pathfinder</h3>
-          <div class="card-desc">Map goals, problems, risks, and gaps on an infinite canvas. Export a structured AI prompt with your entire plan baked in.</div>
-          <div class="card-tags">
-            <span class="card-tag">Canvas</span>
-            <span class="card-tag">Planning</span>
-            <span class="card-tag">AI Prompt</span>
-          </div>
-        </div>
-      </a>
-
       <!-- Emoji Archive -->
       <div class="site-card multi-tool" data-card-id="emojis"
            data-href="https://emojis.neorgon.com/"
@@ -1116,6 +1367,26 @@
         </div>
       </a>
 
+      <!-- BuyHacks -->
+      <a class="site-card" data-card-id="buyhacks"
+         href="https://buyhacks.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #f59e0b;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/buyhacks.svg" class="card-site-icon" alt="BuyHacks"></div>
+            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">buyhacks.neorgon.com</div>
+          <h3 class="card-name">BuyHacks</h3>
+          <div class="card-desc">Curated product showcase with community votes and life-hack tips. Browse tested products, vote love/own/want.</div>
+          <div class="card-tags">
+            <span class="card-tag">Products</span>
+            <span class="card-tag">Voting</span>
+            <span class="card-tag">Tips</span>
+          </div>
+        </div>
+      </a>
+
     </div>
   </main>
 
@@ -1132,7 +1403,7 @@
     <div class="sites-grid">
 
       <!-- Ghost card — Vibe Check -->
-      <div class="site-card ghost-card" role="button" tabindex="0"
+      <div class="site-card ghost-card" data-card-id="vibecheck" role="button" tabindex="0"
            style="--card-glow: rgba(56,189,248,.25); --card-glow-border: rgba(56,189,248,.3); --card-accent: #38bdf8;">
         <div class="ghost-locked">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35">
@@ -1156,7 +1427,7 @@
       </div>
 
       <!-- Ghost card — Autopilot -->
-      <div class="site-card ghost-card" role="button" tabindex="0"
+      <div class="site-card ghost-card" data-card-id="autopilot" role="button" tabindex="0"
            style="--card-glow: rgba(251,191,36,.25); --card-glow-border: rgba(251,191,36,.3); --card-accent: #fbbf24;">
         <div class="ghost-locked">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35">
@@ -1180,7 +1451,7 @@
       </div>
 
       <!-- Ghost card — Rush Q Cards -->
-      <div class="site-card ghost-card" role="button" tabindex="0"
+      <div class="site-card ghost-card" data-card-id="rushq" role="button" tabindex="0"
            style="--card-glow: rgba(251,191,36,.25); --card-glow-border: rgba(251,191,36,.3); --card-accent: #fbbf24;">
         <div class="ghost-locked">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35">
@@ -1203,6 +1474,30 @@
         </a>
       </div>
 
+      <!-- Ghost card — Energon HQ -->
+      <div class="site-card ghost-card" data-card-id="ehq" role="button" tabindex="0"
+           style="--card-glow: rgba(99,102,241,.25); --card-glow-border: rgba(99,102,241,.3); --card-accent: #818cf8;">
+        <div class="ghost-locked">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <a class="card-content ghost-revealed" href="https://ehq.cl/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/energon-logo.png" class="card-site-icon" alt="Energon" style="width:40px;height:40px;"></div>
+            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">ehq.cl</div>
+          <h3 class="card-name">Energon HQ</h3>
+          <div class="card-desc">Command center for Energon tools, docs, and team resources.</div>
+          <div class="card-tags">
+            <span class="card-tag">Platform</span>
+            <span class="card-tag">Hub</span>
+          </div>
+        </a>
+      </div>
+
     </div>
   </div>
 
@@ -1212,6 +1507,41 @@
     &nbsp;·&nbsp;
     <a class="footer-link" href="https://github.com/energon-a-secas" target="_blank" rel="noopener noreferrer">GitHub</a>
   </footer>
+
+<!-- Konami input HUD -->
+<div class="konami-hud" id="konamiHud"></div>
+
+<!-- Ambient music toggle -->
+<button class="music-toggle" id="musicToggle" aria-label="Toggle ambient music" title="Ambient music">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 18V5l12-2v13"/>
+    <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+  </svg>
+</button>
+
+<!-- Settings -->
+<button class="settings-btn" id="settingsBtn" aria-label="Settings" title="Settings">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+</button>
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-title">Settings</div>
+  <div class="settings-row">
+    <span class="settings-label">Sound effects</span>
+    <button class="settings-toggle on" id="togSound" aria-label="Toggle sound"></button>
+  </div>
+  <div class="settings-row">
+    <span class="settings-label">Cursor glow</span>
+    <button class="settings-toggle on" id="togGlow" aria-label="Toggle glow"></button>
+  </div>
+  <div class="settings-divider"></div>
+  <div class="settings-hint">
+    <kbd>Esc</kbd> <kbd>Esc</kbd> Terminal<br>
+    <kbd>↑↑↓↓←→←→BA</kbd> Warp drive<br>
+    Terminal: <kbd>matrix</kbd> <kbd>warp</kbd> <kbd>help</kbd>
+  </div>
+</div>
 
 <!-- Terminal -->
 <div class="term-overlay" id="termOverlay">
@@ -1355,16 +1685,83 @@ let warpIntensity = 0;
 /* ── Konami Code — Warp Drive ─────────────────────────────────────────────── */
 (function () {
   const code = [38,38,40,40,37,39,37,39,66,65];
+  const labels = ['↑','↑','↓','↓','←','→','←','→','B','A'];
+  const arrows = {
+    38: '<polyline points="12 19 12 5"/><polyline points="5 12 12 5 19 12"/>',
+    40: '<polyline points="12 5 12 19"/><polyline points="5 12 12 19 19 12"/>',
+    37: '<polyline points="19 12 5 12"/><polyline points="12 5 5 12 12 19"/>',
+    39: '<polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/>',
+  };
   let pos = 0;
+  let hideTimer = null;
+
+  const hud = document.getElementById('konamiHud');
+
+  function buildHud() {
+    if (!hud) return;
+    hud.innerHTML = '';
+    for (let i = 0; i < code.length; i++) {
+      const key = document.createElement('div');
+      key.className = 'konami-key';
+      if (arrows[code[i]]) {
+        key.innerHTML = `<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">${arrows[code[i]]}</svg>`;
+      } else {
+        key.textContent = labels[i];
+      }
+      hud.appendChild(key);
+    }
+  }
+
+  function showHud() {
+    if (!hud) return;
+    clearTimeout(hideTimer);
+    hud.classList.add('visible');
+  }
+
+  function hideHud(delay) {
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      if (hud) hud.classList.remove('visible');
+      setTimeout(() => {
+        if (hud) hud.querySelectorAll('.konami-key').forEach(k => {
+          k.classList.remove('hit', 'miss');
+        });
+      }, 300);
+    }, delay || 1500);
+  }
+
+  function updateHud(step, hit) {
+    if (!hud) return;
+    const keys = hud.querySelectorAll('.konami-key');
+    if (hit) {
+      if (keys[step]) keys[step].classList.add('hit');
+    } else {
+      keys.forEach(k => { if (!k.classList.contains('hit')) k.classList.add('miss'); });
+      setTimeout(() => {
+        keys.forEach(k => k.classList.remove('hit', 'miss'));
+      }, 400);
+    }
+  }
+
+  buildHud();
 
   document.addEventListener('keydown', e => {
     if (e.keyCode === code[pos]) {
+      if (pos === 0) showHud();
+      if (window._neoSound) window._neoSound.konamiKey(pos);
+      updateHud(pos, true);
       pos++;
       if (pos === code.length) {
+        hideHud(800);
         pos = 0;
         engageWarp();
       }
     } else {
+      if (pos > 0) {
+        if (window._neoSound) window._neoSound.konamiFail(pos);
+        updateHud(pos, false);
+        hideHud(1000);
+      }
       pos = 0;
     }
   });
@@ -1389,6 +1786,7 @@ let warpIntensity = 0;
     if (warpMode) return;
     warpMode = true;
     document.body.classList.add('warp-active');
+    if (window._neoSound) window._neoSound.warpEngage();
 
     const toast = document.getElementById('warpToast');
     toast.classList.add('visible');
@@ -1478,15 +1876,19 @@ document.getElementById('secretToggle').addEventListener('click', () => {
 
 /* ── Ghost card unlock ─────────────────────────────────────────────────────── */
 document.querySelectorAll('.ghost-card').forEach(card => {
+  function unlock() {
+    card.classList.add('unlocked');
+    if (window._neoSound) window._neoSound.unlock();
+  }
   card.addEventListener('click', e => {
     if (card.classList.contains('unlocked')) return;
     e.preventDefault();
-    card.classList.add('unlocked');
+    unlock();
   });
   card.addEventListener('keydown', e => {
     if ((e.key === 'Enter' || e.key === ' ') && !card.classList.contains('unlocked')) {
       e.preventDefault();
-      card.classList.add('unlocked');
+      unlock();
     }
   });
 });
@@ -1567,11 +1969,13 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 
   function openTerm() {
     overlay.classList.add('open');
+    if (window._neoSound) window._neoSound.termOpen();
     setTimeout(() => input.focus(), 50);
   }
 
   function closeTerm() {
     overlay.classList.remove('open');
+    if (window._neoSound) window._neoSound.termClose();
   }
 
   let escCount = 0;
@@ -1582,7 +1986,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       if (isOpen()) { closeTerm(); escCount = 0; return; }
       escCount++;
       clearTimeout(escTimer);
-      if (escCount >= 3) { escCount = 0; openTerm(); }
+      if (escCount >= 2) { escCount = 0; openTerm(); }
       else { escTimer = setTimeout(() => { escCount = 0; }, 500); }
     }
   });
@@ -1618,12 +2022,17 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       addLine('  login <u> <p>— authenticate', 'sys');
       addLine('  reset-layout — restore default card order', 'sys');
       addLine('  export-layout— copy layout JSON to clipboard', 'sys');
+      addLine('  matrix       — toggle matrix rain (stays in terminal)', 'sys');
+      addLine('  matrix background — toggle matrix & close terminal', 'sys');
       addLine('  exit         — close terminal', 'sys');
       if (authedUser) {
         addLine('', 'sys');
         addLine('Authenticated commands:', 'sys');
         addLine('  status       — auth status', 'sys');
         addLine('  unlock       — reveal secret section', 'sys');
+        addLine('  ghost <id>   — hide/show a card by ID', 'sys');
+        addLine('  ghost list   — show hidden cards', 'sys');
+        addLine('  ghost reset  — restore all hidden cards', 'sys');
         addLine('  broadcast <m>— show toast on page', 'sys');
         addLine('  logout       — end session', 'sys');
       }
@@ -1687,6 +2096,17 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     },
     date() { addLine(new Date().toString(), 'sys'); },
     exit() { closeTerm(); },
+    matrix(args) {
+      if (window.toggleMatrix) {
+        window.toggleMatrix();
+        addLine('Wake up, Neo...', 'sys');
+        if ((args || '').trim().toLowerCase() === 'background') {
+          closeTerm();
+        }
+      } else {
+        addLine('Matrix module not loaded.', 'err');
+      }
+    },
     'reset-layout'() {
       if (window.resetCardOrder) {
         window.resetCardOrder();
@@ -1724,6 +2144,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 
       const check = checkClientRateLimit();
       if (check.blocked) {
+        if (window._neoSound) window._neoSound.deny();
         addLine(`Too many attempts. Locked for ${check.remaining}s.`, 'err');
         return;
       }
@@ -1747,6 +2168,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
           addLine('Type "help" to see new commands.', 'sys');
         } else {
           recordClientFailure();
+          if (window._neoSound) window._neoSound.deny();
           addLine(result.error || 'Invalid credentials.', 'err');
           if (result.locked) {
             addLine(`Server lockout: ${result.remaining}s remaining.`, 'err');
@@ -1754,6 +2176,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
         }
       } catch (err) {
         recordClientFailure();
+        if (window._neoSound) window._neoSound.deny();
         addLine('Connection failed.', 'err');
       }
     },
@@ -1786,6 +2209,47 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       toast.classList.add('visible');
       setTimeout(() => toast.classList.remove('visible'), 4000);
       addLine('Broadcast sent.', 'sys');
+    },
+    ghost(args) {
+      const arg = (args || '').trim().toLowerCase();
+      if (!arg) {
+        addLine('Usage: ghost <cardId> — toggle card visibility', 'err');
+        addLine('       ghost list    — show hidden cards', 'err');
+        addLine('       ghost reset   — restore all cards', 'err');
+        return;
+      }
+      if (arg === 'list') {
+        const hidden = JSON.parse(localStorage.getItem('neorgon-ghost') || '[]');
+        if (!hidden.length) { addLine('No hidden cards.', 'sys'); return; }
+        addLine('Hidden cards:', 'sys');
+        hidden.forEach(id => addLine(`  ${id}`, 'sys'));
+        return;
+      }
+      if (arg === 'reset') {
+        localStorage.removeItem('neorgon-ghost');
+        document.querySelectorAll('.sites-grid .site-card[data-card-id]').forEach(c => {
+          c.style.display = '';
+        });
+        addLine('All cards restored.', 'sys');
+        return;
+      }
+      const card = document.querySelector(`.sites-grid .site-card[data-card-id="${arg}"]`);
+      if (!card) {
+        addLine(`Unknown card: "${arg}". Check data-card-id values.`, 'err');
+        return;
+      }
+      const hidden = JSON.parse(localStorage.getItem('neorgon-ghost') || '[]');
+      const idx = hidden.indexOf(arg);
+      if (idx >= 0) {
+        hidden.splice(idx, 1);
+        card.style.display = '';
+        addLine(`Card "${arg}" restored.`, 'sys');
+      } else {
+        hidden.push(arg);
+        card.style.display = 'none';
+        addLine(`Card "${arg}" hidden.`, 'sys');
+      }
+      localStorage.setItem('neorgon-ghost', JSON.stringify(hidden));
     },
     logout() {
       addLine(`Goodbye, ${authedUser}.`, 'sys');
@@ -1840,6 +2304,555 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 })();
 </script>
 
+<!-- Procedural UI sounds — Web Audio API, zero files, zero copyright -->
+<script>
+/* ── Spatial audio system ─────────────────────────────────────────────────── */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  let ctx = null;
+  let ready = false;
+
+  const PENTATONIC = [523, 587, 659, 784, 880, 1047, 1175, 1319, 1568, 1760, 2093, 2349, 2637];
+
+  function ensureContext() {
+    if (!ctx) {
+      try {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        ready = true;
+      } catch { return false; }
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ready;
+  }
+
+  function onGesture() {
+    ensureContext();
+    if (ctx && ctx.state === 'running') {
+      ['click', 'keydown', 'touchstart'].forEach(ev =>
+        document.removeEventListener(ev, onGesture, true)
+      );
+    }
+  }
+  ['click', 'keydown', 'touchstart'].forEach(ev =>
+    document.addEventListener(ev, onGesture, { capture: true })
+  );
+
+  function playTone(freq, duration, gain, type, sweep) {
+    if (window._neoSoundEnabled === false) return;
+    if (!ctx) ensureContext();
+    if (!ready || !ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const osc = ctx.createOscillator();
+    const vol = ctx.createGain();
+    const now = ctx.currentTime;
+
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    if (sweep) osc.frequency.exponentialRampToValueAtTime(sweep, now + duration);
+
+    vol.gain.setValueAtTime(0, now);
+    vol.gain.linearRampToValueAtTime(gain, now + 0.008);
+    vol.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    osc.connect(vol);
+    vol.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + duration + 0.01);
+  }
+
+  function hoverIn(index) {
+    const base = PENTATONIC[index % PENTATONIC.length];
+    playTone(base, 0.09, 0.045, 'sine', base * 1.12);
+  }
+
+  function hoverOut(index) {
+    const base = PENTATONIC[index % PENTATONIC.length];
+    playTone(base * 0.85, 0.06, 0.02, 'sine');
+  }
+
+  function dragStart() {
+    playTone(440, 0.15, 0.05, 'triangle', 660);
+  }
+
+  function dropCard() {
+    playTone(880, 0.06, 0.04, 'sine', 1320);
+    setTimeout(() => playTone(1320, 0.1, 0.035, 'sine'), 70);
+  }
+
+  function unlock() {
+    playTone(523, 0.08, 0.04, 'triangle', 784);
+    setTimeout(() => playTone(784, 0.08, 0.035, 'triangle', 1047), 80);
+    setTimeout(() => playTone(1047, 0.12, 0.03, 'sine'), 160);
+  }
+
+  function termOpen() {
+    playTone(1200, 0.12, 0.04, 'sine', 1600);
+    setTimeout(() => playTone(1600, 0.15, 0.035, 'sine', 2000), 70);
+  }
+
+  function termClose() {
+    playTone(1600, 0.1, 0.035, 'sine', 1200);
+    setTimeout(() => playTone(1000, 0.12, 0.025, 'sine', 800), 60);
+  }
+
+  const KONAMI_SCALE = [262, 294, 330, 392, 440, 523, 587, 659, 784, 880];
+
+  function konamiKey(step) {
+    const freq = KONAMI_SCALE[step];
+    const intensity = 0.03 + (step / KONAMI_SCALE.length) * 0.03;
+    playTone(freq, 0.1, intensity, 'square', freq * 1.05);
+  }
+
+  function konamiFail(step) {
+    if (step === 0) return;
+    playTone(185, 0.18, 0.045, 'sawtooth', 120);
+    setTimeout(() => playTone(140, 0.22, 0.035, 'square', 100), 90);
+  }
+
+  function deny() {
+    playTone(330, 0.15, 0.05, 'square', 220);
+    setTimeout(() => playTone(220, 0.25, 0.045, 'square', 165), 150);
+  }
+
+  function warpEngage() {
+    if (window._neoSoundEnabled === false) return;
+    if (!ctx) ensureContext();
+    if (!ready || !ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+
+    /* Layer 1 — Rising charge-up sweep */
+    const charge = ctx.createOscillator();
+    const chargeGain = ctx.createGain();
+    charge.type = 'sine';
+    charge.frequency.setValueAtTime(200, now);
+    charge.frequency.exponentialRampToValueAtTime(2400, now + 1.0);
+    charge.frequency.exponentialRampToValueAtTime(6000, now + 1.8);
+    chargeGain.gain.setValueAtTime(0, now);
+    chargeGain.gain.linearRampToValueAtTime(0.05, now + 0.2);
+    chargeGain.gain.linearRampToValueAtTime(0.06, now + 1.0);
+    chargeGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.0);
+    charge.connect(chargeGain);
+    chargeGain.connect(ctx.destination);
+    charge.start(now);
+    charge.stop(now + 2.1);
+
+    /* Layer 2 — Shimmer: FM modulated sine for that sparkle */
+    const mod = ctx.createOscillator();
+    const modGain = ctx.createGain();
+    mod.type = 'sine';
+    mod.frequency.setValueAtTime(6, now);
+    mod.frequency.exponentialRampToValueAtTime(30, now + 1.5);
+    modGain.gain.setValueAtTime(100, now);
+    modGain.gain.linearRampToValueAtTime(800, now + 1.5);
+    const shimmer = ctx.createOscillator();
+    const shimmerGain = ctx.createGain();
+    shimmer.type = 'sine';
+    shimmer.frequency.setValueAtTime(800, now);
+    shimmer.frequency.exponentialRampToValueAtTime(3200, now + 1.5);
+    mod.connect(modGain);
+    modGain.connect(shimmer.frequency);
+    shimmerGain.gain.setValueAtTime(0, now);
+    shimmerGain.gain.linearRampToValueAtTime(0.035, now + 0.4);
+    shimmerGain.gain.linearRampToValueAtTime(0.04, now + 1.2);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.2);
+    shimmer.connect(shimmerGain);
+    shimmerGain.connect(ctx.destination);
+    mod.start(now);
+    shimmer.start(now);
+    mod.stop(now + 2.3);
+    shimmer.stop(now + 2.3);
+
+    /* Layer 3 — Hyperspace whoosh: filtered noise burst at the jump moment */
+    const noise = ctx.createBufferSource();
+    const noiseLen = ctx.sampleRate * 3;
+    const noiseBuf = ctx.createBuffer(1, noiseLen, ctx.sampleRate);
+    const noiseData = noiseBuf.getChannelData(0);
+    for (let i = 0; i < noiseLen; i++) noiseData[i] = (Math.random() * 2 - 1) * 0.5;
+    noise.buffer = noiseBuf;
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'highpass';
+    noiseFilter.frequency.setValueAtTime(800, now);
+    noiseFilter.frequency.exponentialRampToValueAtTime(6000, now + 1.2);
+    noiseFilter.frequency.exponentialRampToValueAtTime(12000, now + 2.0);
+    noiseFilter.Q.value = 3;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0, now);
+    noiseGain.gain.linearRampToValueAtTime(0.025, now + 0.8);
+    noiseGain.gain.linearRampToValueAtTime(0.04, now + 1.5);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.5);
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start(now);
+    noise.stop(now + 2.6);
+
+    /* Layer 4 — Sub-bass pulse for weight */
+    const sub = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(60, now);
+    sub.frequency.exponentialRampToValueAtTime(120, now + 1.5);
+    subGain.gain.setValueAtTime(0, now);
+    subGain.gain.linearRampToValueAtTime(0.06, now + 0.5);
+    subGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.0);
+    sub.connect(subGain);
+    subGain.connect(ctx.destination);
+    sub.start(now);
+    sub.stop(now + 2.1);
+
+    /* Drop-out chime — bright descending arrival bells */
+    setTimeout(() => {
+      playTone(2400, 0.1, 0.04, 'sine', 1800);
+      setTimeout(() => playTone(1800, 0.12, 0.035, 'sine', 1200), 80);
+      setTimeout(() => playTone(1200, 0.18, 0.03, 'sine', 900), 180);
+    }, 2500);
+  }
+
+  let lastHover = 0;
+  const DEBOUNCE = 60;
+
+  const cards = document.querySelectorAll('.sites-grid .site-card');
+  cards.forEach((card, i) => {
+    card.addEventListener('mouseenter', () => {
+      const now = Date.now();
+      if (now - lastHover < DEBOUNCE) return;
+      lastHover = now;
+      hoverIn(i);
+    });
+    card.addEventListener('mouseleave', () => {
+      hoverOut(i);
+    });
+  });
+
+  /* Logo & GitHub hover sounds */
+  const logoWrap = document.querySelector('.logo-wrap');
+  const ghLink = document.querySelector('.header-link[title="GitHub"]');
+  if (logoWrap) {
+    logoWrap.addEventListener('mouseenter', () => {
+      if (window._neoSoundEnabled === false) return;
+      playTone(880, 0.08, 0.04, 'sine', 1100);
+      setTimeout(() => playTone(1100, 0.06, 0.03, 'sine', 1320), 50);
+    });
+  }
+  if (ghLink) {
+    ghLink.addEventListener('mouseenter', () => {
+      if (window._neoSoundEnabled === false) return;
+      playTone(660, 0.07, 0.04, 'triangle', 780);
+    });
+  }
+
+  window._neoSound = { dragStart, dropCard, unlock, termOpen, termClose, konamiKey, konamiFail, warpEngage, deny };
+})();
+</script>
+
+
+<!-- Cursor glow -->
+<script>
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const glow = document.getElementById('cursorGlow');
+  if (!glow) return;
+  let active = false;
+
+  document.addEventListener('mousemove', e => {
+    if (!active) { glow.classList.add('active'); active = true; }
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
+  });
+
+  document.addEventListener('mouseleave', () => {
+    glow.classList.remove('active');
+    active = false;
+  });
+})();
+</script>
+
+<!-- Apply ghost (hidden) cards from localStorage -->
+<script>
+(function () {
+  const hidden = JSON.parse(localStorage.getItem('neorgon-ghost') || '[]');
+  hidden.forEach(id => {
+    const card = document.querySelector(`.sites-grid .site-card[data-card-id="${id}"]`);
+    if (card) card.style.display = 'none';
+  });
+})();
+</script>
+
+<!-- Staggered card entrance (bottom-up) -->
+<script>
+(function () {
+  const cards = Array.from(document.querySelectorAll('.sites-section:not(.secret-section) .site-card[data-card-id]'))
+    .filter(c => c.style.display !== 'none');
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    cards.forEach(c => { c.style.opacity = 1; });
+    return;
+  }
+  const total = cards.length;
+  cards.forEach((card, i) => {
+    card.style.animationDelay = (i * 110) + 'ms';
+  });
+})();
+</script>
+
+<!-- Hero typing effect -->
+<script>
+(function () {
+  const el = document.getElementById('heroTyping');
+  const cursor = document.getElementById('typingCursor');
+  if (!el) return;
+
+  const text = 'actually work';
+  let i = 0;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = text;
+    if (cursor) cursor.remove();
+    return;
+  }
+
+  function type() {
+    if (i <= text.length) {
+      el.textContent = text.slice(0, i);
+      i++;
+      setTimeout(type, 70 + Math.random() * 50);
+    } else {
+      setTimeout(() => { if (cursor) cursor.style.display = 'none'; }, 2000);
+    }
+  }
+
+  setTimeout(type, 200);
+})();
+</script>
+
+<!-- Ambient generative music -->
+<script>
+(function () {
+  const btn = document.getElementById('musicToggle');
+  if (!btn) return;
+
+  let playing = false;
+  let audioCtx = null;
+  let nodes = [];
+
+  function startMusic() {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const master = audioCtx.createGain();
+    master.gain.value = 0.12;
+    master.connect(audioCtx.destination);
+
+    /* Pad drone — slow-moving filtered saw chords */
+    function createDrone(freq) {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.value = freq;
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 400;
+      filter.Q.value = 2;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.15;
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(master);
+      osc.start();
+      nodes.push(osc);
+
+      /* Slowly modulate filter */
+      (function sweep() {
+        if (!audioCtx || !playing) return;
+        const now = audioCtx.currentTime;
+        const target = 200 + Math.random() * 600;
+        filter.frequency.linearRampToValueAtTime(target, now + 4 + Math.random() * 4);
+        setTimeout(sweep, 4000 + Math.random() * 4000);
+      })();
+    }
+
+    createDrone(55);
+    createDrone(82.41);
+    createDrone(110);
+
+    /* Arpeggio chimes — random pentatonic notes */
+    const NOTES = [220, 261.6, 329.6, 392, 440, 523.3, 659.3, 784];
+
+    function chime() {
+      if (!playing) return;
+      const freq = NOTES[Math.floor(Math.random() * NOTES.length)];
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq * (Math.random() > 0.5 ? 2 : 1);
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.08 + Math.random() * 0.06, now + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5 + Math.random());
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(now);
+      osc.stop(now + 2.5);
+      setTimeout(chime, 800 + Math.random() * 2200);
+    }
+
+    setTimeout(chime, 500);
+
+    /* Sub pulse */
+    const sub = audioCtx.createOscillator();
+    sub.type = 'sine';
+    sub.frequency.value = 36.7;
+    const subGain = audioCtx.createGain();
+    subGain.gain.value = 0.1;
+    sub.connect(subGain);
+    subGain.connect(master);
+    sub.start();
+    nodes.push(sub);
+  }
+
+  function stopMusic() {
+    nodes.forEach(n => { try { n.stop(); } catch {} });
+    nodes = [];
+    if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  }
+
+  /* Hide button if user prefers reduced motion */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    btn.style.display = 'none';
+    return;
+  }
+
+  btn.addEventListener('click', () => {
+    if (window._neoSoundEnabled === false) return;
+    playing = !playing;
+    btn.classList.toggle('playing', playing);
+    if (playing) startMusic();
+    else stopMusic();
+  });
+})();
+</script>
+
+<!-- Matrix rain easter egg (type "matrix" in terminal) -->
+<script>
+(function () {
+  const canvas = document.getElementById('matrixCanvas');
+  if (!canvas) return;
+  const mCtx = canvas.getContext('2d');
+  let active = false;
+  let animId = null;
+  let drops = [];
+
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789NEORGON';
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const cols = Math.floor(canvas.width / 14);
+    drops = Array.from({ length: cols }, () => Math.random() * -50);
+  }
+
+  function draw() {
+    if (!active) return;
+    mCtx.fillStyle = 'rgba(0, 9, 18, 0.06)';
+    mCtx.fillRect(0, 0, canvas.width, canvas.height);
+    mCtx.fillStyle = '#0f0';
+    mCtx.font = '13px monospace';
+
+    for (let i = 0; i < drops.length; i++) {
+      const char = chars[Math.floor(Math.random() * chars.length)];
+      const x = i * 14;
+      const y = drops[i] * 14;
+
+      const brightness = Math.random();
+      if (brightness > 0.95) mCtx.fillStyle = '#fff';
+      else if (brightness > 0.8) mCtx.fillStyle = '#5f5';
+      else mCtx.fillStyle = `rgba(0, ${150 + Math.floor(Math.random() * 105)}, 0, 0.8)`;
+
+      mCtx.fillText(char, x, y);
+      if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+    animId = requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { if (active) resize(); });
+
+  window.toggleMatrix = function () {
+    active = !active;
+    if (active) {
+      resize();
+      canvas.classList.add('active');
+      draw();
+    } else {
+      canvas.classList.remove('active');
+      if (animId) cancelAnimationFrame(animId);
+      mCtx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    return active;
+  };
+})();
+</script>
+
+<!-- Settings panel controller -->
+<script>
+(function () {
+  const PREFS_KEY = 'neorgon-prefs';
+  const btn = document.getElementById('settingsBtn');
+  const panel = document.getElementById('settingsPanel');
+  if (!btn || !panel) return;
+
+  const defaults = { sound: true, glow: true };
+
+  function loadPrefs() {
+    try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(PREFS_KEY))); }
+    catch { return { ...defaults }; }
+  }
+
+  function savePrefs(p) { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); }
+
+  const prefs = loadPrefs();
+
+  function applyPref(key, val) {
+    prefs[key] = val;
+    savePrefs(prefs);
+    if (key === 'sound') window._neoSoundEnabled = val;
+    if (key === 'glow') {
+      const glow = document.getElementById('cursorGlow');
+      if (glow) glow.style.display = val ? '' : 'none';
+    }
+  }
+
+  function initToggle(id, key) {
+    const tog = document.getElementById(id);
+    if (!tog) return;
+    tog.classList.toggle('on', prefs[key]);
+    applyPref(key, prefs[key]);
+    tog.addEventListener('click', () => {
+      const val = !prefs[key];
+      tog.classList.toggle('on', val);
+      applyPref(key, val);
+    });
+  }
+
+  initToggle('togSound', 'sound');
+  initToggle('togGlow', 'glow');
+
+  /* Global flags default to true */
+  if (window._neoSoundEnabled === undefined) window._neoSoundEnabled = prefs.sound;
+
+  btn.addEventListener('click', () => {
+    const open = panel.classList.toggle('open');
+    btn.classList.toggle('open', open);
+  });
+
+  document.addEventListener('click', e => {
+    if (!panel.contains(e.target) && !btn.contains(e.target)) {
+      panel.classList.remove('open');
+      btn.classList.remove('open');
+    }
+  });
+})();
+</script>
+
 <!-- SortableJS — drag-and-drop for card grid (mouse + touch) -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
 <script>
@@ -1885,13 +2898,16 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   }
 
   function getCurrentOrder() {
+    const hidden = JSON.parse(localStorage.getItem('neorgon-ghost') || '[]');
     return Array.from(grid.querySelectorAll('[data-card-id]'))
-      .map(c => c.dataset.cardId);
+      .map(c => c.dataset.cardId)
+      .filter(id => !hidden.includes(id));
   }
 
   /* Apply saved order on load */
   const saved = getSavedOrder();
   if (saved) applyOrder(saved);
+  updateFeatured();
 
   /* Init SortableJS */
   Sortable.create(grid, {
@@ -1903,7 +2919,11 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     delay: 120,
     delayOnTouchOnly: true,
     touchStartThreshold: 5,
+    onStart() {
+      if (window._neoSound) window._neoSound.dragStart();
+    },
     onEnd() {
+      if (window._neoSound) window._neoSound.dropCard();
       const order = getCurrentOrder();
       saveOrder(order);
       updateFeatured();
