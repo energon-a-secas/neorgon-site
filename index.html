@@ -1611,6 +1611,27 @@
         </div>
       </a>
 
+      <!-- Snippets -->
+      <a class="site-card" data-card-id="snippets"
+         href="https://snippets.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(250,204,21,.3); --card-glow-border: rgba(250,204,21,.35); --card-accent: #facc15;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/snippets.svg" class="card-site-icon" alt="Snippets" width="28" height="28" loading="lazy"></div>
+            <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">snippets.neorgon.com</div>
+          <h3 class="card-name">Snippets</h3>
+          <div class="card-desc">141 shell commands, DevOps recipes, and config snippets. Searching is faster than prompting.</div>
+          <div class="card-tags">
+            <span class="card-tag">Shell</span>
+            <span class="card-tag">Docker</span>
+            <span class="card-tag">K8s</span>
+            <span class="card-tag">DevOps</span>
+          </div>
+        </div>
+      </a>
+
     </div>
   </main>
 
@@ -2674,7 +2695,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   function cleanup() {
     if (cleaned) return;
     cleaned = true;
-    ['click', 'keydown', 'touchstart'].forEach(ev =>
+    ['pointerdown', 'mousedown', 'keydown', 'touchstart'].forEach(ev =>
       document.removeEventListener(ev, onGesture, true)
     );
     /* Silent warm-up: schedule a near-inaudible blip so the context is fully
@@ -2690,7 +2711,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     }
   }
   let cleaned = false;
-  ['click', 'keydown', 'touchstart'].forEach(ev =>
+  ['pointerdown', 'mousedown', 'keydown', 'touchstart'].forEach(ev =>
     document.addEventListener(ev, onGesture, { capture: true })
   );
 
