@@ -1346,7 +1346,7 @@
           </div>
           <div class="card-domain">skillmap.neorgon.com</div>
           <h3 class="card-name">Skill Map</h3>
-          <div class="card-desc">Map your skills and learning paths on a visual grid. Connect topics, color-code progress, and lock dependencies.</div>
+          <div class="card-desc">Plot your learning path on a visual grid. See what's blocked, what's done, and what to tackle next.</div>
           <div class="card-tags">
             <span class="card-tag">Learning</span>
             <span class="card-tag">Diagrams</span>
@@ -1458,7 +1458,7 @@
           </div>
           <div class="card-domain">jsonstudio.neorgon.com</div>
           <h3 class="card-name">JSON Studio</h3>
-          <div class="card-desc">Build, explore, and anonymise JSON. Drag blocks to compose schemas, pivot data with charts, or scramble values for safe sharing.</div>
+          <div class="card-desc">Build JSON by dragging blocks, explore datasets with filters and pivots, or scramble values for safe sharing.</div>
           <div class="card-tags">
             <span class="card-tag">JSON</span>
             <span class="card-tag">Viewer</span>
@@ -1513,7 +1513,7 @@
           </div>
           <div class="card-domain">emojis.neorgon.com</div>
           <h3 class="card-name">Emoji Archive</h3>
-          <div class="card-desc">202 Slack emojis across 7 categories. Search, browse, and download with one click.</div>
+          <div class="card-desc">The chat emojis we love, all in one place. Search by name or category, click to copy.</div>
           <div class="card-tags">
             <span class="card-tag">Slack</span>
             <span class="card-tag">Emojis</span>
@@ -1542,7 +1542,7 @@
           </div>
           <div class="card-domain">memes.neorgon.com</div>
           <h3 class="card-name">Meme Vault</h3>
-          <div class="card-desc">Browse, vote, and upload memes. Login to build your collection, or go anonymous. Powered by Convex.</div>
+          <div class="card-desc">All your favorite memes in one place. Search, grab, and drop them into any conversation.</div>
           <div class="card-tags">
             <span class="card-tag">Memes</span>
             <span class="card-tag">Voting</span>
@@ -1562,7 +1562,7 @@
           </div>
           <div class="card-domain">charactersheet.neorgon.com</div>
           <h3 class="card-name">Character Sheet</h3>
-          <div class="card-desc">RPG-style personality interview. Gaming, anime, movies, hobbies, and hot takes. Export your character card.</div>
+          <div class="card-desc">Know thyself. Answer questions about your tastes, habits, and hot takes, then export a card you can actually share.</div>
           <div class="card-tags">
             <span class="card-tag">RPG</span>
             <span class="card-tag">Personality</span>
@@ -1582,7 +1582,7 @@
           </div>
           <div class="card-domain">ogstudio.neorgon.com</div>
           <h3 class="card-name">OG Studio</h3>
-          <div class="card-desc">Generate branded 1200x630 social preview images for any Neorgon tool. Three pattern types, bulk download.</div>
+          <div class="card-desc">Generate social preview images for Neorgon tools or anything you want. Pick a pattern, match your colors, download as PNG.</div>
           <div class="card-tags">
             <span class="card-tag">OG Images</span>
             <span class="card-tag">Social</span>
@@ -1602,7 +1602,7 @@
           </div>
           <div class="card-domain">buyhacks.neorgon.com</div>
           <h3 class="card-name">BuyHacks</h3>
-          <div class="card-desc">Curated product showcase with community votes and life-hack tips. Browse tested products, vote love/own/want.</div>
+          <div class="card-desc">Products we've actually tested, with community votes and life-hack tips. Vote love, own, or want.</div>
           <div class="card-tags">
             <span class="card-tag">Products</span>
             <span class="card-tag">Voting</span>
@@ -1645,7 +1645,7 @@
           </div>
           <div class="card-domain">interviews.neorgon.com</div>
           <h3 class="card-name">Vibe Check</h3>
-          <div class="card-desc">Behavioral interview scorecard. 18 questions, 6 categories, Core Five archetype matching.</div>
+          <div class="card-desc">Score behavioral interviews in real time. 18 questions across 6 categories, with a candidate archetype at the end.</div>
           <div class="card-tags">
             <span class="card-tag">Interviews</span>
             <span class="card-tag">Scoring</span>
@@ -1669,7 +1669,7 @@
           </div>
           <div class="card-domain">autopilot.neorgon.com</div>
           <h3 class="card-name">Autopilot</h3>
-          <div class="card-desc">Visual idle-schedule builder. Generates macOS shell commands for presence automation.</div>
+          <div class="card-desc">Chain active, idle, and away blocks on a timeline. Generates the shell commands so you don't have to.</div>
           <div class="card-tags">
             <span class="card-tag">macOS</span>
             <span class="card-tag">Scheduler</span>
@@ -1693,7 +1693,7 @@
           </div>
           <div class="card-domain">internal</div>
           <h3 class="card-name">Rush Q Cards</h3>
-          <div class="card-desc">Corporate strategy card game. 8-quarter campaign with AI opponents, team management, and reputation scoring.</div>
+          <div class="card-desc">Corporate strategy card game. Hire, build, and outmaneuver AI opponents across 8 quarters.</div>
           <div class="card-tags">
             <span class="card-tag">Game</span>
             <span class="card-tag">Strategy</span>
@@ -3481,6 +3481,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   let active = false;
   let animId = null;
   let frame = 0;
+  let introActive = false; /* true while broadcast takeover intro is running */
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -3562,7 +3563,8 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   window.addEventListener('resize', () => { if (active) resize(); });
 
   window.interventionOn = function () {
-    if (active) return;
+    if (active || introActive) return;
+    introActive = true;
     resize();
     canvas.style.opacity = '1';
     canvas.classList.add('active');
@@ -3573,6 +3575,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     const W = canvas.width, H = canvas.height;
 
     function introStep() {
+      if (!introActive) return; /* killed mid-intro */
       introFrame++;
       const progress = introFrame / INTRO_DURATION;
 
@@ -3660,6 +3663,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 
       } else {
         /* Phase 4: Transition complete — start normal draw loop */
+        introActive = false;
         active = true;
         frame = 0;
         draw();
@@ -3673,52 +3677,98 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   };
 
   window.interventionOff = function () {
+    if (introActive) {
+      /* Called during intro — just kill instantly */
+      if (window.interventionKill) window.interventionKill();
+      return;
+    }
     if (!active) return;
     active = false;
     if (animId) cancelAnimationFrame(animId);
     document.body.classList.remove('intervention-bg');
 
-    /* Broadcast ending — white → static → black → gone */
+    /* Classic CRT power-off — collapse to horizontal line → dot → gone */
     const W = canvas.width, H = canvas.height;
+    /* Snapshot current screen */
+    const snap = document.createElement('canvas');
+    snap.width = W; snap.height = H;
+    snap.getContext('2d').drawImage(canvas, 0, 0);
+
     let outFrame = 0;
+    const COLLAPSE_FRAMES = 18;  /* vertical collapse to line */
+    const LINE_FRAMES = 14;      /* line shrinks to dot */
+    const GLOW_FRAMES = 20;      /* dot/glow fades out */
+    const TOTAL = COLLAPSE_FRAMES + LINE_FRAMES + GLOW_FRAMES;
 
     function outStep() {
       outFrame++;
+      ctx.clearRect(0, 0, W, H);
 
-      if (outFrame <= 8) {
-        /* Quick static burst */
-        const nd = ctx.createImageData(W, H);
-        const dd = nd.data;
-        for (let i = 0; i < dd.length; i += 4) {
-          const v = 100 + Math.floor(Math.random() * 155);
-          dd[i] = v; dd[i + 1] = v; dd[i + 2] = v; dd[i + 3] = 255;
-        }
-        ctx.putImageData(nd, 0, 0);
-        /* Horizontal tears */
-        for (let i = 0; i < 3; i++) {
-          const y = Math.random() * H;
-          const h = 5 + Math.random() * 20;
-          ctx.drawImage(canvas, 0, y, W, h, (Math.random() - 0.5) * 40, y, W, h);
-        }
-      } else if (outFrame <= 25) {
-        /* Fade static to dark */
-        const fade = (outFrame - 8) / 17;
-        const bg = Math.floor(10 * (1 - fade) + 9);
-        ctx.fillStyle = `rgb(${bg * 15},${bg},${Math.floor(bg * 1.3)})`;
-        ctx.fillRect(0, 0, W, H);
-        /* Diminishing noise */
-        for (let i = 0; i < 20 * (1 - fade); i++) {
-          const y = Math.random() * H;
-          const v = Math.floor(Math.random() * 100 * (1 - fade));
-          ctx.fillStyle = `rgb(${v},${v},${v})`;
-          ctx.fillRect(0, y, W, 1 + Math.random() * 3);
+      /* Dark background throughout */
+      ctx.fillStyle = '#000912';
+      ctx.fillRect(0, 0, W, H);
+
+      if (outFrame <= COLLAPSE_FRAMES) {
+        /* Phase 1: Image collapses vertically to a bright horizontal line */
+        const t = outFrame / COLLAPSE_FRAMES;
+        const ease = t * t; /* accelerating */
+        const visH = Math.max(2, H * (1 - ease));
+        const yOff = (H - visH) / 2;
+
+        /* Draw squished snapshot */
+        ctx.save();
+        ctx.globalAlpha = 1 - ease * 0.3;
+        ctx.drawImage(snap, 0, 0, W, H, 0, yOff, W, visH);
+        ctx.restore();
+
+        /* Bright edge glow as it compresses */
+        ctx.fillStyle = `rgba(220, 230, 255, ${ease * 0.6})`;
+        ctx.fillRect(0, yOff - 1, W, 2);
+        ctx.fillRect(0, yOff + visH - 1, W, 2);
+
+      } else if (outFrame <= COLLAPSE_FRAMES + LINE_FRAMES) {
+        /* Phase 2: Bright horizontal line shrinks to center dot */
+        const t = (outFrame - COLLAPSE_FRAMES) / LINE_FRAMES;
+        const ease = t * t;
+        const lineW = Math.max(4, W * (1 - ease));
+        const lineX = (W - lineW) / 2;
+        const lineH = Math.max(2, 3 * (1 - ease * 0.7));
+
+        /* Bright white line */
+        ctx.fillStyle = `rgba(240, 245, 255, ${1 - ease * 0.3})`;
+        ctx.fillRect(lineX, H / 2 - lineH / 2, lineW, lineH);
+
+        /* Glow around line */
+        ctx.save();
+        ctx.shadowBlur = 15 - ease * 10;
+        ctx.shadowColor = 'rgba(200, 220, 255, 0.8)';
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.8 - ease * 0.5})`;
+        ctx.fillRect(lineX + 2, H / 2 - 1, lineW - 4, 2);
+        ctx.restore();
+
+      } else if (outFrame <= TOTAL) {
+        /* Phase 3: Center dot glow fades */
+        const t = (outFrame - COLLAPSE_FRAMES - LINE_FRAMES) / GLOW_FRAMES;
+        const alpha = (1 - t) * (1 - t);
+        const dotR = 4 * (1 - t * 0.5);
+
+        ctx.save();
+        ctx.shadowBlur = 20 * alpha;
+        ctx.shadowColor = `rgba(200, 220, 255, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(W / 2, H / 2, dotR, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(240, 245, 255, ${alpha})`;
+        ctx.fill();
+        ctx.restore();
+
+        /* Restore starfield partway through fade */
+        if (outFrame === COLLAPSE_FRAMES + LINE_FRAMES + 5) {
+          document.getElementById('starfield').style.opacity = '';
         }
       } else {
-        /* Done — clear and restore */
         ctx.clearRect(0, 0, W, H);
         canvas.classList.remove('active');
         canvas.style.opacity = '';
-        document.getElementById('starfield').style.opacity = '';
         return;
       }
 
@@ -3731,6 +3781,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   /* Instant kill — no exit animation */
   window.interventionKill = function () {
     active = false;
+    introActive = false; /* cancel intro if running */
     canvas.classList.remove('active');
     canvas.style.opacity = '';
     document.body.classList.remove('intervention-bg');
