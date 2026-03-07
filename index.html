@@ -147,7 +147,7 @@
     /* ── Hero ────────────────────────────────────────────────────────────── */
     .hero {
       text-align: center;
-      padding: 80px 40px 60px;
+      padding: 60px 40px 36px;
     }
 
     .hero-badge {
@@ -198,6 +198,166 @@
       line-height: 1.7;
     }
 
+    /* ── Search bar ─────────────────────────────────────────────────────── */
+    .hero-search-wrap {
+      position: relative;
+      max-width: 480px;
+      margin: 28px auto 0;
+    }
+    .hero-search {
+      width: 100%;
+      padding: 14px 44px 14px 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.04);
+      backdrop-filter: blur(12px);
+      color: var(--text-primary);
+      font-family: var(--font);
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .25s, box-shadow .25s, background .25s;
+    }
+    .hero-search::placeholder {
+      color: rgba(255,255,255,.28);
+      font-weight: 400;
+    }
+    .hero-search:focus {
+      border-color: rgba(192,132,252,.45);
+      box-shadow: 0 0 0 3px rgba(192,132,252,.1), 0 0 24px rgba(192,132,252,.08);
+      background: rgba(255,255,255,.06);
+    }
+    .hero-search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: rgba(255,255,255,.25);
+      pointer-events: none;
+      transition: color .2s;
+    }
+    .hero-search:focus ~ .hero-search-icon { color: rgba(192,132,252,.6); }
+    .hero-search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.35);
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: .85rem;
+      font-family: var(--font);
+      transition: background .15s, color .15s;
+      padding: 0;
+    }
+    .hero-search-clear:hover { background: rgba(255,255,255,.12); color: rgba(255,255,255,.6); }
+    .hero-search-clear.show { display: flex; }
+
+    /* Keyboard hint */
+    .search-hint {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      color: rgba(255,255,255,.18);
+      padding: 2px 7px;
+      border-radius: 5px;
+      border: 1px solid rgba(255,255,255,.08);
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+    .hero-search:focus ~ .search-hint,
+    .hero-search-clear.show ~ .search-hint { opacity: 0; }
+
+    /* Result count */
+    .search-count {
+      font-size: .72rem;
+      color: rgba(255,255,255,.25);
+      text-align: center;
+      margin-top: 8px;
+      height: 16px;
+      transition: opacity .2s;
+    }
+
+    /* ── Floating tag constellation ────────────────────────────────────── */
+    .constellation-box {
+      position: relative;
+      max-width: 720px;
+      height: 200px;
+      margin: 16px auto 0;
+      overflow: visible;
+    }
+    .constellation-canvas {
+      position: absolute;
+      inset: -30px;
+      width: calc(100% + 60px);
+      height: calc(100% + 60px);
+      pointer-events: none;
+    }
+    .tag-pill {
+      position: absolute;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      /* Position via transform (GPU-accelerated, sub-pixel smooth).
+         Only animate visual properties for hover/zoom. */
+      left: 0; top: 0;
+      transition: opacity .4s ease, box-shadow .4s ease, filter .4s ease;
+      z-index: 1;
+      will-change: transform;
+    }
+    .tag-pill:hover {
+      z-index: 2;
+      box-shadow: 0 0 14px var(--pill-color, rgba(192,132,252,.35));
+      filter: brightness(1.15);
+    }
+    .tag-pill.matched {
+      box-shadow: 0 0 12px var(--pill-color, rgba(192,132,252,.5));
+    }
+    .tag-pill.repelled {
+      opacity: .15;
+    }
+    .tag-pill.repelled:hover {
+      opacity: .65;
+    }
+    .tag-pill.planet-zoom {
+      z-index: 10;
+      filter: brightness(1.4);
+      box-shadow: 0 0 24px var(--pill-color, rgba(192,132,252,.5)), 0 0 60px var(--pill-color, rgba(192,132,252,.25));
+    }
+
+    /* ── Card filter: hide non-matches ─────────────────────────────────── */
+    .sites-grid .site-card.search-hidden {
+      display: none !important;
+    }
+    .search-no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: .95rem;
+      display: none;
+    }
+    .search-no-results.show { display: block; }
+
     /* ── Sites grid ──────────────────────────────────────────────────────── */
     .sites-section {
       flex: 1;
@@ -234,7 +394,7 @@
       flex-direction: column;
       gap: 12px;
       overflow: hidden;
-      transition: border-color .2s, box-shadow .3s;
+      transition: border-color .2s, box-shadow .3s, opacity .35s ease, transform .35s ease;
     }
 
     /* Neon glow on hover via custom prop */
@@ -332,23 +492,39 @@
       background: color-mix(in srgb, var(--card-accent, #818cf8) 8%, transparent);
     }
 
-    /* Featured card (full-width — first card in grid) */
-    .site-card.featured {
-      grid-column: 1 / -1;
-      flex-direction: row;
-      align-items: center;
-      gap: 28px;
-    }
-    .site-card.featured .card-icon-wrap {
-      width: 60px; height: 60px;
-      border-radius: 16px;
-      font-size: 2rem;
-    }
-    .site-card.featured .card-site-icon { width: 36px; height: 36px; }
-    .site-card.featured .card-name { font-size: 1.2rem; }
+    /* Featured card — disabled, all cards uniform */
 
-    @media (max-width: 700px) {
-      .site-card.featured { flex-direction: column; }
+    /* ── GIF preview on hover ──────────────────────────────────────────── */
+    .card-preview {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .35s ease;
+      z-index: 5;
+      background: #0a0e1a;
+    }
+    .card-preview.visible { opacity: 1; }
+    .card-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      display: block;
+    }
+    .card-preview::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(4,7,20,.7) 0%, transparent 40%);
+      pointer-events: none;
+    }
+    @media (max-width: 600px) {
+      .card-preview { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .card-preview { display: none; }
     }
 
     /* ── Multi-tool card popup ───────────────────────────────────────────── */
@@ -737,9 +913,15 @@
 
     @media (max-width: 600px) {
       .site-header { padding: 16px 20px; }
-      .hero { padding: 60px 20px 40px; }
+      .hero { padding: 60px 20px 30px; }
       .sites-section { padding: 0 20px 60px; }
       .sites-grid { grid-template-columns: 1fr; }
+
+      .hero-search-wrap { margin-top: 20px; }
+      .hero-search { font-size: .88rem; padding: 12px 40px; }
+      .search-hint { display: none; }
+      .constellation-box { height: 140px; }
+      .tag-pill { font-size: .6rem; padding: 4px 10px; }
 
       /* Settings panel — full width on mobile */
       .settings-panel { left: 12px; right: 12px; width: auto; }
@@ -1109,10 +1291,7 @@
     body.matrix-bg .site-card .card-title { color: rgba(255, 255, 255, .95); }
     body.matrix-bg .site-card .card-desc { color: rgba(255, 255, 255, .7); }
     body.matrix-bg .hero-section { text-shadow: 0 0 20px rgba(0,0,0,.8); }
-    body.matrix-bg .site-card.featured {
-      background: rgba(0, 12, 24, .88);
-      border-color: rgba(0, 255, 70, .15);
-    }
+    /* (featured card removed — uniform grid) */
 
     /* ── L Intervention (Death Note CRT broadcast) ───────────── */
     #interventionCanvas {
@@ -1161,10 +1340,7 @@
     }
     body.intervention-bg .site-card .card-arrow { color: #666; }
     body.intervention-bg .site-card .card-site-icon { filter: brightness(0.15); }
-    body.intervention-bg .site-card.featured {
-      background: rgba(255, 255, 255, .95);
-      border-color: rgba(0, 0, 0, .1);
-    }
+    /* (featured card removed — uniform grid) */
     body.intervention-bg .site-card::before { opacity: 0 !important; }
     body.intervention-bg .site-card::after { opacity: 0 !important; }
 
@@ -1288,12 +1464,23 @@
     <p class="hero-sub">
       Lightweight tools that solve real problems. Open source, no strings attached.
     </p>
+    <div class="hero-search-wrap">
+      <input class="hero-search" id="heroSearch" type="text" placeholder="Search tools, tags, or keywords..." autocomplete="off" spellcheck="false">
+      <svg class="hero-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <button class="hero-search-clear" id="searchClear" aria-label="Clear search">&times;</button>
+      <span class="search-hint">/</span>
+    </div>
+    <div class="search-count" id="searchCount"></div>
+    <div class="constellation-box" id="constellationBox">
+      <canvas class="constellation-canvas" id="constellationCanvas"></canvas>
+    </div>
   </section>
 
   <!-- Sites -->
   <main class="sites-section" id="tools" aria-label="Platforms and tools">
     <h2 class="section-label">Platforms &amp; Tools</h2>
     <div class="sites-grid">
+      <div class="search-no-results" id="searchNoResults">No tools match your search.</div>
 
       <!-- Pathfinder (featured) -->
       <a class="site-card" data-card-id="pathfinder"
@@ -1308,9 +1495,9 @@
           <h3 class="card-name">Pathfinder</h3>
           <div class="card-desc">Map goals, problems, risks, and gaps on an infinite canvas. Export a structured AI prompt with your entire plan baked in.</div>
           <div class="card-tags">
-            <span class="card-tag">Canvas</span>
             <span class="card-tag">Planning</span>
-            <span class="card-tag">AI Prompt</span>
+            <span class="card-tag">Visual Canvas</span>
+            <span class="card-tag">Export</span>
           </div>
         </div>
       </a>
@@ -1328,9 +1515,9 @@
           <h3 class="card-name">Infra Drills</h3>
           <div class="card-desc">Real-world break-fix challenges for AWS, Kubernetes, and GitLab CI/CD. Runs entirely on your machine.</div>
           <div class="card-tags">
-            <span class="card-tag">AWS</span>
-            <span class="card-tag">Kubernetes</span>
-            <span class="card-tag">GitLab</span>
+            <span class="card-tag">DevOps</span>
+            <span class="card-tag">Challenges</span>
+            <span class="card-tag">CLI</span>
           </div>
         </div>
       </a>
@@ -1348,8 +1535,8 @@
           <h3 class="card-name">Skill Map</h3>
           <div class="card-desc">Plot your learning path on a visual grid. See what's blocked, what's done, and what to tackle next.</div>
           <div class="card-tags">
+            <span class="card-tag">Planning</span>
             <span class="card-tag">Learning</span>
-            <span class="card-tag">Diagrams</span>
           </div>
         </div>
       </a>
@@ -1368,9 +1555,9 @@
           <h3 class="card-name">Client Says</h3>
           <div class="card-desc">Timezone converter for remote teams, plus a corporate jargon translator. Because "let's circle back" actually means "no."</div>
           <div class="card-tags">
+            <span class="card-tag">Productivity</span>
             <span class="card-tag">Timezone</span>
-            <span class="card-tag">Remote Work</span>
-            <span class="card-tag">Jargon</span>
+            <span class="card-tag">Translator</span>
           </div>
         </div>
         <div class="card-subtool-popup">
@@ -1399,8 +1586,8 @@
           <h3 class="card-name">Decision Wheel</h3>
           <div class="card-desc">Spin to pick a winner, blame a team, or settle any debate. Build your own wheel from scratch.</div>
           <div class="card-tags">
-            <span class="card-tag">Decision</span>
             <span class="card-tag">Fun</span>
+            <span class="card-tag">Randomizer</span>
           </div>
         </div>
         <div class="card-subtool-popup">
@@ -1429,9 +1616,9 @@
           <h3 class="card-name">Reference Matrix</h3>
           <div class="card-desc">37 cultural references from the Enerbot Slack bot, with a live regex playground and JSON API.</div>
           <div class="card-tags">
+            <span class="card-tag">Data</span>
             <span class="card-tag">API</span>
-            <span class="card-tag">Memes</span>
-            <span class="card-tag">Regex</span>
+            <span class="card-tag">Search</span>
           </div>
         </div>
         <div class="card-subtool-popup">
@@ -1460,9 +1647,9 @@
           <h3 class="card-name">JSON Studio</h3>
           <div class="card-desc">Build JSON by dragging blocks, explore datasets with filters and pivots, or scramble values for safe sharing.</div>
           <div class="card-tags">
-            <span class="card-tag">JSON</span>
-            <span class="card-tag">Viewer</span>
-            <span class="card-tag">Scrambler</span>
+            <span class="card-tag">Data</span>
+            <span class="card-tag">Editor</span>
+            <span class="card-tag">Privacy</span>
           </div>
         </div>
         <div class="card-subtool-popup">
@@ -1494,9 +1681,9 @@
           <h3 class="card-name">Presentation Sage</h3>
           <div class="card-desc">Write decks as structured YAML, export to PPTX, HTML, or Marp. A built-in auditor flags pacing and flow issues.</div>
           <div class="card-tags">
-            <span class="card-tag">YAML</span>
             <span class="card-tag">Slides</span>
-            <span class="card-tag">PPTX</span>
+            <span class="card-tag">Export</span>
+            <span class="card-tag">Audit</span>
           </div>
         </div>
       </a>
@@ -1515,8 +1702,8 @@
           <h3 class="card-name">Emoji Archive</h3>
           <div class="card-desc">The chat emojis we love, all in one place. Search by name or category, click to copy.</div>
           <div class="card-tags">
-            <span class="card-tag">Slack</span>
-            <span class="card-tag">Emojis</span>
+            <span class="card-tag">Social</span>
+            <span class="card-tag">Search</span>
           </div>
         </div>
         <div class="card-subtool-popup">
@@ -1544,8 +1731,8 @@
           <h3 class="card-name">Meme Vault</h3>
           <div class="card-desc">All your favorite memes in one place. Search, grab, and drop them into any conversation.</div>
           <div class="card-tags">
-            <span class="card-tag">Memes</span>
-            <span class="card-tag">Voting</span>
+            <span class="card-tag">Fun</span>
+            <span class="card-tag">Community</span>
             <span class="card-tag">Upload</span>
           </div>
         </div>
@@ -1564,9 +1751,9 @@
           <h3 class="card-name">Character Sheet</h3>
           <div class="card-desc">Know thyself. Answer questions about your tastes, habits, and hot takes, then export a card you can actually share.</div>
           <div class="card-tags">
-            <span class="card-tag">RPG</span>
+            <span class="card-tag">Fun</span>
             <span class="card-tag">Personality</span>
-            <span class="card-tag">Card</span>
+            <span class="card-tag">Export</span>
           </div>
         </div>
       </a>
@@ -1584,9 +1771,9 @@
           <h3 class="card-name">OG Studio</h3>
           <div class="card-desc">Generate social preview images for Neorgon tools or anything you want. Pick a pattern, match your colors, download as PNG.</div>
           <div class="card-tags">
-            <span class="card-tag">OG Images</span>
             <span class="card-tag">Social</span>
-            <span class="card-tag">Canvas</span>
+            <span class="card-tag">Design</span>
+            <span class="card-tag">Generator</span>
           </div>
         </div>
       </a>
@@ -1604,9 +1791,9 @@
           <h3 class="card-name">BuyHacks</h3>
           <div class="card-desc">Products we've actually tested, with community votes and life-hack tips. Vote love, own, or want.</div>
           <div class="card-tags">
-            <span class="card-tag">Products</span>
-            <span class="card-tag">Voting</span>
-            <span class="card-tag">Tips</span>
+            <span class="card-tag">Shopping</span>
+            <span class="card-tag">Community</span>
+            <span class="card-tag">Reviews</span>
           </div>
         </div>
       </a>
@@ -1624,10 +1811,9 @@
           <h3 class="card-name">Snippets</h3>
           <div class="card-desc">141 shell commands, DevOps recipes, and config snippets. Searching is faster than prompting.</div>
           <div class="card-tags">
-            <span class="card-tag">Shell</span>
-            <span class="card-tag">Docker</span>
-            <span class="card-tag">K8s</span>
             <span class="card-tag">DevOps</span>
+            <span class="card-tag">Cheatsheet</span>
+            <span class="card-tag">Search</span>
           </div>
         </div>
       </a>
@@ -1782,6 +1968,10 @@
   <div class="settings-row">
     <span class="settings-label">Cursor glow</span>
     <button class="settings-toggle on" id="togGlow" aria-label="Toggle glow"></button>
+  </div>
+  <div class="settings-row">
+    <span class="settings-label">Card previews</span>
+    <button class="settings-toggle" id="togPreviews" aria-label="Toggle card previews"></button>
   </div>
   <div class="settings-divider"></div>
   <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
@@ -3008,6 +3198,441 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 })();
 </script>
 
+<!-- Search + floating constellation -->
+<script>
+(function () {
+  const input = document.getElementById('heroSearch');
+  const clearBtn = document.getElementById('searchClear');
+  const countEl = document.getElementById('searchCount');
+  const noResults = document.getElementById('searchNoResults');
+  const box = document.getElementById('constellationBox');
+  const canvas = document.getElementById('constellationCanvas');
+  if (!input || !box || !canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const grid = document.querySelector('.sites-grid');
+  const cards = Array.from(document.querySelectorAll('.site-card[data-card-id]'));
+  const ghost = cards.filter(c => c.classList.contains('ghost-card')).map(c => c.dataset.cardId);
+
+  /* Build searchable index */
+  const index = cards.map(card => {
+    const name = (card.querySelector('.card-name') || {}).textContent || '';
+    const desc = (card.querySelector('.card-desc') || {}).textContent || '';
+    const domain = (card.querySelector('.card-domain') || {}).textContent || '';
+    const tags = Array.from(card.querySelectorAll('.card-tag')).map(t => t.textContent);
+    return {
+      el: card,
+      id: card.dataset.cardId,
+      text: [name, desc, domain, ...tags].join(' ').toLowerCase(),
+      tags: tags
+    };
+  });
+
+  /* Save original card order for restore */
+  const originalOrder = cards.map(c => c.dataset.cardId);
+
+  /* ── Curated categories ─────────────────────────────────────── */
+  const CATEGORIES = [
+    { label: 'DevOps',       color: '#fbbf24', ids: ['infradrills','snippets'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell infra drills snippets' },
+    { label: 'Planning',     color: '#4ade80', ids: ['pathfinder','skillmap'], keywords: 'planning visual canvas export learning roadmap pathfinder skill map strategy' },
+    { label: 'Data',         color: '#2dd4bf', ids: ['jsonstudio','references'], keywords: 'data editor privacy api search json reference matrix scrambler viewer' },
+    { label: 'Slides',       color: '#fb923c', ids: ['slides'], keywords: 'slides export audit presentation sage yaml pptx marp' },
+    { label: 'Fun',          color: '#f472b6', ids: ['decisionwheel','memes','charactersheet'], keywords: 'fun randomizer community upload personality export character wheel spin memes' },
+    { label: 'Social',       color: '#22d3ee', ids: ['emojis','ogstudio'], keywords: 'social search design generator emojis emoji archive og preview slack' },
+    { label: 'Productivity', color: '#a78bfa', ids: ['clientsays','autopilot'], keywords: 'productivity timezone translator remote work jargon macos scheduler client says decoded autopilot' },
+    { label: 'Shopping',     color: '#f59e0b', ids: ['buyhacks'], keywords: 'shopping community reviews buyhacks buy hacks products' },
+    { label: 'Interviews',   color: '#38bdf8', ids: ['vibecheck'], keywords: 'interviews scoring vibe check behavioral' },
+    { label: 'Game',         color: '#e879f9', ids: ['rushq'], keywords: 'game strategy rush q cards corporate' },
+  ];
+
+  /* ── Floating pills (physics) ───────────────────────────────── */
+  var W = 0, H = 0;
+  var pills = [];
+
+  var canvasPad = 30; /* extra canvas bleed on each side */
+  function resizeCanvas() {
+    var rect = box.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    canvas.width = (W + canvasPad * 2) * devicePixelRatio;
+    canvas.height = (H + canvasPad * 2) * devicePixelRatio;
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    ctx.translate(canvasPad, canvasPad);
+  }
+
+  function randomPositions(count, w, h, minDist) {
+    var padX = 50, padY = 22;
+    var positions = [];
+    for (var i = 0; i < count; i++) {
+      var attempts = 0;
+      var cx, cy, ok;
+      do {
+        cx = padX + Math.random() * (w - padX * 2);
+        cy = padY + Math.random() * (h - padY * 2);
+        ok = true;
+        for (var j = 0; j < positions.length; j++) {
+          var dx = cx - positions[j][0], dy = cy - positions[j][1];
+          if (Math.sqrt(dx * dx + dy * dy) < minDist) { ok = false; break; }
+        }
+        attempts++;
+      } while (!ok && attempts < 200);
+      positions.push([cx, cy]);
+    }
+    return positions;
+  }
+
+  function createPills() {
+    pills.forEach(p => p.el.remove());
+    pills = [];
+    var positions = randomPositions(CATEGORIES.length, W, H, 80);
+
+    CATEGORIES.forEach(function (cat, i) {
+      var el = document.createElement('button');
+      el.className = 'tag-pill';
+      el.textContent = cat.label;
+      el.style.color = cat.color;
+      el.style.setProperty('--pill-color', cat.color + '80');
+      el.style.borderColor = 'color-mix(in srgb, ' + cat.color + ' 35%, transparent)';
+      el.style.background = 'color-mix(in srgb, ' + cat.color + ' 8%, transparent)';
+      box.appendChild(el);
+
+      var cx = positions[i][0];
+      var cy = positions[i][1];
+
+      var pill = {
+        el: el,
+        cat: cat,
+        x: cx, y: cy,
+        homeX: cx, homeY: cy,
+        vx: (Math.random() - 0.5) * 0.1,
+        vy: (Math.random() - 0.5) * 0.08,
+        matched: false,
+        repelled: false
+      };
+
+      el.addEventListener('click', function () {
+        var current = input.value.trim();
+        var toggling = current.toLowerCase() === cat.label.toLowerCase();
+
+        /* Planet zoom — animate scale via the physics-applied transform */
+        el.classList.add('planet-zoom');
+        pill._zoomScale = 1;
+        var zoomStart = performance.now();
+        var zoomDuration = 450;
+        function animateZoom(now) {
+          var t = Math.min(1, (now - zoomStart) / zoomDuration);
+          /* Bell curve: 0→1→0 via sin, peak scale 1.4 at t=0.5 */
+          pill._zoomScale = 1 + 0.4 * Math.sin(t * Math.PI);
+          if (t < 1) requestAnimationFrame(animateZoom);
+          else pill._zoomScale = 1;
+        }
+        requestAnimationFrame(animateZoom);
+
+        /* Push other pills away gently */
+        pills.forEach(function (other) {
+          if (other === pill) return;
+          var dx = other.x - pill.x;
+          var dy = other.y - pill.y;
+          var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          other.vx += (dx / dist) * 2;
+          other.vy += (dy / dist) * 1.5;
+        });
+
+        setTimeout(function () {
+          el.classList.remove('planet-zoom');
+          if (toggling) {
+            input.value = '';
+          } else {
+            input.value = cat.label;
+          }
+          doFilter();
+          input.focus();
+        }, 400);
+      });
+
+      pills.push(pill);
+    });
+  }
+
+  /* ── Connections between pills sharing cards ────────────────── */
+  var connections = [];
+  function buildConnections() {
+    connections = [];
+    for (var i = 0; i < CATEGORIES.length; i++) {
+      for (var j = i + 1; j < CATEGORIES.length; j++) {
+        /* Connect if they share keywords in common card descriptions */
+        var shared = CATEGORIES[i].ids.some(function (id) {
+          var card = index.find(function (c) { return c.id === id; });
+          if (!card) return false;
+          return CATEGORIES[j].keywords.split(' ').some(function (kw) {
+            return card.text.includes(kw);
+          });
+        });
+        if (shared) connections.push([i, j]);
+      }
+    }
+    /* Also connect neighbors for visual density */
+    for (var i = 0; i < CATEGORIES.length - 1; i++) {
+      var pair = [i, i + 1];
+      if (!connections.some(function (c) { return c[0] === pair[0] && c[1] === pair[1]; })) {
+        connections.push(pair);
+      }
+    }
+    /* Wrap last to first */
+    connections.push([0, CATEGORIES.length - 1]);
+  }
+
+  /* ── Physics tick ───────────────────────────────────────────── */
+  var centerX = 0, centerY = 0;
+  var isFiltering = false;
+
+  function tick() {
+    centerX = W / 2;
+    centerY = H / 2;
+
+    pills.forEach(function (p) {
+      if (isFiltering) {
+        if (p.matched) {
+          /* Attract to center */
+          var dx = centerX - p.x;
+          var dy = centerY - p.y;
+          p.vx += dx * 0.003;
+          p.vy += dy * 0.003;
+        } else {
+          /* Repel toward edges */
+          var dx = p.x - centerX;
+          var dy = p.y - centerY;
+          var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          p.vx += (dx / dist) * 0.12;
+          p.vy += (dy / dist) * 0.08;
+        }
+      } else {
+        /* Drift toward home — stronger spring while returning, gentle at rest */
+        var dx = p.homeX - p.x;
+        var dy = p.homeY - p.y;
+        var k = 0.008;
+        if (p._returning > 0) {
+          k = 0.04; /* Smooth glide, no bounce */
+          p._returning -= 0.008;
+          if (p._returning <= 0) p._returning = 0;
+        }
+        p.vx += dx * k;
+        p.vy += dy * k;
+        /* Very subtle wobble — slow organic drift, not jitter */
+        if (!p._wobblePhase) p._wobblePhase = Math.random() * Math.PI * 2;
+        p._wobblePhase += 0.008;
+        p.vx += Math.sin(p._wobblePhase) * 0.008;
+        p.vy += Math.cos(p._wobblePhase * 0.7) * 0.006;
+      }
+
+      /* Pill-to-pill repulsion — soft quadratic falloff */
+      pills.forEach(function (other) {
+        if (other === p) return;
+        var dx = p.x - other.x;
+        var dy = p.y - other.y;
+        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        var minDist = 85;
+        if (dist < minDist) {
+          var t = (minDist - dist) / minDist;
+          var force = t * t * 0.2;
+          p.vx += (dx / dist) * force;
+          p.vy += (dy / dist) * force;
+        }
+      });
+
+      /* Damping — heavier while returning to prevent overshoot */
+      var damp = p._returning > 0 ? 0.88 : 0.96;
+      p.vx *= damp;
+      p.vy *= damp;
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      /* Soft bounds — gentle pull back instead of hard wall */
+      var pw = p.el.offsetWidth / 2 || 40;
+      var ph = p.el.offsetHeight / 2 || 12;
+      var margin = 20;
+      if (p.x < margin) p.vx += (margin - p.x) * 0.05;
+      if (p.x > W - margin) p.vx += (W - margin - p.x) * 0.05;
+      if (p.y < margin) p.vy += (margin - p.y) * 0.05;
+      if (p.y > H - margin) p.vy += (H - margin - p.y) * 0.05;
+
+      /* Apply position — GPU-composited transform for smooth sub-pixel movement */
+      var s = p._zoomScale || 1;
+      p.el.style.transform = 'translate(' + (p.x - pw) + 'px,' + (p.y - ph) + 'px)' + (s !== 1 ? ' scale(' + s + ')' : '');
+
+      /* Visual state */
+      p.el.classList.toggle('matched', p.matched && isFiltering);
+      p.el.classList.toggle('repelled', !p.matched && isFiltering);
+    });
+
+    /* Draw connection lines */
+    ctx.clearRect(-canvasPad, -canvasPad, W + canvasPad * 2, H + canvasPad * 2);
+    connections.forEach(function (pair) {
+      var a = pills[pair[0]], b = pills[pair[1]];
+      if (!a || !b) return;
+      var bothMatch = a.matched && b.matched && isFiltering;
+      var opacity = isFiltering ? (bothMatch ? 0.25 : 0.03) : 0.08;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = 'rgba(255,255,255,' + opacity + ')';
+      ctx.lineWidth = bothMatch ? 1.5 : 0.8;
+      ctx.stroke();
+    });
+
+    requestAnimationFrame(tick);
+  }
+
+  /* ── Search / filter ────────────────────────────────────────── */
+  function doFilter() {
+    var q = input.value.trim().toLowerCase();
+    clearBtn.classList.toggle('show', q.length > 0);
+
+    if (!q) {
+      isFiltering = false;
+      /* Restore original order and show all */
+      cards.forEach(function (c) { c.classList.remove('search-hidden'); });
+      originalOrder.forEach(function (id) {
+        var card = grid.querySelector('[data-card-id="' + id + '"]');
+        if (card) grid.appendChild(card);
+      });
+      /* Re-apply saved order if exists */
+      try {
+        var saved = JSON.parse(localStorage.getItem('neorgon-card-order'));
+        if (saved && Array.isArray(saved)) {
+          saved.forEach(function (id) {
+            var card = grid.querySelector('[data-card-id="' + id + '"]');
+            if (card) grid.appendChild(card);
+          });
+        }
+      } catch (e) {}
+      pills.forEach(function (p) {
+        p.matched = false; p.repelled = false;
+        /* Kill momentum so pills don't overshoot; the spring handles the glide */
+        p.vx *= 0.15;
+        p.vy *= 0.15;
+        /* Flag: temporarily stronger spring for smooth return without bounce */
+        p._returning = 1;
+      });
+      noResults.classList.remove('show');
+      countEl.textContent = '';
+      return;
+    }
+
+    isFiltering = true;
+
+    /* Check which categories match */
+    pills.forEach(function (p) {
+      var catMatch = p.cat.label.toLowerCase().includes(q) ||
+                     p.cat.keywords.includes(q);
+      p.matched = catMatch;
+    });
+
+    /* Check which cards match (text search + category membership) */
+    var matchedIds = new Set();
+    pills.forEach(function (p) {
+      if (p.matched) p.cat.ids.forEach(function (id) { matchedIds.add(id); });
+    });
+    /* Also direct text search on cards */
+    index.forEach(function (item) {
+      if (item.text.includes(q)) matchedIds.add(item.id);
+    });
+
+    /* Reorder: matched cards first, non-matched hidden */
+    var visible = 0;
+    var total = index.filter(function (i) { return !ghost.includes(i.id); }).length;
+
+    /* Move matched to top, hide rest */
+    var matched = [];
+    var unmatched = [];
+    cards.forEach(function (c) {
+      var id = c.dataset.cardId;
+      if (matchedIds.has(id)) {
+        c.classList.remove('search-hidden');
+        matched.push(c);
+        if (!ghost.includes(id)) visible++;
+      } else {
+        c.classList.add('search-hidden');
+        unmatched.push(c);
+      }
+    });
+
+    /* Reorder DOM: matched first — only non-ghost cards in the main grid */
+    matched.forEach(function (c) { if (!c.classList.contains('ghost-card')) grid.appendChild(c); });
+    unmatched.forEach(function (c) { if (!c.classList.contains('ghost-card')) grid.appendChild(c); });
+
+    /* Also update pill match state for pills not matched by label but by card overlap */
+    pills.forEach(function (p) {
+      if (!p.matched) {
+        p.matched = p.cat.ids.some(function (id) { return matchedIds.has(id); });
+      }
+    });
+
+    if (visible === 0) {
+      noResults.classList.add('show');
+      countEl.textContent = '';
+    } else {
+      noResults.classList.remove('show');
+      countEl.textContent = visible + ' of ' + total + ' tools';
+    }
+  }
+
+  input.addEventListener('input', doFilter);
+
+  clearBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    input.value = '';
+    doFilter();
+    input.focus();
+  });
+
+  /* Keyboard: / to focus, Esc to clear/blur */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === '/' && document.activeElement !== input &&
+        !document.activeElement.closest('.term-overlay') &&
+        document.activeElement.tagName !== 'INPUT' &&
+        document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      input.focus();
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (e.key === 'Escape' && document.activeElement === input) {
+      e.preventDefault();
+      if (input.value) {
+        input.value = '';
+        doFilter();
+      } else {
+        input.blur();
+      }
+    }
+  });
+
+  /* ── Init ────────────────────────────────────────────────────── */
+  function init() {
+    resizeCanvas();
+    createPills();
+    buildConnections();
+    tick();
+  }
+
+  /* Wait for layout */
+  if (document.readyState === 'complete') init();
+  else window.addEventListener('load', init);
+
+  window.addEventListener('resize', function () {
+    resizeCanvas();
+    /* Recalc home positions with random scatter */
+    var positions = randomPositions(pills.length, W, H, 80);
+    pills.forEach(function (p, i) {
+      p.homeX = positions[i][0];
+      p.homeY = positions[i][1];
+    });
+  });
+})();
+</script>
+
 <!-- Hero typing effect -->
 <script>
 (function () {
@@ -3821,7 +4446,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   const panel = document.getElementById('settingsPanel');
   if (!btn || !panel) return;
 
-  const defaults = { sound: true, glow: true, bg: 'stars' };
+  const defaults = { sound: true, glow: true, previews: false, bg: 'stars' };
 
   function loadPrefs() {
     try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(PREFS_KEY))); }
@@ -3840,6 +4465,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       const glow = document.getElementById('cursorGlow');
       if (glow) glow.style.display = val ? '' : 'none';
     }
+    if (key === 'previews') window._neoPreviewsEnabled = val;
   }
 
   function initToggle(id, key) {
@@ -3856,6 +4482,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 
   initToggle('togSound', 'sound');
   initToggle('togGlow', 'glow');
+  initToggle('togPreviews', 'previews');
 
   /* Background picker */
   const bgPicker = document.getElementById('bgPicker');
@@ -3914,6 +4541,86 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       panel.classList.remove('open');
       btn.classList.remove('open');
     }
+  });
+})();
+</script>
+
+<!-- GIF preview on sustained hover (controlled by settings) -->
+<script>
+(function () {
+  const HOVER_DELAY = 1200;
+  const PREVIEW_PATH = 'assets/previews/';
+  const PREVIEW_MAP = {
+    pathfinder: 'pathfinder.gif',
+    infradrills: 'infradrills.gif',
+    skillmap: 'skillmap.gif',
+    clientsays: 'clientsays.gif',
+    decisionwheel: 'decisionwheel.gif',
+    references: 'references.gif',
+    jsonstudio: 'jsonstudio.gif',
+    slides: 'slides.gif',
+    emojis: 'emojis.gif',
+    memes: 'memes.gif',
+    charactersheet: 'charactersheet.gif',
+    ogstudio: 'og-studio.gif',
+    buyhacks: 'buyhacks.gif',
+    snippets: 'snippets.gif',
+    vibecheck: 'vibecheck.gif',
+    autopilot: 'autopilot.gif',
+    rushq: 'rushq.gif',
+    ehq: 'ehq.gif',
+  };
+
+  /* Global flag — settings panel sets this */
+  window._neoPreviewsEnabled = false;
+
+  const failed = new Set();
+
+  document.querySelectorAll('.site-card[data-card-id]').forEach(function (card) {
+    const id = card.dataset.cardId;
+    if (!PREVIEW_MAP[id]) return;
+
+    let timer = null;
+    let previewEl = null;
+
+    function getOrCreatePreview() {
+      if (previewEl) return previewEl;
+      previewEl = document.createElement('div');
+      previewEl.className = 'card-preview';
+      previewEl.innerHTML = '<img alt="" loading="lazy">';
+      card.appendChild(previewEl);
+      return previewEl;
+    }
+
+    function show() {
+      if (!window._neoPreviewsEnabled) return;
+      if (failed.has(id)) return;
+      var el = getOrCreatePreview();
+      var img = el.querySelector('img');
+      if (!img.src || img.src === location.href) {
+        img.src = PREVIEW_PATH + PREVIEW_MAP[id];
+        img.onerror = function () {
+          failed.add(id);
+          el.classList.remove('visible');
+          img.removeAttribute('src');
+        };
+      }
+      el.classList.add('visible');
+    }
+
+    function hide() {
+      clearTimeout(timer);
+      timer = null;
+      if (previewEl) previewEl.classList.remove('visible');
+    }
+
+    card.addEventListener('mouseenter', function () {
+      if (!window._neoPreviewsEnabled) return;
+      if (failed.has(id)) return;
+      timer = setTimeout(show, HOVER_DELAY);
+    });
+    card.addEventListener('mouseleave', hide);
+    card.addEventListener('dragstart', hide);
   });
 })();
 </script>
