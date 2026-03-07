@@ -63,6 +63,7 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
+      transition: opacity 1.2s;
     }
 
     /* ── Ambient glow orbs ───────────────────────────────────────────────── */
@@ -395,10 +396,11 @@
       padding: 40px 0 8px;
     }
     .secret-btn {
+      position: relative;
       background: none;
       border: none;
       cursor: pointer;
-      padding: 10px;
+      padding: 16px;
       opacity: 0.12;
       transition: opacity .4s, filter .4s;
       filter: grayscale(1) brightness(0.6);
@@ -415,16 +417,92 @@
       height: 22px;
     }
 
+    /* Proximity scanner ring */
+    .secret-btn .scanner-ring {
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      border: 1px solid rgba(56,189,248,0);
+      pointer-events: none;
+      transition: border-color .3s;
+    }
+    .secret-btn.scanning .scanner-ring {
+      animation: scanPulse 1.2s ease-out infinite;
+    }
+
+    @keyframes scanPulse {
+      0%   { transform: scale(0.8); border-color: rgba(56,189,248,.35); opacity: 1; }
+      100% { transform: scale(2.2); border-color: rgba(56,189,248,0); opacity: 0; }
+    }
+
+    /* Icon crossfade */
+    .secret-btn .icon-warning,
+    .secret-btn .icon-planet {
+      transition: opacity .6s, transform .6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .secret-btn .icon-planet {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.3) rotate(-90deg);
+      opacity: 0;
+      width: 32px; height: 32px;
+      filter: drop-shadow(0 0 12px rgba(56,189,248,.6));
+    }
+    .secret-btn.revealed .icon-warning {
+      opacity: 0;
+      transform: scale(0.3) rotate(90deg);
+    }
+    .secret-btn.revealed .icon-planet {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+    .secret-btn.revealed {
+      opacity: 0.7;
+      filter: none;
+    }
+
+    /* Discovery burst */
+    .discovery-burst {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56,189,248,.15) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .discovery-burst.active {
+      animation: burstExpand .9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes burstExpand {
+      0%   { width: 0; height: 0; opacity: 1; }
+      100% { width: 500px; height: 500px; opacity: 0; }
+    }
+
+    /* Slow orbit for revealed planet */
+    .secret-btn.revealed .icon-planet {
+      animation: gentleOrbit 20s linear infinite;
+    }
+    @keyframes gentleOrbit {
+      from { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      to   { transform: translate(-50%, -50%) scale(1) rotate(360deg); }
+    }
+
     /* ── Secret section ────────────────────────────────────────────────── */
     .secret-section {
       max-height: 0;
       overflow: hidden;
       opacity: 0;
-      transition: max-height .5s ease, opacity .4s ease;
+      transform: translateY(20px);
+      transition: max-height .8s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity .6s ease .15s,
+                  transform .6s cubic-bezier(0.22, 1, 0.36, 1) .15s;
     }
     .secret-section.revealed {
       max-height: 600px;
       opacity: 1;
+      transform: translateY(0);
     }
     .secret-section .section-label {
       color: rgba(251,191,36,.35);
@@ -970,6 +1048,34 @@
       line-height: 1.6;
       margin-top: 8px;
     }
+    .settings-seg {
+      display: flex;
+      gap: 0;
+      background: rgba(255,255,255,.06);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .settings-seg button {
+      flex: 1;
+      padding: 5px 10px;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,.5);
+      font-size: .72rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .25s, color .25s;
+      white-space: nowrap;
+    }
+    .settings-seg button.active {
+      background: rgba(192,132,252,.3);
+      color: #fff;
+    }
+    .settings-seg button:hover:not(.active) {
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.7);
+    }
     .settings-hint kbd {
       display: inline-block;
       padding: 1px 5px;
@@ -987,9 +1093,124 @@
       z-index: 0;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 1s;
+      transition: opacity 1.2s;
     }
     #matrixCanvas.active { opacity: 0.7; }
+
+    /* Card contrast boost when matrix background is active */
+    body.matrix-bg .site-card {
+      background: rgba(0, 12, 24, .82);
+      border-color: rgba(0, 255, 70, .12);
+      box-shadow: 0 0 18px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(0, 255, 70, .05);
+    }
+    body.matrix-bg .site-card:hover {
+      border-color: var(--card-glow-border, rgba(0, 255, 70, .25));
+    }
+    body.matrix-bg .site-card .card-title { color: rgba(255, 255, 255, .95); }
+    body.matrix-bg .site-card .card-desc { color: rgba(255, 255, 255, .7); }
+    body.matrix-bg .hero-section { text-shadow: 0 0 20px rgba(0,0,0,.8); }
+    body.matrix-bg .site-card.featured {
+      background: rgba(0, 12, 24, .88);
+      border-color: rgba(0, 255, 70, .15);
+    }
+
+    /* ── L Intervention (Death Note CRT broadcast) ───────────── */
+    #interventionCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.8s;
+    }
+    #interventionCanvas.active { opacity: 1; }
+
+    body.intervention-bg { color: #1a1a1a; background: #ededea; }
+
+    /* Header */
+    body.intervention-bg .site-header { border-bottom-color: rgba(0,0,0,.08); }
+    body.intervention-bg .logo-img { filter: brightness(0); opacity: .8; }
+    body.intervention-bg .logo-name { color: #111; }
+    body.intervention-bg .header-link { color: rgba(0,0,0,.6); }
+    body.intervention-bg .header-link:hover { color: #000; border-color: rgba(0,0,0,.15); background: rgba(0,0,0,.05); }
+    body.intervention-bg .hero-badge { background: rgba(0,0,0,.06); color: #333; border-color: rgba(0,0,0,.1); }
+    body.intervention-bg .hero-badge .badge-dot { background: #333; }
+
+    /* Hero */
+    body.intervention-bg .hero { text-shadow: none; }
+    body.intervention-bg .hero h1 { color: #111; }
+    body.intervention-bg .hero .hero-sub { color: #555; }
+    body.intervention-bg .hero .typing-cursor { background: #333; }
+
+    /* Cards */
+    body.intervention-bg .site-card {
+      background: rgba(255, 255, 255, .92);
+      border-color: rgba(0, 0, 0, .08);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+    }
+    body.intervention-bg .site-card:hover {
+      border-color: rgba(0, 0, 0, .18);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
+    }
+    body.intervention-bg .site-card .card-title { color: #111; }
+    body.intervention-bg .site-card .card-desc { color: #444; }
+    body.intervention-bg .site-card .card-domain { color: #666; }
+    body.intervention-bg .site-card .card-tag {
+      background: rgba(0, 0, 0, .05);
+      color: #444;
+      border-color: rgba(0, 0, 0, .1);
+    }
+    body.intervention-bg .site-card .card-arrow { color: #666; }
+    body.intervention-bg .site-card .card-site-icon { filter: brightness(0.15); }
+    body.intervention-bg .site-card.featured {
+      background: rgba(255, 255, 255, .95);
+      border-color: rgba(0, 0, 0, .1);
+    }
+    body.intervention-bg .site-card::before { opacity: 0 !important; }
+    body.intervention-bg .site-card::after { opacity: 0 !important; }
+
+    /* Sections & footer */
+    body.intervention-bg .sites-heading { color: #222; }
+    body.intervention-bg .site-footer,
+    body.intervention-bg .footer-link { color: #666; }
+    body.intervention-bg .secret-btn { border-color: rgba(0,0,0,.1); }
+    body.intervention-bg .secret-btn .icon-warning { filter: brightness(0.3); }
+    body.intervention-bg .orb { display: none; }
+
+    /* Bottom buttons + settings panel */
+    body.intervention-bg .music-toggle,
+    body.intervention-bg .settings-btn {
+      background: rgba(0, 0, 0, .06);
+      color: #444;
+      border-color: rgba(0, 0, 0, .1);
+    }
+    body.intervention-bg .music-toggle:hover,
+    body.intervention-bg .settings-btn:hover {
+      background: rgba(0, 0, 0, .1);
+      color: #222;
+    }
+    body.intervention-bg .settings-panel {
+      background: rgba(255, 255, 255, .92);
+      border-color: rgba(0, 0, 0, .1);
+      backdrop-filter: blur(16px);
+    }
+    body.intervention-bg .settings-title { color: #222; }
+    body.intervention-bg .settings-label { color: #444; }
+    body.intervention-bg .settings-divider { border-color: rgba(0, 0, 0, .08); }
+    body.intervention-bg .settings-hint { color: #888; }
+    body.intervention-bg .settings-hint kbd {
+      background: rgba(0, 0, 0, .06);
+      color: #444;
+      border-color: rgba(0, 0, 0, .1);
+    }
+    body.intervention-bg .settings-seg {
+      background: rgba(0, 0, 0, .05);
+      border-color: rgba(0, 0, 0, .1);
+    }
+    body.intervention-bg .settings-seg button { color: #888; }
+    body.intervention-bg .settings-seg button.active { background: rgba(0, 0, 0, .08); color: #111; }
+    body.intervention-bg .settings-seg button:hover:not(.active) { background: rgba(0, 0, 0, .04); color: #555; }
+    body.intervention-bg .card-name { color: #111; }
 
     /* ── Entrance animation ─────────────────────────────────────── */
     @keyframes fadeIn {
@@ -1019,6 +1240,7 @@
 <!-- Starfield -->
 <canvas id="starfield"></canvas>
 <canvas id="matrixCanvas"></canvas>
+<canvas id="interventionCanvas"></canvas>
 <div class="cursor-glow" id="cursorGlow"></div>
 <div class="warp-toast" id="warpToast">Warp Engaged</div>
 <div class="arrival-toast" id="arrivalToast">
@@ -1041,7 +1263,10 @@
   <!-- Header -->
   <header class="site-header">
     <a class="logo-wrap" href="https://ehq.cl/" target="_blank" rel="noopener noreferrer">
-      <img src="energon-classic-logo.png" class="logo-img" alt="Energon">
+      <picture>
+        <source srcset="energon-classic-logo.webp" type="image/webp">
+        <img src="energon-classic-logo.png" class="logo-img" alt="Energon" width="36" height="36">
+      </picture>
       <span class="logo-name">Neorgon</span>
     </a>
     <nav class="header-links">
@@ -1077,7 +1302,7 @@
          style="--card-glow: rgba(74,222,128,.3); --card-glow-border: rgba(74,222,128,.35); --card-accent: #4ade80;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/pathfinder.svg" class="card-site-icon" alt="Pathfinder"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/pathfinder.svg" class="card-site-icon" alt="Pathfinder" width="36" height="36"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">pathfinder.neorgon.com</div>
@@ -1097,7 +1322,7 @@
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #fbbf24;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/local-drills.svg" class="card-site-icon" alt="Infra Drills"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/local-drills.svg" class="card-site-icon" alt="Infra Drills" width="28" height="28"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">infradrills.neorgon.com</div>
@@ -1117,7 +1342,7 @@
          style="--card-glow: rgba(167,139,250,.3); --card-glow-border: rgba(167,139,250,.35); --card-accent: #a78bfa;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/skill-roadmap.svg" class="card-site-icon" alt="Skill Map"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/skill-roadmap.svg" class="card-site-icon" alt="Skill Map" width="28" height="28"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">skillmap.neorgon.com</div>
@@ -1137,7 +1362,7 @@
            style="--card-glow: rgba(236,72,153,.3); --card-glow-border: rgba(236,72,153,.35); --card-accent: #f472b6;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/client-says.svg" class="card-site-icon" alt="Client Says"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/client-says.svg" class="card-site-icon" alt="Client Says" width="28" height="28"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">clientsays.neorgon.com</div>
@@ -1168,7 +1393,7 @@
            style="--card-glow: rgba(52,211,153,.3); --card-glow-border: rgba(52,211,153,.35); --card-accent: #34d399;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/spin-the-wheel.svg" class="card-site-icon" alt="Decision Wheel"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/spin-the-wheel.svg" class="card-site-icon" alt="Decision Wheel" width="28" height="28"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">decisionwheel.neorgon.com</div>
@@ -1198,7 +1423,7 @@
            style="--card-glow: rgba(244,114,182,.3); --card-glow-border: rgba(244,114,182,.35); --card-accent: #f472b6;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/reference-matrix.svg" class="card-site-icon" alt="Reference Matrix"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/reference-matrix.svg" class="card-site-icon" alt="Reference Matrix" width="28" height="28"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">references.neorgon.com</div>
@@ -1229,7 +1454,7 @@
            style="--card-glow: rgba(45,212,191,.3); --card-glow-border: rgba(45,212,191,.35); --card-accent: #2dd4bf;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/json-builder.svg" class="card-site-icon" alt="JSON Studio"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/json-builder.svg" class="card-site-icon" alt="JSON Studio" width="28" height="28"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">jsonstudio.neorgon.com</div>
@@ -1263,7 +1488,7 @@
          style="--card-glow: rgba(251,146,60,.3); --card-glow-border: rgba(251,146,60,.35); --card-accent: #fb923c;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/presentation-sage.svg" class="card-site-icon" alt="Presentation Sage"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/presentation-sage.svg" class="card-site-icon" alt="Presentation Sage" width="28" height="28"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">slides.neorgon.com</div>
@@ -1284,7 +1509,7 @@
            style="--card-glow: rgba(34,211,238,.3); --card-glow-border: rgba(34,211,238,.35); --card-accent: #22d3ee;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/emojis.svg" class="card-site-icon" alt="Emoji Archive"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/emojis.svg" class="card-site-icon" alt="Emoji Archive" width="28" height="28"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">emojis.neorgon.com</div>
@@ -1313,7 +1538,7 @@
          style="--card-glow: rgba(244,63,94,.3); --card-glow-border: rgba(244,63,94,.35); --card-accent: #f43f5e;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/memes.svg" class="card-site-icon" alt="Meme Vault"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/memes.svg" class="card-site-icon" alt="Meme Vault" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">memes.neorgon.com</div>
@@ -1333,7 +1558,7 @@
          style="--card-glow: rgba(232,121,249,.3); --card-glow-border: rgba(232,121,249,.35); --card-accent: #e879f9;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/character-sheet.svg" class="card-site-icon" alt="Character Sheet"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/character-sheet.svg" class="card-site-icon" alt="Character Sheet" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">charactersheet.neorgon.com</div>
@@ -1353,7 +1578,7 @@
          style="--card-glow: rgba(163,230,53,.3); --card-glow-border: rgba(163,230,53,.35); --card-accent: #a3e635;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/og-studio.svg" class="card-site-icon" alt="OG Studio"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/og-studio.svg" class="card-site-icon" alt="OG Studio" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">ogstudio.neorgon.com</div>
@@ -1373,7 +1598,7 @@
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #f59e0b;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/buyhacks.svg" class="card-site-icon" alt="BuyHacks"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/buyhacks.svg" class="card-site-icon" alt="BuyHacks" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">buyhacks.neorgon.com</div>
@@ -1393,7 +1618,10 @@
   <!-- Secret trigger -->
   <div class="secret-trigger">
     <button class="secret-btn" id="secretToggle" aria-label="Show more tools" aria-expanded="false" aria-controls="secretSection">
-      <img src="assets/icons/warning.svg" alt="" width="22" height="22">
+      <span class="scanner-ring"></span>
+      <span class="discovery-burst"></span>
+      <img class="icon-warning" src="assets/icons/warning.svg" alt="" width="22" height="22">
+      <img class="icon-planet" src="assets/icons/earth.svg" alt="" width="32" height="32">
     </button>
   </div>
 
@@ -1413,7 +1641,7 @@
         </div>
         <a class="card-content ghost-revealed" href="https://interviews.neorgon.com/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/interviews.svg" class="card-site-icon" alt="Vibe Check"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/interviews.svg" class="card-site-icon" alt="Vibe Check" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">interviews.neorgon.com</div>
@@ -1437,7 +1665,7 @@
         </div>
         <a class="card-content ghost-revealed" href="https://autopilot.neorgon.com/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/autopilot.svg" class="card-site-icon" alt="Autopilot"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/autopilot.svg" class="card-site-icon" alt="Autopilot" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">autopilot.neorgon.com</div>
@@ -1461,7 +1689,7 @@
         </div>
         <a class="card-content ghost-revealed" href="https://rushq.neorgon.com/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/rush-q-cards.svg" class="card-site-icon" alt="Rush Q Cards"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/rush-q-cards.svg" class="card-site-icon" alt="Rush Q Cards" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">internal</div>
@@ -1485,7 +1713,7 @@
         </div>
         <a class="card-content ghost-revealed" href="https://ehq.cl/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/energon-logo.png" class="card-site-icon" alt="Energon" style="width:40px;height:40px;"></div>
+            <div class="card-icon-wrap"><picture><source srcset="assets/icons/energon-logo.webp" type="image/webp"><img src="assets/icons/energon-logo.png" class="card-site-icon" alt="Energon" width="40" height="40" loading="lazy" style="width:40px;height:40px;"></picture></div>
             <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">ehq.cl</div>
@@ -1536,6 +1764,15 @@
     <button class="settings-toggle on" id="togGlow" aria-label="Toggle glow"></button>
   </div>
   <div class="settings-divider"></div>
+  <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
+    <span class="settings-label">Background</span>
+    <div class="settings-seg" id="bgPicker">
+      <button data-bg="stars" class="active">Stars</button>
+      <button data-bg="matrix">Matrix</button>
+      <button data-bg="intervention">L</button>
+    </div>
+  </div>
+  <div class="settings-divider"></div>
   <div class="settings-hint">
     <kbd>Esc</kbd> <kbd>Esc</kbd> Terminal<br>
     <kbd>↑↑↓↓←→←→BA</kbd> Warp drive<br>
@@ -1580,14 +1817,19 @@ let warpIntensity = 0;
     H = canvas.height = window.innerHeight;
     cx = W / 2;
     cy = H / 2;
-    stars = Array.from({ length: 200 }, () => ({
-      x:      Math.random() * W,
-      y:      Math.random() * H,
-      r:      Math.random() * 1.4 + 0.3,
-      base:   Math.random() * 0.6 + 0.1,
-      speed:  Math.random() * 0.015 + 0.004,
-      phase:  Math.random() * Math.PI * 2,
-    }));
+    stars = Array.from({ length: 200 }, (_, i) => {
+      const twinkle = i < 20;
+      return {
+        x:      Math.random() * W,
+        y:      Math.random() * H,
+        r:      twinkle ? Math.random() * 1.2 + 0.8 : Math.random() * 1.4 + 0.3,
+        base:   twinkle ? Math.random() * 0.15 + 0.03 : Math.random() * 0.6 + 0.1,
+        speed:  twinkle ? Math.random() * 0.024 + 0.009 : Math.random() * 0.015 + 0.004,
+        phase:  Math.random() * Math.PI * 2,
+        twinkle,
+        flareTimer: twinkle ? Math.random() * 400 : 0,
+      };
+    });
   }
 
   let wasWarp = false;
@@ -1660,6 +1902,32 @@ let warpIntensity = 0;
           const r = Math.random() * Math.random() * maxR * 0.4;
           s.x = cx + Math.cos(a) * r;
           s.y = cy + Math.sin(a) * r;
+        }
+      } else if (s.twinkle) {
+        /* Twinkle stars — sharper oscillation + occasional bright flare with glow */
+        s.flareTimer--;
+        let flare = 0;
+        if (s.flareTimer <= 0) {
+          s.flareTimer = Math.random() * 500 + 200;
+          flare = 1;
+        }
+        const twinkleOp = s.base + 0.85 * Math.pow(Math.abs(Math.sin(s.phase)), 3);
+        const op = Math.min(1, twinkleOp + flare * 0.6);
+        const glowR = s.r + (flare > 0 ? 3 : op > 0.6 ? 1.5 * op : 0);
+        if (glowR > s.r) {
+          ctx.save();
+          ctx.shadowBlur = glowR * 4;
+          ctx.shadowColor = 'rgba(180, 210, 255, 0.7)';
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r * 1.1, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(210, 230, 255, ${op})`;
+          ctx.fill();
+          ctx.restore();
+        } else {
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(210, 230, 255, ${twinkleOp})`;
+          ctx.fill();
         }
       } else {
         ctx.beginPath();
@@ -1865,14 +2133,77 @@ document.querySelectorAll('.site-card.multi-tool').forEach(card => {
   });
 });
 
-/* ── Secret section toggle ────────────────────────────────────────────────── */
-document.getElementById('secretToggle').addEventListener('click', () => {
-  const section = document.getElementById('secretSection');
+/* ── Secret section — proximity scanner + Kamino reveal ───────────────────── */
+(function () {
   const btn = document.getElementById('secretToggle');
-  const open = section.classList.toggle('revealed');
-  btn.setAttribute('aria-expanded', open);
-  if (open) section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-});
+  const section = document.getElementById('secretSection');
+  if (!btn || !section) return;
+
+  const SCAN_RADIUS = 320;
+  let scanInterval = null;
+  let lastPingTime = 0;
+
+  /* Proximity sonar — pings faster as mouse approaches */
+  document.addEventListener('mousemove', e => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const rect = btn.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+
+    if (dist < SCAN_RADIUS && !section.classList.contains('revealed')) {
+      btn.classList.add('scanning');
+
+      /* Ping rate: closer = faster (200ms to 800ms) */
+      const proximity = 1 - (dist / SCAN_RADIUS);
+      const interval = 800 - proximity * 600;
+      const now = Date.now();
+
+      if (now - lastPingTime > interval && window._neoSound && window._neoSoundEnabled !== false) {
+        lastPingTime = now;
+        /* Sonar ping — frequency rises with proximity */
+        const freq = 600 + proximity * 800;
+        const vol = 0.03 + proximity * 0.06;
+        if (window._neoSoundPing) window._neoSoundPing(freq, vol);
+      }
+
+      /* Visual: button opacity scales with proximity */
+      btn.style.opacity = 0.12 + proximity * 0.35;
+    } else {
+      btn.classList.remove('scanning');
+      if (!section.classList.contains('revealed')) {
+        btn.style.opacity = '';
+      }
+    }
+  });
+
+  /* Click — Kamino reveal */
+  btn.addEventListener('click', () => {
+    const opening = section.classList.toggle('revealed');
+    btn.setAttribute('aria-expanded', opening);
+
+    if (opening) {
+      btn.classList.remove('scanning');
+      btn.classList.add('revealed');
+      btn.style.opacity = '';
+
+      /* Burst effect */
+      const burst = btn.querySelector('.discovery-burst');
+      burst.classList.remove('active');
+      void burst.offsetWidth;
+      burst.classList.add('active');
+
+      /* Discovery sound */
+      if (window._neoSoundDiscover) window._neoSoundDiscover();
+
+      setTimeout(() => {
+        section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 300);
+    } else {
+      btn.classList.remove('revealed');
+    }
+  });
+})();
 
 /* ── Ghost card unlock ─────────────────────────────────────────────────────── */
 document.querySelectorAll('.ghost-card').forEach(card => {
@@ -2098,8 +2429,11 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     exit() { closeTerm(); },
     matrix(args) {
       if (window.toggleMatrix) {
-        window.toggleMatrix();
-        addLine('Wake up, Neo...', 'sys');
+        const isActive = window.toggleMatrix();
+        const mode = isActive ? 'matrix' : 'stars';
+        addLine(isActive ? 'Wake up, Neo...' : 'Welcome back to reality.', 'sys');
+        if (window._neoBgSync) window._neoBgSync(mode);
+        if (window._neoMusicSwitch) window._neoMusicSwitch(mode);
         if ((args || '').trim().toLowerCase() === 'background') {
           closeTerm();
         }
@@ -2326,14 +2660,37 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     return ready;
   }
 
+  /* AudioContext requires a trusted gesture (click/keydown/touch) before
+     it can run. Hover (mouseenter) is NOT trusted, so we must ensure the
+     context is created and resumed during a real gesture. We keep listening
+     until resume() actually resolves to 'running'. */
   function onGesture() {
     ensureContext();
-    if (ctx && ctx.state === 'running') {
-      ['click', 'keydown', 'touchstart'].forEach(ev =>
-        document.removeEventListener(ev, onGesture, true)
-      );
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().then(() => cleanup());
+    } else if (ctx && ctx.state === 'running') {
+      cleanup();
     }
   }
+  function cleanup() {
+    if (cleaned) return;
+    cleaned = true;
+    ['click', 'keydown', 'touchstart'].forEach(ev =>
+      document.removeEventListener(ev, onGesture, true)
+    );
+    /* Silent warm-up: schedule a near-inaudible blip so the context is fully
+       primed and the next hover sound plays instantly with no lag. */
+    if (ctx && window._neoSoundEnabled !== false) {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      g.gain.value = 0.001;
+      osc.connect(g);
+      g.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.01);
+    }
+  }
+  let cleaned = false;
   ['click', 'keydown', 'touchstart'].forEach(ev =>
     document.addEventListener(ev, onGesture, { capture: true })
   );
@@ -2544,6 +2901,40 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     });
   }
 
+  /* Proximity sonar ping — variable freq/vol */
+  window._neoSoundPing = function (freq, vol) {
+    if (window._neoSoundEnabled === false) return;
+    if (!ctx) ensureContext();
+    if (!ready || !ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.7, now + 0.15);
+    gain.gain.setValueAtTime(vol, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.16);
+  };
+
+  /* Discovery reveal — ascending shimmer chord */
+  window._neoSoundDiscover = function () {
+    if (window._neoSoundEnabled === false) return;
+    if (!ctx) ensureContext();
+    if (!ready || !ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const notes = [440, 554, 659, 880, 1108];
+    notes.forEach((f, i) => {
+      setTimeout(() => playTone(f, 0.3, 0.045, 'sine', f * 1.5), i * 80);
+    });
+    /* Deep sub hit */
+    setTimeout(() => playTone(110, 0.4, 0.06, 'triangle'), 50);
+  };
+
   window._neoSound = { dragStart, dropCard, unlock, termOpen, termClose, konamiKey, konamiFail, warpEngage, deny };
 })();
 </script>
@@ -2627,7 +3018,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 })();
 </script>
 
-<!-- Ambient generative music -->
+<!-- Ambient generative music (mode-aware) -->
 <script>
 (function () {
   const btn = document.getElementById('musicToggle');
@@ -2636,14 +3027,27 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   let playing = false;
   let audioCtx = null;
   let nodes = [];
+  let currentMode = 'stars';
 
-  function startMusic() {
+  function stopMusic() {
+    playing = false;
+    nodes.forEach(n => { try { n.stop(); } catch {} });
+    nodes = [];
+    if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  }
+
+  function makeCtx() {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const master = audioCtx.createGain();
     master.gain.value = 0.12;
     master.connect(audioCtx.destination);
+    return master;
+  }
 
-    /* Pad drone — slow-moving filtered saw chords */
+  /* ── Stars — cosmic ambient (original) ─────────────────────── */
+  function startStarsMusic() {
+    const master = makeCtx();
+
     function createDrone(freq) {
       const osc = audioCtx.createOscillator();
       osc.type = 'sawtooth';
@@ -2659,26 +3063,20 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       gain.connect(master);
       osc.start();
       nodes.push(osc);
-
-      /* Slowly modulate filter */
       (function sweep() {
         if (!audioCtx || !playing) return;
         const now = audioCtx.currentTime;
-        const target = 200 + Math.random() * 600;
-        filter.frequency.linearRampToValueAtTime(target, now + 4 + Math.random() * 4);
+        filter.frequency.linearRampToValueAtTime(200 + Math.random() * 600, now + 4 + Math.random() * 4);
         setTimeout(sweep, 4000 + Math.random() * 4000);
       })();
     }
-
     createDrone(55);
     createDrone(82.41);
     createDrone(110);
 
-    /* Arpeggio chimes — random pentatonic notes */
     const NOTES = [220, 261.6, 329.6, 392, 440, 523.3, 659.3, 784];
-
     function chime() {
-      if (!playing) return;
+      if (!playing || currentMode !== 'stars') return;
       const freq = NOTES[Math.floor(Math.random() * NOTES.length)];
       const osc = audioCtx.createOscillator();
       osc.type = 'sine';
@@ -2694,10 +3092,8 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       osc.stop(now + 2.5);
       setTimeout(chime, 800 + Math.random() * 2200);
     }
-
     setTimeout(chime, 500);
 
-    /* Sub pulse */
     const sub = audioCtx.createOscillator();
     sub.type = 'sine';
     sub.frequency.value = 36.7;
@@ -2709,11 +3105,185 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     nodes.push(sub);
   }
 
-  function stopMusic() {
-    nodes.forEach(n => { try { n.stop(); } catch {} });
-    nodes = [];
-    if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  /* ── Matrix — dark digital hum with glitchy pulses ─────────── */
+  function startMatrixMusic() {
+    const master = makeCtx();
+    master.gain.value = 0.10;
+
+    /* Deep digital drone — detuned square waves */
+    [41.2, 61.7, 82.4].forEach(freq => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'square';
+      osc.frequency.value = freq;
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 200;
+      filter.Q.value = 4;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.12;
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(master);
+      osc.start();
+      nodes.push(osc);
+      (function sweep() {
+        if (!audioCtx || !playing) return;
+        const now = audioCtx.currentTime;
+        filter.frequency.linearRampToValueAtTime(100 + Math.random() * 300, now + 3 + Math.random() * 5);
+        setTimeout(sweep, 3000 + Math.random() * 5000);
+      })();
+    });
+
+    /* Glitch blips — short high-pitched random bursts */
+    function blip() {
+      if (!playing || currentMode !== 'matrix') return;
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      osc.type = Math.random() > 0.5 ? 'square' : 'sawtooth';
+      osc.frequency.setValueAtTime(800 + Math.random() * 2000, now);
+      osc.frequency.exponentialRampToValueAtTime(200 + Math.random() * 400, now + 0.08);
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.06 + Math.random() * 0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.15);
+      setTimeout(blip, 1500 + Math.random() * 4000);
+    }
+    setTimeout(blip, 800);
+
+    /* Sub bass throb */
+    const sub = audioCtx.createOscillator();
+    sub.type = 'sine';
+    sub.frequency.value = 30;
+    const subGain = audioCtx.createGain();
+    subGain.gain.value = 0.14;
+    sub.connect(subGain);
+    subGain.connect(master);
+    sub.start();
+    nodes.push(sub);
+
+    /* Slow LFO on sub */
+    const lfo = audioCtx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.08;
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = 0.06;
+    lfo.connect(lfoGain);
+    lfoGain.connect(subGain.gain);
+    lfo.start();
+    nodes.push(lfo);
   }
+
+  /* ── L Intervention — tense piano-like + eerie strings ─────── */
+  function startInterventionMusic() {
+    const master = makeCtx();
+    master.gain.value = 0.10;
+
+    /* Low string drone — minor second dissonance */
+    [130.8, 138.6, 65.4].forEach(freq => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.value = freq;
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 250;
+      filter.Q.value = 1.5;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.08;
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(master);
+      osc.start();
+      nodes.push(osc);
+      (function sweep() {
+        if (!audioCtx || !playing) return;
+        const now = audioCtx.currentTime;
+        filter.frequency.linearRampToValueAtTime(150 + Math.random() * 250, now + 5 + Math.random() * 5);
+        setTimeout(sweep, 5000 + Math.random() * 5000);
+      })();
+    });
+
+    /* Sparse piano-like notes — minor key, Death Note vibe */
+    const MINOR_NOTES = [130.8, 146.8, 155.6, 174.6, 196, 207.7, 233.1, 261.6];
+    function pianoNote() {
+      if (!playing || currentMode !== 'intervention') return;
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const freq = MINOR_NOTES[Math.floor(Math.random() * MINOR_NOTES.length)];
+      const octave = Math.random() > 0.6 ? 2 : 1;
+
+      /* Simulate piano attack with triangle + fast decay */
+      const osc = audioCtx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.value = freq * octave;
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.12 + Math.random() * 0.06, now + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.02, now + 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 2 + Math.random());
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(now);
+      osc.stop(now + 3);
+      setTimeout(pianoNote, 2000 + Math.random() * 5000);
+    }
+    setTimeout(pianoNote, 1000);
+
+    /* High eerie whistle — very quiet */
+    const whistle = audioCtx.createOscillator();
+    whistle.type = 'sine';
+    whistle.frequency.value = 1046;
+    const whistleGain = audioCtx.createGain();
+    whistleGain.gain.value = 0.015;
+    whistle.connect(whistleGain);
+    whistleGain.connect(master);
+    whistle.start();
+    nodes.push(whistle);
+
+    /* Slow vibrato on whistle */
+    const vib = audioCtx.createOscillator();
+    vib.type = 'sine';
+    vib.frequency.value = 4;
+    const vibGain = audioCtx.createGain();
+    vibGain.gain.value = 8;
+    vib.connect(vibGain);
+    vibGain.connect(whistle.frequency);
+    vib.start();
+    nodes.push(vib);
+
+    /* Deep tension sub */
+    const sub = audioCtx.createOscillator();
+    sub.type = 'sine';
+    sub.frequency.value = 32.7;
+    const subGain = audioCtx.createGain();
+    subGain.gain.value = 0.12;
+    sub.connect(subGain);
+    subGain.connect(master);
+    sub.start();
+    nodes.push(sub);
+  }
+
+  function startMusic() {
+    const prefs = JSON.parse(localStorage.getItem('neorgon-prefs') || '{}');
+    currentMode = prefs.bg || 'stars';
+    if (currentMode === 'matrix') startMatrixMusic();
+    else if (currentMode === 'intervention') startInterventionMusic();
+    else startStarsMusic();
+  }
+
+  /* Called by settings when bg changes while music is playing */
+  window._neoMusicSwitch = function (mode) {
+    currentMode = mode;
+    if (playing) {
+      stopMusic();
+      playing = true;
+      btn.classList.add('playing');
+      startMusic();
+    }
+  };
 
   /* Hide button if user prefers reduced motion */
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -2723,15 +3293,19 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 
   btn.addEventListener('click', () => {
     if (window._neoSoundEnabled === false) return;
-    playing = !playing;
-    btn.classList.toggle('playing', playing);
-    if (playing) startMusic();
-    else stopMusic();
+    if (playing) {
+      stopMusic();
+      btn.classList.remove('playing');
+    } else {
+      playing = true;
+      btn.classList.add('playing');
+      startMusic();
+    }
   });
 })();
 </script>
 
-<!-- Matrix rain easter egg (type "matrix" in terminal) -->
+<!-- Matrix rain (settings toggle + terminal command) -->
 <script>
 (function () {
   const canvas = document.getElementById('matrixCanvas');
@@ -2740,27 +3314,41 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   let active = false;
   let animId = null;
   let drops = [];
+  let colSpeed = [];     /* per-column speed multiplier */
+  let slowMode = true;   /* background mode = slow */
+  let collapsing = false;
+  let collapseAlpha = 1;
 
   const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789NEORGON';
+  const COL_W = 14;
 
   function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    const cols = Math.floor(canvas.width / 14);
+    const cols = Math.floor(canvas.width / COL_W);
     drops = Array.from({ length: cols }, () => Math.random() * -50);
+    colSpeed = Array.from({ length: cols }, () => 0.6 + Math.random() * 0.8);
   }
 
   function draw() {
-    if (!active) return;
-    mCtx.fillStyle = 'rgba(0, 9, 18, 0.06)';
+    if (!active && !collapsing) return;
+
+    if (collapsing) {
+      drawCollapse();
+      return;
+    }
+
+    const speed = slowMode ? 0.35 : 1;
+    const fade = slowMode ? 0.035 : 0.06;
+
+    mCtx.fillStyle = `rgba(0, 9, 18, ${fade})`;
     mCtx.fillRect(0, 0, canvas.width, canvas.height);
-    mCtx.fillStyle = '#0f0';
     mCtx.font = '13px monospace';
 
     for (let i = 0; i < drops.length; i++) {
       const char = chars[Math.floor(Math.random() * chars.length)];
-      const x = i * 14;
-      const y = drops[i] * 14;
+      const x = i * COL_W;
+      const y = drops[i] * COL_W;
 
       const brightness = Math.random();
       if (brightness > 0.95) mCtx.fillStyle = '#fff';
@@ -2769,25 +3357,262 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 
       mCtx.fillText(char, x, y);
       if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
+      drops[i] += speed * colSpeed[i];
     }
+    animId = requestAnimationFrame(draw);
+  }
+
+  /* Collapse exit — snapshot into column slices that fall at random speeds */
+  let colSlices = [];
+
+  function startCollapse() {
+    collapsing = true;
+    collapseAlpha = 1;
+    /* Snapshot current canvas into an offscreen copy */
+    const snap = document.createElement('canvas');
+    snap.width = canvas.width;
+    snap.height = canvas.height;
+    snap.getContext('2d').drawImage(canvas, 0, 0);
+
+    const cols = Math.floor(canvas.width / COL_W);
+    colSlices = Array.from({ length: cols }, (_, i) => ({
+      img: snap,
+      sx: i * COL_W,
+      y: 0,
+      speed: 1 + Math.random() * 4,
+      accel: 0.15 + Math.random() * 0.4,
+      rot: (Math.random() - 0.5) * 0.02,
+      rotV: 0,
+    }));
+    animId = requestAnimationFrame(draw);
+  }
+
+  function drawCollapse() {
+    mCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+    /* Check if all slices have fallen off the bottom */
+    const allGone = colSlices.every(sl => sl.y > canvas.height + 100);
+
+    if (allGone) {
+      collapsing = false;
+      colSlices = [];
+      canvas.style.opacity = '';
+      mCtx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+
+    let visible = 0;
+    for (const sl of colSlices) {
+      sl.speed += sl.accel;
+      sl.y += sl.speed;
+      sl.rotV += sl.rot;
+
+      if (sl.y > canvas.height + canvas.height) continue;
+      visible++;
+
+      mCtx.save();
+      mCtx.translate(sl.sx + COL_W / 2, sl.y + canvas.height / 2);
+      mCtx.rotate(sl.rotV);
+      mCtx.drawImage(sl.img, sl.sx, 0, COL_W, canvas.height, -COL_W / 2, -canvas.height / 2, COL_W, canvas.height);
+      mCtx.restore();
+    }
+
     animId = requestAnimationFrame(draw);
   }
 
   window.addEventListener('resize', () => { if (active) resize(); });
 
+  /* Activate matrix */
+  function matrixOn() {
+    if (active) return;
+    active = true;
+    collapsing = false;
+    resize();
+    canvas.classList.add('active');
+    document.body.classList.add('matrix-bg');
+    document.getElementById('starfield').style.opacity = '0';
+    draw();
+  }
+
+  /* Deactivate matrix with collapse */
+  function matrixOff() {
+    if (!active) return;
+    active = false;
+    document.body.classList.remove('matrix-bg');
+    document.getElementById('starfield').style.opacity = '';
+    if (animId) cancelAnimationFrame(animId);
+    /* Keep canvas visible during collapse — bypass CSS transition */
+    canvas.style.opacity = '0.7';
+    canvas.classList.remove('active');
+    startCollapse();
+  }
+
+  /* Instant kill — no exit animation (for switching between bg modes) */
+  function matrixKill() {
+    if (!active && !collapsing) return;
+    active = false;
+    collapsing = false;
+    colSlices = [];
+    canvas.classList.remove('active');
+    canvas.style.opacity = '';
+    document.body.classList.remove('matrix-bg');
+    document.getElementById('starfield').style.opacity = '';
+    if (animId) cancelAnimationFrame(animId);
+    mCtx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  /* Public API */
   window.toggleMatrix = function () {
-    active = !active;
-    if (active) {
-      resize();
-      canvas.classList.add('active');
-      draw();
-    } else {
-      canvas.classList.remove('active');
-      if (animId) cancelAnimationFrame(animId);
-      mCtx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+    if (active) matrixOff(); else matrixOn();
     return active;
+  };
+  window.matrixOn = matrixOn;
+  window.matrixOff = matrixOff;
+  window.matrixKill = matrixKill;
+  window.isMatrixActive = function () { return active; };
+})();
+</script>
+
+<!-- L Intervention — Death Note CRT broadcast interference -->
+<script>
+(function () {
+  const canvas = document.getElementById('interventionCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let active = false;
+  let animId = null;
+  let frame = 0;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  /* Load the real Death Note L logo SVG as an Image for canvas drawing */
+  const lImg = new Image();
+  let lReady = false;
+  lImg.onload = () => { lReady = true; };
+  lImg.src = 'assets/icons/l-death-note-logo.svg';
+
+  function draw() {
+    if (!active) return;
+    frame++;
+    const W = canvas.width;
+    const H = canvas.height;
+
+    /* Solid white base */
+    ctx.fillStyle = '#f0f0ee';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Static scanlines — fixed alternating pattern */
+    for (let y = 0; y < H; y += 3) {
+      ctx.fillStyle = (y % 6 < 3) ? 'rgba(0, 0, 0, 0.06)' : 'rgba(0, 0, 0, 0.025)';
+      ctx.fillRect(0, y, W, 1);
+    }
+
+    /* Single slow rolling bright band */
+    const bandY = ((frame * 0.3) % (H + 200)) - 100;
+    const bandGrad = ctx.createLinearGradient(0, bandY - 50, 0, bandY + 50);
+    bandGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+    bandGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.08)');
+    bandGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.18)');
+    bandGrad.addColorStop(0.6, 'rgba(255, 255, 255, 0.08)');
+    bandGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = bandGrad;
+    ctx.fillRect(0, bandY - 50, W, 100);
+
+    /* Rare horizontal glitch tear */
+    if (Math.random() < 0.008) {
+      const tearY = Math.random() * H;
+      const tearH = 2 + Math.random() * 4;
+      const shift = (Math.random() - 0.5) * 15;
+      ctx.drawImage(canvas, 0, tearY, W, tearH, shift, tearY, W, tearH);
+    }
+
+    /* Rare VHS tracking wobble */
+    if (frame % 300 < 4) {
+      const wobbY = Math.random() * H;
+      const wobbH = 15 + Math.random() * 30;
+      ctx.drawImage(canvas, 0, wobbY, W, wobbH, Math.sin(frame * 0.3) * 2, wobbY, W, wobbH);
+    }
+
+    /* Death Note L logo — centered, screen-sized */
+    if (lReady) {
+      const lSize = Math.min(W, H) * 0.7;
+      const aspect = lImg.naturalWidth / lImg.naturalHeight;
+      const lH = lSize;
+      const lW = lH * aspect;
+      const lAlpha = 0.5 + 0.05 * Math.sin(frame * 0.003);
+
+      ctx.save();
+      ctx.globalAlpha = lAlpha;
+      ctx.drawImage(lImg, (W - lW) / 2, (H - lH) / 2, lW, lH);
+      ctx.restore();
+    }
+
+    /* Soft vignette */
+    const vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.72);
+    vg.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    vg.addColorStop(1, 'rgba(0, 0, 0, 0.05)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, W, H);
+
+    animId = requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { if (active) resize(); });
+
+  window.interventionOn = function () {
+    if (active) return;
+    active = true;
+    frame = 0;
+    resize();
+    canvas.classList.add('active');
+    document.body.classList.add('intervention-bg');
+    document.getElementById('starfield').style.opacity = '0';
+    draw();
+  };
+
+  window.interventionOff = function () {
+    if (!active) return;
+    active = false;
+    canvas.classList.remove('active');
+    document.body.classList.remove('intervention-bg');
+    document.getElementById('starfield').style.opacity = '';
+    if (animId) cancelAnimationFrame(animId);
+    /* Static burst then fade to black */
+    const W = canvas.width, H = canvas.height;
+    ctx.fillStyle = '#f0f0ee';
+    ctx.fillRect(0, 0, W, H);
+    const snapData = ctx.getImageData(0, 0, W, H);
+    const dd = snapData.data;
+    for (let i = 0; i < dd.length; i += 4) {
+      const v = 160 + Math.floor(Math.random() * 80);
+      dd[i] = v; dd[i + 1] = v; dd[i + 2] = v;
+    }
+    ctx.putImageData(snapData, 0, 0);
+    let fade = 1;
+    function fadeOut() {
+      fade -= 0.035;
+      if (fade <= 0) { ctx.clearRect(0, 0, W, H); return; }
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalAlpha = fade;
+      ctx.putImageData(snapData, 0, 0);
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(fadeOut);
+    }
+    requestAnimationFrame(fadeOut);
+  };
+
+  /* Instant kill — no exit animation */
+  window.interventionKill = function () {
+    if (!active) return;
+    active = false;
+    canvas.classList.remove('active');
+    document.body.classList.remove('intervention-bg');
+    document.getElementById('starfield').style.opacity = '';
+    if (animId) cancelAnimationFrame(animId);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 })();
 </script>
@@ -2800,7 +3625,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   const panel = document.getElementById('settingsPanel');
   if (!btn || !panel) return;
 
-  const defaults = { sound: true, glow: true };
+  const defaults = { sound: true, glow: true, bg: 'stars' };
 
   function loadPrefs() {
     try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(PREFS_KEY))); }
@@ -2836,6 +3661,50 @@ document.querySelectorAll('.ghost-card').forEach(card => {
   initToggle('togSound', 'sound');
   initToggle('togGlow', 'glow');
 
+  /* Background picker */
+  const bgPicker = document.getElementById('bgPicker');
+  if (bgPicker) {
+    const bgBtns = bgPicker.querySelectorAll('button[data-bg]');
+
+    function applyBg(mode) {
+      prefs.bg = mode;
+      savePrefs(prefs);
+      bgBtns.forEach(b => b.classList.toggle('active', b.dataset.bg === mode));
+
+      if (mode === 'stars') {
+        if (window.matrixOff) window.matrixOff();
+        if (window.interventionOff) window.interventionOff();
+      } else {
+        if (window.matrixKill) window.matrixKill();
+        if (window.interventionKill) window.interventionKill();
+        if (mode === 'matrix' && window.matrixOn) window.matrixOn();
+        if (mode === 'intervention' && window.interventionOn) window.interventionOn();
+      }
+
+      /* Switch music to match background */
+      if (window._neoMusicSwitch) window._neoMusicSwitch(mode);
+    }
+
+    /* Restore saved bg */
+    bgBtns.forEach(b => b.classList.toggle('active', b.dataset.bg === prefs.bg));
+    if (prefs.bg === 'matrix') {
+      setTimeout(() => { if (window.matrixOn) window.matrixOn(); }, 100);
+    } else if (prefs.bg === 'intervention') {
+      setTimeout(() => { if (window.interventionOn) window.interventionOn(); }, 100);
+    }
+
+    bgBtns.forEach(b => {
+      b.addEventListener('click', () => applyBg(b.dataset.bg));
+    });
+
+    /* Sync: if terminal toggles matrix, update picker */
+    window._neoBgSync = function (mode) {
+      prefs.bg = mode;
+      savePrefs(prefs);
+      bgBtns.forEach(b => b.classList.toggle('active', b.dataset.bg === prefs.bg));
+    };
+  }
+
   /* Global flags default to true */
   if (window._neoSoundEnabled === undefined) window._neoSoundEnabled = prefs.sound;
 
@@ -2854,10 +3723,10 @@ document.querySelectorAll('.ghost-card').forEach(card => {
 </script>
 
 <!-- SortableJS — drag-and-drop for card grid (mouse + touch) -->
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
 <script>
 /* ── Card reorder system ──────────────────────────────────────────────────── */
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
   const STORAGE_KEY = 'neorgon-card-order';
   const grid = document.querySelector('.sites-section .sites-grid');
   if (!grid || typeof Sortable === 'undefined') return;
@@ -2959,7 +3828,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
       console.error('Import failed:', e.message);
     }
   };
-})();
+});
 </script>
 </body>
 </html>
