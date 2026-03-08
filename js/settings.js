@@ -140,4 +140,14 @@
       btn.classList.remove('open');
     }
   });
+
+  /* ── Keyboard shortcut: , ───────────────────────────────────────── */
+  document.addEventListener('keydown', e => {
+    if (e.key !== ',') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable) return;
+    if (document.activeElement.closest('.term-overlay')) return;
+    btn.click();
+  });
 })();
