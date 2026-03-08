@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="color-scheme" content="dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <title>Neorgon: Made for Real Problems</title>
@@ -812,6 +812,19 @@
     </div>
   </div>
   <div class="settings-divider"></div>
+  <div class="settings-row">
+    <span class="settings-label">Auto-match music</span>
+    <button class="settings-toggle on" id="togMusicMatch" role="switch" aria-checked="true" aria-label="Toggle auto-match music to theme"></button>
+  </div>
+  <div class="settings-row" id="musicTrackRow" style="flex-direction:column;align-items:stretch;gap:8px;display:none;">
+    <span class="settings-label">Music track</span>
+    <div class="settings-seg" id="musicPicker">
+      <button data-track="stars">Cosmic</button>
+      <button data-track="matrix">Digital</button>
+      <button data-track="intervention">L</button>
+    </div>
+  </div>
+  <div class="settings-divider"></div>
   <div class="settings-hint">
     <kbd>Esc</kbd> <kbd>Esc</kbd> Terminal<br>
     <kbd>↑↑↓↓←→←→BA</kbd> Warp drive<br>
@@ -850,7 +863,9 @@
 <script src="js/entrance.js"></script>
 <script src="js/search.js"></script>
 <script src="js/hero.js"></script>
+<div id="ytMusicPlayer" style="position:fixed;left:-9999px;width:1px;height:1px;pointer-events:none;" aria-hidden="true"></div>
 <script src="js/music.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
 <script src="js/matrix.js"></script>
 <script src="js/intervention.js"></script>
 <script src="js/settings.js"></script>

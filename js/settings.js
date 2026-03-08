@@ -4,7 +4,7 @@
   const panel = document.getElementById('settingsPanel');
   if (!btn || !panel) return;
 
-  const defaults = { sound: true, glow: true, previews: false, bg: 'stars' };
+  const defaults = { sound: true, glow: true, previews: false, bg: 'stars', musicAutoMatch: true, musicTrack: null };
 
   function loadPrefs() {
     try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(PREFS_KEY))); }
@@ -43,6 +43,44 @@
   initToggle('togSound', 'sound');
   initToggle('togGlow', 'glow');
   initToggle('togPreviews', 'previews');
+
+  /* Music auto-match toggle */
+  const togMusicMatch = document.getElementById('togMusicMatch');
+  const musicTrackRow = document.getElementById('musicTrackRow');
+
+  function applyMusicAutoMatch(val) {
+    prefs.musicAutoMatch = val;
+    savePrefs(prefs);
+    if (togMusicMatch) {
+      togMusicMatch.classList.toggle('on', val);
+      togMusicMatch.setAttribute('aria-checked', String(val));
+    }
+    if (musicTrackRow) musicTrackRow.style.display = val ? 'none' : '';
+    if (window._neoMusicAutoMatch) window._neoMusicAutoMatch(val);
+  }
+
+  applyMusicAutoMatch(prefs.musicAutoMatch);
+
+  if (togMusicMatch) {
+    togMusicMatch.addEventListener('click', () => applyMusicAutoMatch(!prefs.musicAutoMatch));
+  }
+
+  /* Music track picker */
+  const musicPicker = document.getElementById('musicPicker');
+  if (musicPicker) {
+    const trackBtns = musicPicker.querySelectorAll('button[data-track]');
+    const activeTrack = prefs.musicTrack || prefs.bg || 'stars';
+    trackBtns.forEach(b => b.classList.toggle('active', b.dataset.track === activeTrack));
+
+    trackBtns.forEach(b => {
+      b.addEventListener('click', () => {
+        prefs.musicTrack = b.dataset.track;
+        savePrefs(prefs);
+        trackBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.track === b.dataset.track));
+        if (window._neoMusicTrackSwitch) window._neoMusicTrackSwitch(b.dataset.track);
+      });
+    });
+  }
 
   /* Background picker */
   const bgPicker = document.getElementById('bgPicker');

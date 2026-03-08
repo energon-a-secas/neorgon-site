@@ -1196,6 +1196,15 @@ button:active, .btn:active {
 }
 
 /* ── Ambient music toggle ──────────────────────────────────── */
+@keyframes musicRing {
+  0%   { transform: scale(1);   opacity: .7; }
+  100% { transform: scale(2.4); opacity: 0;  }
+}
+@keyframes musicGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(192,132,252,.2); }
+  50%       { box-shadow: 0 0 26px rgba(192,132,252,.65), 0 0 52px rgba(192,132,252,.18); }
+}
+
 .music-toggle {
   position: fixed;
   bottom: 20px;
@@ -1214,6 +1223,18 @@ button:active, .btn:active {
   justify-content: center;
   transition: color .2s, border-color .2s, box-shadow .2s;
   padding: 0;
+  overflow: visible;
+}
+.music-toggle::before,
+.music-toggle::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(192,132,252,.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
 }
 .music-toggle:hover {
   color: rgba(255,255,255,.6);
@@ -1221,10 +1242,29 @@ button:active, .btn:active {
 }
 .music-toggle.playing {
   color: #c084fc;
-  border-color: rgba(192,132,252,.3);
-  box-shadow: 0 0 12px rgba(192,132,252,.2);
+  border-color: rgba(192,132,252,.4);
+  animation: musicGlow 2.4s ease-in-out infinite;
 }
-.music-toggle svg { width: 16px; height: 16px; }
+.music-toggle.playing::before {
+  opacity: 1;
+  animation: musicRing 2s ease-out infinite;
+}
+.music-toggle.playing::after {
+  opacity: 1;
+  animation: musicRing 2s ease-out infinite 1s;
+}
+.music-toggle svg {
+  width: 16px;
+  height: 16px;
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform;
+}
+
+/* Intervention bg overrides */
+body.intervention-bg .music-toggle::before,
+body.intervention-bg .music-toggle::after { border-color: rgba(0,0,0,.25); }
+body.intervention-bg .music-toggle.playing { animation: none; box-shadow: none; }
 
 /* ── Konami input display ─────────────────────────────────── */
 .konami-hud {
