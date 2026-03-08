@@ -5,15 +5,15 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Neorgon: Made for Real Problems</title>
-  <meta name="description" content="16 open-source tools for planning, DevOps, data, fun, and more. No signup, no nonsense.">
+  <meta name="description" content="We made 16 tools and forgot to add a paywall. Open-source, no signup, no nonsense.">
   <meta property="og:title" content="Neorgon: Made for Real Problems">
-  <meta property="og:description" content="Plan, build, play, ship. 16 open-source tools — no signup, no nonsense.">
+  <meta property="og:description" content="We made 16 tools and forgot to add a paywall.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://neorgon.com/">
   <meta property="og:site_name" content="Neorgon">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Neorgon: Made for Real Problems">
-  <meta name="twitter:description" content="Plan, build, play, ship. 16 open-source tools — no signup, no nonsense.">
+  <meta name="twitter:description" content="We made 16 tools and forgot to add a paywall.">
   <meta name="twitter:image" content="https://neorgon.com/og-preview.jpg">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://neorgon.com/">
@@ -29,7 +29,7 @@
     "@type": "WebSite",
     "name": "Neorgon",
     "url": "https://neorgon.com/",
-    "description": "16 open-source tools for planning, DevOps, data, fun, and more. No signup, no nonsense.",
+    "description": "We made 16 tools and forgot to add a paywall. Open-source, no signup, no nonsense.",
     "author": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" }
   }
   </script>
@@ -772,6 +772,36 @@
     }
     .ghost-card.unlocked .ghost-revealed {
       visibility: visible;
+    }
+
+    /* ── External card ────────────────────────────────────────────────── */
+    .external-card {
+      border-style: dashed;
+      border-color: rgba(255,255,255,.12);
+    }
+    .external-card:hover {
+      border-style: dashed;
+    }
+    .external-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 6px;
+      padding: 2px 7px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .external-badge svg {
+      width: 10px;
+      height: 10px;
+      opacity: .6;
     }
 
     /* ── Arrival toast ──────────────────────────────────────────────────── */
@@ -1669,7 +1699,7 @@
       <span class="neon-word" id="heroTyping"></span><span class="typing-cursor" id="typingCursor"></span>
     </h1>
     <p class="hero-sub">
-      Plan, build, play, ship. 16 open-source tools — no signup, no nonsense.
+      We made 16 tools and forgot to add a paywall.
     </p>
     <div class="hero-search-wrap">
       <input class="hero-search" id="heroSearch" type="text" placeholder="Search tools, tags, or keywords…" aria-label="Search tools" autocomplete="off" spellcheck="false">
@@ -2060,6 +2090,26 @@
         </div>
       </a>
 
+      <!-- YouTube Memes -->
+      <a class="site-card external-card" data-card-id="youtube"
+         href="https://www.youtube.com/@energon-hq/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(255,0,0,.25); --card-glow-border: rgba(255,0,0,.3); --card-accent: #ff4444;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/youtube.svg" class="card-site-icon" alt="YouTube" width="28" height="28" loading="lazy"></div>
+            <span class="external-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>External</span>
+          </div>
+          <div class="card-domain">youtube.com/@energon-hq</div>
+          <h3 class="card-name">Meme Overflow</h3>
+          <div class="card-desc">Video memes that haven't made it to Meme Vault yet. The backlog of clips, edits, and inside jokes we keep finding.</div>
+          <div class="card-tags">
+            <span class="card-tag">Fun</span>
+            <span class="card-tag">Memes</span>
+            <span class="card-tag">Videos</span>
+          </div>
+        </div>
+      </a>
+
       </div>
     </div>
 
@@ -2151,6 +2201,74 @@
             <span class="card-tag">Lifehacks</span>
             <span class="card-tag">Community</span>
             <span class="card-tag">Reviews</span>
+          </div>
+        </div>
+      </a>
+
+      </div>
+    </div>
+
+    <!-- ── Platforms ─────────────────────────────────────────────── -->
+    <div class="card-group" data-group="platforms" style="--group-color: #64748b">
+      <h3 class="group-label"><span class="group-dot"></span> Platforms</h3>
+      <div class="sites-grid">
+
+      <!-- GitHub -->
+      <a class="site-card external-card" data-card-id="github"
+         href="https://github.com/energon-a-secas/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(139,148,158,.3); --card-glow-border: rgba(139,148,158,.35); --card-accent: #8b949e;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/github.svg" class="card-site-icon" alt="GitHub" width="28" height="28" loading="lazy"></div>
+            <span class="external-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>External</span>
+          </div>
+          <div class="card-domain">github.com/energon-a-secas</div>
+          <h3 class="card-name">GitHub</h3>
+          <div class="card-desc">Open-source repos, issues, and pull requests. Where most of the code lives and contributions happen.</div>
+          <div class="card-tags">
+            <span class="card-tag">Code</span>
+            <span class="card-tag">Open Source</span>
+            <span class="card-tag">Repos</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- GitLab -->
+      <a class="site-card external-card" data-card-id="gitlab"
+         href="https://gitlab.com/energonhq/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(252,109,38,.25); --card-glow-border: rgba(252,109,38,.3); --card-accent: #fc6d26;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/gitlab.svg" class="card-site-icon" alt="GitLab" width="28" height="28" loading="lazy"></div>
+            <span class="external-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>External</span>
+          </div>
+          <div class="card-domain">gitlab.com/energonhq</div>
+          <h3 class="card-name">GitLab</h3>
+          <div class="card-desc">Private repos, CI pipelines, and internal tooling. The quieter side of the operation.</div>
+          <div class="card-tags">
+            <span class="card-tag">Private</span>
+            <span class="card-tag">CI/CD</span>
+            <span class="card-tag">Pipelines</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Docker Hub -->
+      <a class="site-card external-card" data-card-id="dockerhub"
+         href="https://hub.docker.com/u/energonhq/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(36,150,237,.25); --card-glow-border: rgba(36,150,237,.3); --card-accent: #2496ed;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/docker.svg" class="card-site-icon" alt="Docker Hub" width="28" height="28" loading="lazy"></div>
+            <span class="external-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>External</span>
+          </div>
+          <div class="card-domain">hub.docker.com/u/energonhq</div>
+          <h3 class="card-name">Docker Hub</h3>
+          <div class="card-desc">Container images for CI pipelines, local dev environments, and production. Pre-built and ready to pull.</div>
+          <div class="card-tags">
+            <span class="card-tag">Containers</span>
+            <span class="card-tag">Images</span>
+            <span class="card-tag">CI/CD</span>
           </div>
         </div>
       </a>
@@ -2479,6 +2597,10 @@ let warpIntensity = 0;
   }
 })();
 
+/* ── Shared code-input lock ────────────────────────────────────────────────── */
+window._neoCodeLock = false;
+window._neoCodeCooldown = 0;
+
 /* ── Konami Code — Warp Drive ─────────────────────────────────────────────── */
 (function () {
   const code = [38,38,40,40,37,39,37,39,66,65];
@@ -2543,14 +2665,22 @@ let warpIntensity = 0;
   buildHud();
 
   document.addEventListener('keydown', e => {
+    if (window._neoCodeLock && pos === 0) return;
+    if (Date.now() < window._neoCodeCooldown && pos === 0) return;
+
     if (e.keyCode === code[pos]) {
-      if (pos === 0) showHud();
+      if (pos === 0) {
+        window._neoCodeLock = true;
+        showHud();
+      }
       if (window._neoSound) window._neoSound.konamiKey(pos);
       updateHud(pos, true);
       pos++;
       if (pos === code.length) {
         hideHud(800);
         pos = 0;
+        window._neoCodeCooldown = Date.now() + 3000;
+        setTimeout(() => { window._neoCodeLock = false; }, 3000);
         engageWarp();
       }
     } else {
@@ -2558,6 +2688,7 @@ let warpIntensity = 0;
         if (window._neoSound) window._neoSound.konamiFail(pos);
         updateHud(pos, false);
         hideHud(1000);
+        window._neoCodeLock = false;
       }
       pos = 0;
     }
@@ -2692,10 +2823,13 @@ let warpIntensity = 0;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.target.closest('.term-overlay')) return;
     if (e.key.length !== 1) return;
+    if (window._neoCodeLock && !activeCode) return;
+    if (Date.now() < window._neoCodeCooldown && !activeCode) return;
     var ch = e.key.toLowerCase();
 
     if (activeCode) {
       if (ch === activeCode.code[activePos]) {
+        if (window._neoSound) window._neoSound.cheatKey(activePos, activeCode.code.length);
         hitCheatKey(activePos);
         activePos++;
         if (activePos === activeCode.code.length) {
@@ -2703,26 +2837,38 @@ let warpIntensity = 0;
           activeCode.fn();
           activeCode = null;
           activePos = 0;
+          window._neoCodeCooldown = Date.now() + 3000;
+          setTimeout(function () { window._neoCodeLock = false; }, 3000);
         }
       } else {
+        if (window._neoSound) window._neoSound.cheatFail(activePos);
         missCheatHud();
         activeCode = null;
         activePos = 0;
+        window._neoCodeLock = false;
       }
       return;
     }
 
     for (var i = 0; i < cheatList.length; i++) {
       if (ch === cheatList[i].code[0]) {
+        window._neoCodeLock = true;
         activeCode = cheatList[i];
         activePos = 0;
         buildCheatHud(activeCode.code, activeCode.label);
         showCheatHud();
+        if (window._neoSound) window._neoSound.cheatKey(0, activeCode.code.length);
         hitCheatKey(0);
         activePos = 1;
         clearTimeout(hudTimer);
         hudTimer = setTimeout(function () {
-          if (activeCode) { missCheatHud(); activeCode = null; activePos = 0; }
+          if (activeCode) {
+            if (window._neoSound) window._neoSound.cheatFail(activePos);
+            missCheatHud();
+            activeCode = null;
+            activePos = 0;
+            window._neoCodeLock = false;
+          }
         }, 4000);
         return;
       }
@@ -3591,6 +3737,20 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     setTimeout(() => playTone(140, 0.22, 0.035, 'square', 100), 90);
   }
 
+  const CHEAT_SCALE = [330, 370, 415, 466, 523, 587, 659, 740, 831, 932, 1047, 1175, 1319, 1480];
+
+  function cheatKey(step, total) {
+    const freq = CHEAT_SCALE[step % CHEAT_SCALE.length];
+    const intensity = 0.025 + (step / Math.max(total, 1)) * 0.035;
+    playTone(freq, 0.08, intensity, 'triangle', freq * 1.08);
+  }
+
+  function cheatFail(step) {
+    if (step === 0) return;
+    playTone(220, 0.15, 0.04, 'square', 150);
+    setTimeout(() => playTone(165, 0.2, 0.03, 'sawtooth', 110), 80);
+  }
+
   function deny() {
     playTone(330, 0.15, 0.05, 'square', 220);
     setTimeout(() => playTone(220, 0.25, 0.045, 'square', 165), 150);
@@ -3876,7 +4036,7 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     shim.stop(now + 2.1);
   }
 
-  window._neoSound = { dragStart, dropCard, unlock, termOpen, termClose, konamiKey, konamiFail, warpEngage, deny, doomGodMode, mkBloodCode, metroidSuit, gtaHesoyam, segaChoir };
+  window._neoSound = { dragStart, dropCard, unlock, termOpen, termClose, konamiKey, konamiFail, cheatKey, cheatFail, warpEngage, deny, doomGodMode, mkBloodCode, metroidSuit, gtaHesoyam, segaChoir };
 })();
 </script>
 
@@ -3965,9 +4125,10 @@ document.querySelectorAll('.ghost-card').forEach(card => {
     { label: 'DevOps',        color: '#fbbf24', ids: ['infradrills','snippets','lockdown'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell infra drills snippets security hardening lockdown guides' },
     { label: 'Data',          color: '#2dd4bf', ids: ['jsonstudio','references'], keywords: 'data editor privacy api search json reference matrix scrambler viewer' },
     { label: 'Productivity',  color: '#a78bfa', ids: ['slides','ogstudio'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio' },
-    { label: 'Fun',           color: '#f472b6', ids: ['decisionwheel','memes','clientsays','emojis','guildhall'], keywords: 'fun randomizer community upload wheel spin memes timezone translator jargon client says decoded emoji archive search guild hall quests monster hunter gamified teams' },
+    { label: 'Fun',           color: '#f472b6', ids: ['decisionwheel','memes','clientsays','emojis','guildhall','youtube'], keywords: 'fun randomizer community upload wheel spin memes timezone translator jargon client says decoded emoji archive search guild hall quests monster hunter gamified teams youtube video overflow' },
     { label: 'Social',        color: '#38bdf8', ids: ['vibecheck','charactersheet','parla'], keywords: 'social interviews scoring vibe check behavioral personality export character sheet know parla slang latin american regional language' },
     { label: 'Lifehacks',     color: '#f59e0b', ids: ['buyhacks'], keywords: 'lifehacks community reviews buyhacks buy hacks products shopping' },
+    { label: 'Platforms',     color: '#64748b', ids: ['github','gitlab','dockerhub'], keywords: 'platforms github gitlab docker hub containers images repos code open source private ci cd pipelines' },
     { label: 'Game',          color: '#e879f9', ids: ['rushq'], keywords: 'game strategy rush q cards corporate' },
   ];
 

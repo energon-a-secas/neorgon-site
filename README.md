@@ -62,6 +62,12 @@ A minimal, neon-space landing page that links to every Neorgon site with a short
 
 ---
 
+## Architecture
+
+![Architecture](docs/architecture.svg)
+
+---
+
 ## Design
 
 - Deep space background (`#000912`)
