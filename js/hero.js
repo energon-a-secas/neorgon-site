@@ -16,13 +16,13 @@
     if (i <= text.length) {
       el.textContent = text.slice(0, i);
       i++;
-      setTimeout(type, 70 + Math.random() * 50);
+      setTimeout(type, 85 + Math.random() * 45);
     } else {
       setTimeout(() => { if (cursor) cursor.style.display = 'none'; }, 2000);
     }
   }
 
-  setTimeout(type, 200);
+  setTimeout(type, 140);
 })();
 
 
