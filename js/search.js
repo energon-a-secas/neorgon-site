@@ -31,7 +31,7 @@
     { label: 'Planning',      color: '#4ade80', ids: ['pathfinder','skillmap'], keywords: 'planning visual canvas export learning roadmap pathfinder skill map strategy' },
     { label: 'DevOps',        color: '#fbbf24', ids: ['infradrills','snippets','lockdown'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell infra drills snippets security hardening lockdown guides' },
     { label: 'Data',          color: '#2dd4bf', ids: ['jsonstudio','references'], keywords: 'data editor privacy api search json reference matrix scrambler viewer visualizer' },
-    { label: 'Productivity',  color: '#a78bfa', ids: ['slides','ogstudio'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio' },
+    { label: 'Productivity',  color: '#a78bfa', ids: ['slides','ogstudio','codex'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio codex ai agent tutorials claude cursor learning path skills commands mcp' },
     { label: 'Fun',           color: '#f472b6', ids: ['decisionwheel','memes','clientsays','emojis','guildhall','youtube'], keywords: 'fun randomizer community upload wheel spin memes timezone translator jargon client says decoded emoji archive search guild hall quests monster hunter gamified teams youtube video overflow' },
     { label: 'Social',        color: '#38bdf8', ids: ['vibecheck','charactersheet','parla'], keywords: 'social interviews scoring vibe check behavioral personality export character sheet know parla slang latin american regional language' },
     { label: 'Lifehacks',     color: '#f59e0b', ids: ['buyhacks'], keywords: 'lifehacks community reviews buyhacks buy hacks products shopping' },
