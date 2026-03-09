@@ -95,11 +95,14 @@
       if (mode === 'stars') {
         if (window.matrixOff) window.matrixOff();
         if (window.interventionOff) window.interventionOff();
+        if (window.evangelionOff) window.evangelionOff();
       } else {
         if (window.matrixKill) window.matrixKill();
         if (window.interventionKill) window.interventionKill();
+        if (window.evangelionKill) window.evangelionKill();
         if (mode === 'matrix' && window.matrixOn) window.matrixOn();
         if (mode === 'intervention' && window.interventionOn) window.interventionOn();
+        if (mode === 'evangelion' && window.evangelionOn) window.evangelionOn();
       }
 
       /* Switch music to match background */
@@ -112,6 +115,8 @@
       setTimeout(() => { if (window.matrixOn) window.matrixOn(); }, 100);
     } else if (prefs.bg === 'intervention') {
       setTimeout(() => { if (window.interventionOn) window.interventionOn(); }, 100);
+    } else if (prefs.bg === 'evangelion') {
+      setTimeout(() => { if (window.evangelionOn) window.evangelionOn(); }, 100);
     }
 
     bgBtns.forEach(b => {

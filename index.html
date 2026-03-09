@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <title>Neorgon: Made for Real Problems</title>
+  <title>Neorgon | Made for Real Problems</title>
   <meta name="description" content="We made 18 tools and forgot to add a paywall. Open-source, no signup, no nonsense.">
   <meta property="og:title" content="Neorgon: Made for Real Problems">
   <meta property="og:description" content="We made 18 tools and forgot to add a paywall.">
@@ -43,6 +43,18 @@
 <canvas id="starfield"></canvas>
 <canvas id="matrixCanvas"></canvas>
 <canvas id="interventionCanvas"></canvas>
+<canvas id="evangelionCanvas"></canvas>
+
+<!-- NERV Warning Overlay -->
+<div class="nerv-warning-overlay" id="nervWarningOverlay">
+  <div class="nerv-bar nerv-bar-top"></div>
+  <div class="nerv-warning-center">
+    <div class="nerv-warning-label">警告</div>
+    <div class="nerv-warning-sub">WARNING</div>
+    <div class="nerv-warning-type">PATTERN BLUE — ANGEL DETECTED</div>
+  </div>
+  <div class="nerv-bar nerv-bar-bottom"></div>
+</div>
 <div class="cursor-glow" id="cursorGlow"></div>
 <div class="warp-toast" id="warpToast">Warp Engaged</div>
 <div class="cheat-toast" id="cheatToast"></div>
@@ -809,6 +821,7 @@
       <button data-bg="stars" class="active">Stars</button>
       <button data-bg="matrix">Matrix</button>
       <button data-bg="intervention">L</button>
+      <button data-bg="evangelion">EVA</button>
     </div>
   </div>
   <div class="settings-divider"></div>
@@ -822,6 +835,7 @@
       <button data-track="stars">Cosmic</button>
       <button data-track="matrix">Digital</button>
       <button data-track="intervention">L</button>
+      <button data-track="evangelion">EVA</button>
     </div>
   </div>
   <div class="settings-divider"></div>
@@ -829,7 +843,7 @@
     <kbd>M</kbd> Music &nbsp;·&nbsp; <kbd>,</kbd> Settings<br>
     <kbd>Esc</kbd> <kbd>Esc</kbd> Terminal<br>
     <kbd>↑↑↓↓←→←→BA</kbd> Warp drive<br>
-    Terminal: <kbd>matrix</kbd> <kbd>warp</kbd> <kbd>help</kbd>
+    Terminal: <kbd>matrix</kbd> <kbd>nerv</kbd> <kbd>warp</kbd> <kbd>help</kbd>
   </div>
 </div>
 
@@ -869,6 +883,7 @@
 <script src="https://www.youtube.com/iframe_api"></script>
 <script src="js/matrix.js"></script>
 <script src="js/intervention.js"></script>
+<script src="js/evangelion.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/previews.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>

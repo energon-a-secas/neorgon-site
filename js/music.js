@@ -6,7 +6,8 @@
   const TRACKS = {
     stars:        'NkNy9qDWiAw',
     intervention: 'EQLJ1I3CFfg',
-    matrix:       'ZIjfK4MGrGI'
+    matrix:       'ZIjfK4MGrGI',
+    evangelion:   'zWJEHuUZ-fA'
   };
 
   let playing = false;

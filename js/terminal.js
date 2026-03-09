@@ -129,6 +129,7 @@
       addLine('  export-layout— copy layout JSON to clipboard', 'sys');
       addLine('  matrix       — toggle matrix rain (stays in terminal)', 'sys');
       addLine('  matrix background — toggle matrix & close terminal', 'sys');
+      addLine('  nerv [level] — trigger NERV warning (blue/red/orange)', 'sys');
       addLine('  exit         — close terminal', 'sys');
       addLine('', 'sys');
       addLine('Cheat codes (type anywhere):', 'sys');
@@ -221,6 +222,21 @@
         }
       } else {
         addLine('Matrix module not loaded.', 'err');
+      }
+    },
+    nerv(args) {
+      const level = (args || '').trim().toLowerCase() || 'blue';
+      const valid = ['blue', 'red', 'orange'];
+      if (!valid.includes(level)) {
+        addLine(`Unknown level: "${level}". Use: blue, red, orange`, 'err');
+        return;
+      }
+      if (window.nervWarning) {
+        addLine(`NERV WARNING LEVEL: ${level.toUpperCase()}`, 'sys');
+        closeTerm();
+        setTimeout(() => window.nervWarning(level), 300);
+      } else {
+        addLine('Evangelion module not loaded.', 'err');
       }
     },
     'reset-layout'() {
