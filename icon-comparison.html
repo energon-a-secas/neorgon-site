@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Icon Comparison - Neorgon</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Avenir Next', -apple-system, sans-serif;
+      background: #000912;
+      color: #f0f4ff;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, #B015B0 0%, #3D0080 45%, #E326E4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 48px;
+      font-size: 1.1rem;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 40px;
+      padding: 20px;
+      background: rgba(255,255,255,.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .legend-box {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 2px solid rgba(255,255,255,.3);
+    }
+
+    .legend-box.current {
+      background: rgba(227, 38, 228, 0.15);
+      border-color: #E326E4;
+    }
+
+    .legend-box.proposed {
+      background: rgba(52, 211, 153, 0.15);
+      border-color: #34d399;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 24px;
+    }
+
+    .comparison-card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s;
+    }
+
+    .comparison-card:hover {
+      background: rgba(255,255,255,.05);
+      border-color: rgba(255,255,255,.15);
+      transform: translateY(-2px);
+    }
+
+    .tool-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .comparison-row {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .icon-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 20px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.3);
+    }
+
+    .icon-column.current {
+      border: 2px solid rgba(227, 38, 228, 0.3);
+    }
+
+    .icon-column.proposed {
+      border: 2px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .icon-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      opacity: 0.7;
+    }
+
+    .icon-column.current .icon-label {
+      color: #E326E4;
+    }
+
+    .icon-column.proposed .icon-label {
+      color: #34d399;
+    }
+
+    .icon-wrapper {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .current-icon {
+      width: 32px;
+      height: 32px;
+      filter: drop-shadow(0 0 8px rgba(227, 38, 228, 0.6));
+    }
+
+    .proposed-icon {
+      width: 32px;
+      height: 32px;
+      color: #E326E4;
+      filter: drop-shadow(0 0 8px rgba(227, 38, 228, 0.6));
+    }
+
+    .icon-name {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,.5);
+      font-family: 'Courier New', monospace;
+    }
+
+    .vs {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.3);
+      align-self: center;
+    }
+
+    .actions {
+      margin-top: 40px;
+      text-align: center;
+      padding: 32px;
+      background: rgba(255,255,255,.03);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .actions h2 {
+      margin-bottom: 16px;
+      color: #E326E4;
+    }
+
+    .actions p {
+      color: rgba(255,255,255,.7);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #B015B0 0%, #E326E4 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(227, 38, 228, 0.4);
+    }
+
+    .btn.secondary {
+      background: rgba(255,255,255,.08);
+    }
+
+    .btn.secondary:hover {
+      background: rgba(255,255,255,.12);
+      box-shadow: 0 8px 24px rgba(255,255,255, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .legend {
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Icon System Comparison</h1>
+    <p class="subtitle">Current SVGRepo icons vs. Proposed Lucide icon system</p>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-box current"></div>
+        <span>Current (SVGRepo mixed styles)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-box proposed"></div>
+        <span>Proposed (Lucide unified system)</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Skill Roadmap -->
+      <div class="comparison-card">
+        <div class="tool-name">Skill Roadmap</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/skill-roadmap.svg" alt="skill-roadmap" class="current-icon">
+            </div>
+            <span class="icon-name">skill-roadmap.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="network" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">network</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- JSON Builder -->
+      <div class="comparison-card">
+        <div class="tool-name">JSON Studio</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/json-builder.svg" alt="json-builder" class="current-icon">
+            </div>
+            <span class="icon-name">json-builder.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="braces" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">braces</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Says -->
+      <div class="comparison-card">
+        <div class="tool-name">Client Says</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/client-says.svg" alt="client-says" class="current-icon">
+            </div>
+            <span class="icon-name">client-says.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="clock" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">clock</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local Drills -->
+      <div class="comparison-card">
+        <div class="tool-name">Local Drills</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/local-drills.svg" alt="local-drills" class="current-icon">
+            </div>
+            <span class="icon-name">local-drills.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="server" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">server</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spin the Wheel -->
+      <div class="comparison-card">
+        <div class="tool-name">Decision Wheel</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/spin-the-wheel.svg" alt="spin-the-wheel" class="current-icon">
+            </div>
+            <span class="icon-name">spin-the-wheel.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="disc" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">disc</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reference Matrix -->
+      <div class="comparison-card">
+        <div class="tool-name">Reference Matrix</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/reference-matrix.svg" alt="reference-matrix" class="current-icon">
+            </div>
+            <span class="icon-name">reference-matrix.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="grid-3x3" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">grid-3x3</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Presentation Sage -->
+      <div class="comparison-card">
+        <div class="tool-name">Presentation Sage</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/presentation-sage.svg" alt="presentation-sage" class="current-icon">
+            </div>
+            <span class="icon-name">presentation-sage.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="presentation" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">presentation</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pathfinder -->
+      <div class="comparison-card">
+        <div class="tool-name">Pathfinder</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/pathfinder.svg" alt="pathfinder" class="current-icon">
+            </div>
+            <span class="icon-name">pathfinder.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="compass" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">compass</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Emojis -->
+      <div class="comparison-card">
+        <div class="tool-name">Emoji Archive</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/emojis.svg" alt="emojis" class="current-icon">
+            </div>
+            <span class="icon-name">emojis.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="smile" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">smile</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Memes -->
+      <div class="comparison-card">
+        <div class="tool-name">Meme Vault</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/memes.svg" alt="memes" class="current-icon">
+            </div>
+            <span class="icon-name">memes.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="image" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">image</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interviews -->
+      <div class="comparison-card">
+        <div class="tool-name">Vibe Check</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/interviews.svg" alt="interviews" class="current-icon">
+            </div>
+            <span class="icon-name">interviews.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="clipboard-check" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">clipboard-check</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- OG Studio -->
+      <div class="comparison-card">
+        <div class="tool-name">OG Studio</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/og-studio.svg" alt="og-studio" class="current-icon">
+            </div>
+            <span class="icon-name">og-studio.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="palette" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">palette</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Autopilot -->
+      <div class="comparison-card">
+        <div class="tool-name">Autopilot</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/autopilot.svg" alt="autopilot" class="current-icon">
+            </div>
+            <span class="icon-name">autopilot.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="bot" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">bot</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Character Sheet -->
+      <div class="comparison-card">
+        <div class="tool-name">Character Sheet</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/character-sheet.svg" alt="character-sheet" class="current-icon">
+            </div>
+            <span class="icon-name">character-sheet.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="user-circle" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">user-circle</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BuyHacks -->
+      <div class="comparison-card">
+        <div class="tool-name">BuyHacks</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/buyhacks.svg" alt="buyhacks" class="current-icon">
+            </div>
+            <span class="icon-name">buyhacks.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="shopping-cart" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">shopping-cart</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Snippets -->
+      <div class="comparison-card">
+        <div class="tool-name">Snippets</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/snippets.svg" alt="snippets" class="current-icon">
+            </div>
+            <span class="icon-name">snippets.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="code-2" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">code-2</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guild Hall -->
+      <div class="comparison-card">
+        <div class="tool-name">Guild Hall</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/guild-hub.svg" alt="guild-hub" class="current-icon">
+            </div>
+            <span class="icon-name">guild-hub.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="shield" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">shield</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Parla -->
+      <div class="comparison-card">
+        <div class="tool-name">Parla</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/parla.svg" alt="parla" class="current-icon">
+            </div>
+            <span class="icon-name">parla.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="languages" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">languages</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playbook -->
+      <div class="comparison-card">
+        <div class="tool-name">Playbook</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/playbook.svg" alt="playbook" class="current-icon">
+            </div>
+            <span class="icon-name">playbook.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="book-open" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">book-open</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rush Q Cards -->
+      <div class="comparison-card">
+        <div class="tool-name">Rush Q Cards</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/rush-q-cards.svg" alt="rush-q-cards" class="current-icon">
+            </div>
+            <span class="icon-name">rush-q-cards.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="layers" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">layers</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Lore (if exists) -->
+      <div class="comparison-card">
+        <div class="tool-name">Agent Lore</div>
+        <div class="comparison-row">
+          <div class="icon-column current">
+            <span class="icon-label">Current</span>
+            <div class="icon-wrapper">
+              <img src="assets/icons/agentlore.svg" alt="agentlore" class="current-icon" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=color:rgba(255,255,255,.3)>No icon yet</div>'">
+            </div>
+            <span class="icon-name">agentlore.svg</span>
+          </div>
+          <div class="vs">→</div>
+          <div class="icon-column proposed">
+            <span class="icon-label">Proposed</span>
+            <div class="icon-wrapper">
+              <i data-lucide="sparkles" class="proposed-icon" stroke-width="2"></i>
+            </div>
+            <span class="icon-name">sparkles</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <h2>What do you think?</h2>
+      <p>The Lucide icons provide a unified, stroke-based design system that works perfectly with your neon aesthetic.<br>
+      All icons use the same 24×24 grid, 2px stroke weight, and round caps/joins for visual consistency.</p>
+      <button class="btn" onclick="alert('Tell Claude: \'Looks good, proceed with replacement\' or suggest specific changes!')">Approve & Replace</button>
+      <button class="btn secondary" onclick="alert('Tell Claude which icons you want to change or keep from the current set')">Customize Selection</button>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

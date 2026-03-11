@@ -443,7 +443,7 @@ body {
 }
 .card-site-icon {
   width: 28px; height: 28px; display: block;
-  filter: drop-shadow(0 0 5px rgba(255,255,255,.5));
+  filter: drop-shadow(0 0 3px rgba(227, 38, 228, .7));
 }
 .card-arrow {
   color: var(--text-muted);

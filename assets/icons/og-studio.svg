@@ -1,7 +1,8 @@
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000">
-<g id="SVGRepo_bgCarrier" stroke-width="0"/>
-<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-<g id="SVGRepo_iconCarrier"> <title>pic</title> <desc>Created with Sketch.</desc> <g id="pic" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linejoin="round"> <rect width="48" height="48" fill="white" fill-opacity="0.01"/> <g id="编组备份-3" transform="translate(5.000000, 8.000000)" stroke="#000000"> <path d="M2,0 L36,0 C37.1045695,-2.02906125e-16 38,0.8954305 38,2 L38,30 C38,31.1045695 37.1045695,32 36,32 L2,32 C0.8954305,32 1.3527075e-16,31.1045695 0,30 L0,2 C-1.3527075e-16,0.8954305 0.8954305,2.02906125e-16 2,0 Z" id="Rectangle" stroke-width="4" stroke-linecap="round"> </path> <circle id="Oval" stroke-width="3" stroke-linecap="round" cx="9.5" cy="8.5" r="1.5"> </circle> <path d="M10,16 L15,20 L21,13 L38,26 L38,30 C38,31.1045695 37.1045695,32 36,32 L2,32 C0.8954305,32 2.27508946e-13,31.1045695 2.27373675e-13,30 L2.27373675e-13,26 L10,16 Z" id="Path-3" stroke-width="4" fill="#E326E4" fill-rule="nonzero"> </path> </g> </g> </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E326E4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="13.5" cy="6.5" r=".5" fill="#E326E4"/>
+  <path d="M13.73 4a2 2 0 0 0-3.46 0"/>
+  <path d="M18.06 15.89A2 2 0 0 1 18 16v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2"/>
+  <path d="m3 11 4.5-4.5"/>
+  <path d="m21 15-5-5"/>
+  <path d="m21 20-2-2"/>
+</svg>
