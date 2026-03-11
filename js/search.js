@@ -29,9 +29,10 @@
   /* ── Curated categories ─────────────────────────────────────── */
   const CATEGORIES = [
     { label: 'Planning',      color: '#4ade80', ids: ['pathfinder','skillmap'], keywords: 'planning visual canvas export learning roadmap pathfinder skill map strategy' },
-    { label: 'DevOps',        color: '#fbbf24', ids: ['infradrills','snippets','lockdown'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell infra drills snippets security hardening lockdown guides' },
+    { label: 'DevOps',        color: '#fbbf24', ids: ['infradrills','snippets'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell infra drills snippets' },
     { label: 'Data',          color: '#2dd4bf', ids: ['jsonstudio','references'], keywords: 'data editor privacy api search json reference matrix scrambler viewer visualizer' },
-    { label: 'Productivity',  color: '#a78bfa', ids: ['slides','ogstudio','codex'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio codex ai agent tutorials claude cursor learning path skills commands mcp' },
+    { label: 'Productivity',  color: '#a78bfa', ids: ['slides','ogstudio'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio' },
+    { label: 'Learning',      color: '#67e8f9', ids: ['agentlore','lockdown','anatomy'], keywords: 'learning tutorials ai agent claude cursor mcp commands skills path security hardening lockdown guides ui anatomy wireframe components interface design' },
     { label: 'Fun',           color: '#f472b6', ids: ['decisionwheel','memes','clientsays','emojis','guildhall','youtube'], keywords: 'fun randomizer community upload wheel spin memes timezone translator jargon client says decoded emoji archive search guild hall quests monster hunter gamified teams youtube video overflow' },
     { label: 'Social',        color: '#38bdf8', ids: ['vibecheck','charactersheet','parla','playbook'], keywords: 'social interviews scoring vibe check behavioral personality export character sheet know parla slang latin american regional language playbook career advice tech job hunting bilingual english spanish' },
     { label: 'Lifehacks',     color: '#f59e0b', ids: ['buyhacks'], keywords: 'lifehacks community reviews buyhacks buy hacks products shopping' },
@@ -419,21 +420,35 @@
     createPills();
     buildConnections();
     tick();
-    /* Fade in all pills together */
+    /* Fade in all pills together — double rAF ensures opacity:0 is painted before transitioning */
     pills.forEach(function (p) {
       p.el.style.opacity = '0';
       p.el.style.transition = 'opacity .4s ease';
     });
     requestAnimationFrame(function () {
-      pills.forEach(function (p) {
-        p.el.style.opacity = '';
+      requestAnimationFrame(function () {
+        pills.forEach(function (p) {
+          p.el.style.opacity = '';
+        });
       });
     });
   }
 
-  /* Wait for layout (load) so constellation box has real dimensions */
-  if (document.readyState === 'complete') init();
-  else window.addEventListener('load', init);
+  /* Wait for box to have real dimensions — poll via rAF, no need to wait for full window.load */
+  function tryInit() {
+    var rect = box.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      init();
+    } else {
+      requestAnimationFrame(tryInit);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { requestAnimationFrame(tryInit); });
+  } else {
+    requestAnimationFrame(tryInit);
+  }
 
   window.addEventListener('resize', function () {
     resizeCanvas();
