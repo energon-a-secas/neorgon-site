@@ -1,0 +1,18 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <g fill="#E326E4">
+    <!-- Document/Resume -->
+    <rect x="16" y="8" width="32" height="44" rx="2" fill="none" stroke="#E326E4" stroke-width="2"/>
+    <line x1="22" y1="16" x2="42" y2="16" stroke="#E326E4" stroke-width="2"/>
+    <line x1="22" y1="22" x2="42" y2="22" stroke="#E326E4" stroke-width="2"/>
+    <line x1="22" y1="28" x2="38" y2="28" stroke="#E326E4" stroke-width="2"/>
+
+    <!-- Gaming Controller -->
+    <path d="M12 48 Q10 52 10 54 Q10 56 12 56 L20 56 Q22 56 22 54 L22 52 Q22 50 20 48 Z" />
+    <path d="M42 48 Q44 50 44 52 L44 54 Q44 56 46 56 L54 56 Q56 56 56 54 Q56 52 54 48 Z" />
+    <rect x="20" y="44" width="24" height="8" rx="3"/>
+
+    <!-- Controller Buttons -->
+    <circle cx="26" cy="48" r="1.5"/>
+    <circle cx="38" cy="48" r="1.5"/>
+  </g>
+</svg>

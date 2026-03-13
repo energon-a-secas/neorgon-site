@@ -22,7 +22,7 @@
     }
   }
 
-  setTimeout(type, 140);
+  setTimeout(type, 50);
 })();
 
 

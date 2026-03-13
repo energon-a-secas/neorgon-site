@@ -20,6 +20,7 @@
     autopilot: 'autopilot.gif',
     rushq: 'rushq.gif',
     ehq: 'ehq.gif',
+    'resume-forge': 'resume-forge.gif',
   };
 
   /* Global flag — settings panel sets this */

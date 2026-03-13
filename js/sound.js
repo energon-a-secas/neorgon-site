@@ -57,7 +57,15 @@
     if (window._neoSoundEnabled === false) return;
     if (!ctx) ensureContext();
     if (!ready || !ctx) return;
-    if (ctx.state === 'suspended') ctx.resume();
+    /* Wait for resume when suspended so we don't start the oscillator before
+       the context is running (which would play nothing). Fixes hover sound
+       sometimes requiring a click — after the first gesture, hover plays reliably. */
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(function () {
+        if (ctx.state === 'running') playTone(freq, duration, gain, type, sweep);
+      });
+      return;
+    }
 
     const osc = ctx.createOscillator();
     const vol = ctx.createGain();
@@ -243,17 +251,29 @@
   let lastHover = 0;
   const DEBOUNCE = 60;
 
+  /* Prime AudioContext on first card click so hover sound works immediately
+     after (browsers require a user gesture before audio can play). */
+  function primeOnCardInteraction() {
+    if (!ctx || cleaned) return;
+    ensureContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().then(function () { if (ctx) cleanup(); });
+    }
+  }
+
   const cards = document.querySelectorAll('.sites-grid .site-card');
-  cards.forEach((card, i) => {
-    card.addEventListener('mouseenter', () => {
+  cards.forEach(function (card, i) {
+    card.addEventListener('mouseenter', function () {
       const now = Date.now();
       if (now - lastHover < DEBOUNCE) return;
       lastHover = now;
       hoverIn(i);
     });
-    card.addEventListener('mouseleave', () => {
+    card.addEventListener('mouseleave', function () {
       hoverOut(i);
     });
+    card.addEventListener('pointerdown', primeOnCardInteraction, { once: true });
+    card.addEventListener('keydown', primeOnCardInteraction, { once: true });
   });
 
   /* Logo & GitHub hover sounds */
