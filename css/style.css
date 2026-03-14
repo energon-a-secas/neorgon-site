@@ -1826,4 +1826,41 @@ body.evangelion-bg .hero-search-icon { color: rgba(128,0,255,.3); }
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+
+  /* Disable starfield */
+  #starfield { display: none !important; }
+
+  /* Disable matrix rain, intervention canvas */
+  #matrix, .intervention-canvas { display: none !important; }
+
+  /* Disable physics-based pills animation - make them static */
+  .tag-pill {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* Disable orb animations */
+  .orb { animation: none !important; }
+
+  /* Disable ghost card glow pulse */
+  .ghost-card {
+    animation: none !important;
+  }
+
+  /* Disable sortable ghost animation */
+  .sortable-ghost {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Disable hover transitions that cause motion */
+  .card-content:hover {
+    transform: none !important;
+  }
+
+  /* Disable constellation canvas */
+  #constellationCanvas {
+    display: none !important;
+  }
 }

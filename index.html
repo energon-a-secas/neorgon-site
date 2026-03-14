@@ -24,6 +24,8 @@
   <meta property="og:image" content="https://neorgon.com/og-preview.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <!-- Privacy-first analytics -->
+  <script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <script type="application/ld+json">
   {
@@ -133,7 +135,7 @@
          style="--card-glow: rgba(74,222,128,.3); --card-glow-border: rgba(74,222,128,.35); --card-accent: #4ade80;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/pathfinder.svg" class="card-site-icon" alt="Pathfinder" width="36" height="36"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/pathfinder.svg" class="card-site-icon" alt="Pathfinder" width="36" height="36" loading="lazy"></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">pathfinder.neorgon.com</div>
@@ -153,7 +155,7 @@
          style="--card-glow: rgba(167,139,250,.3); --card-glow-border: rgba(167,139,250,.35); --card-accent: #a78bfa;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/skill-roadmap.svg" class="card-site-icon" alt="Skill Map" width="28" height="28"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/skill-roadmap.svg" class="card-site-icon" alt="Skill Map" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">skillmap.neorgon.com</div>
@@ -180,7 +182,7 @@
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #fbbf24;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/local-drills.svg" class="card-site-icon" alt="Infra Drills" width="28" height="28"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/local-drills.svg" class="card-site-icon" alt="Infra Drills" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">infradrills.neorgon.com</div>
@@ -370,7 +372,7 @@
           <h3 class="card-name">Agent Lore</h3>
           <div class="card-desc">AI agent tutorial hub for Claude and Cursor. Browse skills, commands, MCPs, and diagrams, or follow a guided learning path.</div>
           <div class="card-tags">
-            <span class="card-tag">Productivity</span>
+            <span class="card-tag">Learning</span>
             <span class="card-tag">Tutorials</span>
             <span class="card-tag">AI</span>
           </div>
@@ -386,6 +388,26 @@
           </a>
         </div>
       </div>
+
+      <!-- UI Anatomy -->
+      <a class="site-card" data-card-id="anatomy"
+         href="https://anatomy.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(125,211,252,.3); --card-glow-border: rgba(125,211,252,.35); --card-accent: #7dd3fc;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/anatomy.svg" class="card-site-icon" alt="UI Anatomy" width="28" height="28" loading="lazy"></div>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">anatomy.neorgon.com</div>
+          <h3 class="card-name">UI Anatomy</h3>
+          <div class="card-desc">Hover interactive wireframes to learn UI component names. Master the vocabulary for AI design prompts.</div>
+          <div class="card-tags">
+            <span class="card-tag">Learning</span>
+            <span class="card-tag">UI/UX</span>
+            <span class="card-tag">Wireframes</span>
+          </div>
+        </div>
+      </a>
 
       <!-- Resume Forge -->
       <a class="site-card" data-card-id="resume-forge"
