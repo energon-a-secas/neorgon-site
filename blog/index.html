@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTF349S8R5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HTF349S8R5');
+  </script>
+  <meta name="color-scheme" content="dark">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neorgon Blog | Engineering, Design, and Open Source</title>
+  <meta name="description" content="Engineering decisions, design patterns, and the stories behind building 18 open-source tools.">
+  <meta property="og:title" content="Neorgon Blog">
+  <meta property="og:description" content="Engineering decisions and stories behind Neorgon's open-source tools.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://neorgon.com/blog/">
+  <meta property="og:site_name" content="Neorgon">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Neorgon Blog">
+  <meta name="twitter:description" content="Engineering decisions and stories behind Neorgon's open-source tools.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://neorgon.com/blog/">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#000912">
+  <meta property="og:image" content="https://neorgon.com/og-preview.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- RSS/Atom Feeds -->
+  <link rel="alternate" type="application/rss+xml" title="Neorgon Blog" href="/blog/feed.xml">
+  <link rel="alternate" type="application/atom+xml" title="Neorgon Blog" href="/blog/atom.xml">
+
+  <!-- Privacy-first analytics -->
+  <script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Neorgon Engineering Blog",
+    "description": "Engineering decisions, design patterns, and open-source stories.",
+    "url": "https://neorgon.com/blog/",
+    "publisher": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" }
+  }
+  </script>
+
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .blog-header {
+      padding: 60px 40px 40px;
+      text-align: center;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .blog-title {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #B015B0 0%, #3D0080 45%, #080010 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .blog-subtitle {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .blog-content {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 40px 100px;
+    }
+    .posts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .post-item {
+      padding: 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: all .2s ease;
+    }
+    .post-item:hover {
+      border-color: rgba(176,21,176,.3);
+      background: rgba(255,255,255,.05);
+    }
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .post-date {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .post-category {
+      padding: 4px 12px;
+      background: rgba(176,21,176,.12);
+      border: 1px solid rgba(176,21,176,.2);
+      border-radius: 12px;
+      color: #B015B0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .post-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .post-title:hover {
+      color: #B015B0;
+    }
+    .post-excerpt {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+    .post-link {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #B015B0;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .post-link:hover {
+      gap: 8px;
+    }
+    .post-link svg {
+      width: 14px;
+      height: 14px;
+    }
+    .footer-feed-links {
+      display: flex;
+      gap: 16px;
+      margin-top: 40px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+    }
+    .feed-link {
+      padding: 8px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .feed-link:hover {
+      background: var(--surface-hover);
+      border-color: rgba(176,21,176,.3);
+      color: var(--text-primary);
+    }
+    .feed-link svg {
+      width: 12px;
+      height: 12px;
+    }
+    .nav-back {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 20;
+    }
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all .2s ease;
+    }
+    .back-button:hover {
+      background: var(--surface-hover);
+      border-color: rgba(176,21,176,.5);
+      color: var(--text-primary);
+    }
+    .back-button svg {
+      width: 16px;
+      height: 16px;
+    }
+    @media (max-width: 768px) {
+      .blog-title { font-size: 2.5rem; }
+      .blog-header { padding: 40px 20px 30px; }
+      .blog-content { padding: 0 20px 80px; }
+      .post-item { padding: 24px; }
+      .post-title { font-size: 1.5rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .post-item:hover {
+        border-color: var(--border);
+        background: var(--surface);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Starfield -->
+<canvas id="starfield"></canvas>
+
+<!-- Ambient orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="page">
+  <!-- Navigation -->
+  <nav class="nav-back">
+    <a href="/" class="back-button" aria-label="Back to Neorgon Hub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Tools
+    </a>
+  </nav>
+
+  <!-- Header -->
+  <header class="blog-header">
+    <h1 class="blog-title">Engineering Blog</h1>
+    <p class="blog-subtitle">
+      Engineering decisions, design patterns, and the stories behind building 18 open-source tools.<br>
+      No fluff. Just build notes and lessons learned.
+    </p>
+  </header>
+
+  <!-- Posts -->
+  <main class="blog-content">
+    <div class="posts-list">
+
+      <!-- Latest Post: Why We Care About Motion -->
+      <article class="post-item">
+        <div class="post-meta">
+          <time class="post-date" datetime="2026-03-14">2026-03-14</time>
+          <span class="post-category">Engineering</span>
+        </div>
+        <h2><a href="/blog/why-we-care-about-motion-accessibility.html" class="post-title">Why We Built Prefers-Reduced-Motion Into Every Animation</a></h2>
+        <p class="post-excerpt">
+          Motion-heavy UIs are everywhere. Starfields, physics simulations, pulsing glows—they look great, but they can make some users dizzy, nauseous, or worse. Here's how we built a comprehensive reduced-motion mode into Neorgon's hub, why it matters, and what we learned about accessibility-first engineering.
+        </p>
+        <a href="/blog/why-we-care-about-motion-accessibility.html" class="post-link">
+          Read more
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17L17 7M7 7h10v10"/>
+          </svg>
+        </a>
+      </article>
+
+      <!-- Earlier posts would go here with older dates -->
+
+    </div>
+
+    <!-- RSS/Atom Feeds -->
+    <div class="footer-feed-links">
+      <a href="/blog/feed.xml" class="feed-link" rel="alternate" type="application/rss+xml">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 11a9 9 0 0 1 9 9"></path>
+          <path d="M4 4a16 16 0 0 1 16 16"></path>
+          <circle cx="5" cy="19" r="1"></circle>
+        </svg>
+        RSS Feed
+      </a>
+      <a href="/blog/atom.xml" class="feed-link" rel="alternate" type="application/atom+xml">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 11a9 9 0 0 1 9 9"></path>
+          <path d="M4 4a16 16 0 0 1 16 16"></path>
+          <circle cx="5" cy="19" r="1"></circle>
+        </svg>
+        Atom Feed
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-line"></div>
+    <div class="footer-content">
+      <div class="footer-left">
+        <a href="https://ehq.cl/" class="footer-logo" aria-label="Energon Hub">
+          <img src="/assets/icons/energon-logo.png" alt="Energon" width="24" height="24">
+          <span>Neorgon</span>
+        </a>
+        <span class="footer-tagline">Made for Real Problems</span>
+      </div>
+      <div class="footer-right">
+        <a href="/" class="footer-link">Tools</a>
+        <a href="/about.html" class="footer-link">About</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="https://github.com/lucianoadonis/neorgon" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- JavaScript for starfield -->
+<script src="/js/starfield.js"></script>
+
+</body>
+</html>

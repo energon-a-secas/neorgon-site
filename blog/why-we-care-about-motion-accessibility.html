@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTF349S8R5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HTF349S8R5');
+  </script>
+  <meta name="color-scheme" content="dark">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Why We Built Prefers-Reduced-Motion Into Every Animation - Neorgon Blog</title>
+  <meta name="description" content="Motion-heavy UIs look great but can cause real harm. Here's how we built a comprehensive reduced-motion mode into Neorgon's hub and why accessibility-first engineering matters.">
+  <meta property="og:title" content="Why We Built Prefers-Reduced-Motion Into Every Animation">
+  <meta property="og:description" content="Motion-heavy UIs can cause real harm. Here's how we built a comprehensive reduced-motion mode into Neorgon's hub.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://neorgon.com/blog/why-we-care-about-motion-accessibility.html">
+  <meta property="og:site_name" content="Neorgon">
+  <meta property="og:image" content="https://neorgon.com/og-preview.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Why We Built Prefers-Reduced-Motion Into Every Animation">
+  <meta name="twitter:description" content="Motion-heavy UIs can cause real harm. Here's how we built a comprehensive reduced-motion mode into Neorgon's hub.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://neorgon.com/blog/why-we-care-about-motion-accessibility.html">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#000912">
+
+  <!-- Article schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Why We Built Prefers-Reduced-Motion Into Every Animation",
+    "description": "Motion-heavy UIs can cause real harm. Here's how we built a comprehensive reduced-motion mode into Neorgon's hub.",
+    "image": "https://neorgon.com/og-preview.jpg",
+    "author": { "@type": "Organization", "name": "Neorgon" },
+    "publisher": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" },
+    "datePublished": "2026-03-14",
+    "dateModified": "2026-03-14",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://neorgon.com/blog/why-we-care-about-motion-accessibility.html" }
+  }
+  </script>
+
+  <!-- Privacy-first analytics -->
+  <script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .post-header {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 60px 40px 40px;
+      text-align: center;
+    }
+    .post-meta-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .post-category {
+      padding: 4px 12px;
+      background: rgba(176,21,176,.12);
+      border: 1px solid rgba(176,21,176,.2);
+      border-radius: 12px;
+      color: #B015B0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .post-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+      line-height: 1.2;
+      color: var(--text-primary);
+    }
+    .post-excerpt {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+    .article-content {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+    }
+    article {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+    article h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin: 48px 0 24px;
+      color: var(--text-primary);
+    }
+    article h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin: 32px 0 16px;
+      color: var(--text-primary);
+    }
+    article p {
+      margin: 24px 0;
+    }
+    article strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    article a {
+      color: #B015B0;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+    article a:hover {
+      text-decoration-thickness: 2px;
+    }
+    article code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.95em;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+    article pre {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+      margin: 24px 0;
+    }
+    article pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+    }
+    article blockquote {
+      border-left: 3px solid #B015B0;
+      padding: 16px 24px;
+      margin: 24px 0;
+      background: rgba(176,21,176,.05);
+      font-style: italic;
+    }
+    article ul, article ol {
+      margin: 24px 0;
+      padding-left: 24px;
+    }
+    article li {
+      margin: 8px 0;
+    }
+    .code-block {
+      margin: 32px 0;
+    }
+    .code-label {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(176,21,176,.15);
+      border: 1px solid rgba(176,21,176,.2);
+      border-radius: 4px 4px 0 0;
+      color: #B015B0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .highlight-box {
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(176,21,176,.05) 0%, rgba(61,0,128,.05) 100%);
+      border: 1px solid rgba(176,21,176,.2);
+      border-radius: 12px;
+      margin: 32px 0;
+    }
+    .highlight-box h4 {
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+    .highlight-box ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .article-footer {
+      margin-top: 64px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+    .author-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .author-info h4 {
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .author-info p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .nav-back {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 20;
+    }
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all .2s ease;
+    }
+    .back-button:hover {
+      background: var(--surface-hover);
+      border-color: rgba(176,21,176,.5);
+      color: var(--text-primary);
+    }
+    .back-button svg {
+      width: 16px;
+      height: 16px;
+    }
+    @media (max-width: 768px) {
+      .post-title { font-size: 2rem; }
+      .post-header { padding: 40px 20px 30px; }
+      .article-content { padding: 0 20px 60px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .back-button { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Starfield -->
+<canvas id="starfield"></canvas>
+
+<!-- Ambient orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="page">
+  <!-- Navigation -->
+  <nav class="nav-back">
+    <a href="/blog/" class="back-button" aria-label="Back to blog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Blog
+    </a>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="post-header">
+    <div class="post-meta-bar">
+      <time datetime="2026-03-14">March 14, 2026</time>
+      <span>·</span>
+      <span>8 min read</span>
+      <span>·</span>
+      <span class="post-category">Engineering</span>
+    </div>
+    <h1 class="post-title">Why We Built Prefers-Reduced-Motion Into Every Animation</h1>
+    <p class="post-excerpt">
+      Motion-heavy UIs are everywhere. Starfields, physics simulations, pulsing glows—they look great, but they can make some users dizzy, nauseous, or worse. Here's how we built a comprehensive reduced-motion mode into Neorgon's hub, why it matters, and what we learned about accessibility-first engineering.
+    </p>
+  </header>
+
+  <!-- Article Content -->
+  <main class="article-content">
+    <article>
+
+      <h2>The Problem with Fancy Animations</h2>
+      <p>Neorgon's hub has a lot of motion. Animated starfield background. Physics-simulated category pills that orbit and bounce. Matrix rain. Pulsing glows on hover. It looks <em>cool</em>.</p>
+
+      <p>But here's the thing: motion can cause real harm. People with vestibular disorders, migraines, autism, or sensory sensitivities can experience:</p>
+
+      <ul>
+        <li>Dizziness and vertigo</li>
+        <li>Nausea and motion sickness</li>
+        <li>Headaches and migraines</li>
+        <li>Anxiety and cognitive overload</li>
+        <li>Disorientation and confusion</li>
+      </ul>
+
+      <p>For some users, motion isn't just annoying—it's a <strong>barrier to entry</strong>. A tool they can't use because it makes them physically uncomfortable.</p>
+
+      <div class="highlight-box">
+        <h4>💡 The Statistic That Changed Our Mind</h4>
+        <p>About <strong>30-50% of the population</strong> is sensitive to motion on screens, ranging from mild discomfort to severe symptoms. That's not an edge case. That's half your potential users.</p>
+      </div>
+
+      <h2>What the Web Standards Say</h2>
+      <p>The <code>prefers-reduced-motion</code> CSS media query has been around since 2017. When a user enables "Reduce motion" in their system settings (macOS, iOS, Windows, Android), the browser exposes this preference.</p>
+
+      <p>As of 2026, all modern browsers support it. Yet most websites don't implement it. Why?</p>
+
+      <h3>The Excuses (And Why They're Wrong)</h3>
+      <ul>
+        <li><strong>"It's too much work."</strong> → Takes 20 minutes if you plan for it upfront.</li>
+        <li><strong>"No one uses that setting."</strong> → They do, but you don't see them because they <em>leave your site</em>.</li>
+        <li><strong>"It'll look boring."</strong> → Static doesn't mean lifeless. Thoughtful stillness beats chaotic motion.</li>
+        <li><strong>"We're not targetting sensitive users."</strong> → You don't know who they are. Many people don't disclose disabilities.</li>
+      </ul>
+
+      <h2>How We Implemented It (The Technical Details)</h2>
+
+      <h3>1. Identify <em>All</em> Motion Sources</h3>
+      <p>First, we audited the entire hub for anything that moves:</p>
+
+      <div class="code-label">Motion Audit Checklist</div>
+      <ul>
+        <li>✓ <a href="#starfield">#starfield</a> - Animated background canvas</li>
+        <li>✓ <a href="#matrix">#matrixCanvas</a> - Matrix rain effect</li>
+        <li>✓ <a href="#intervention">#interventionCanvas</a> - CRT broadcast effect</li>
+        <li>✓ <a href="#physics">.tag-pill</a> - Physics simulation</li>
+        <li>✓ <a href="#orbs">.orb</a> - Ambient glow orbs</li>
+        <li>✓ <a href="#glow">.ghost-card</a> - Pulsing glow animation</li>
+        <li>✓ <a href="#hover">.card-content:hover</a> - Hover transitions</li>
+        <li>✓ <a href="#constellation">#constellationCanvas</a> - Search connections</li>
+      </ul>
+
+      <h3>2. Write the CSS Media Query</h3>
+
+      <div class="code-block">
+        <div class="code-label">css/style.css</div>
+        <pre><code>@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Disable canvas animations entirely */
+  #starfield, #matrixCanvas,
+  #interventionCanvas {
+    display: none !important;
+  }
+
+  /* Make physics pills static */
+  .tag-pill {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* Remove orb animations */
+  .orb {
+    animation: none !important;
+  }
+
+  /* Disable hover effects */
+  .card-content:hover {
+    transform: none !important;
+  }
+
+  /* Hide constellation connections */
+  #constellationCanvas {
+    display: none !important;
+  }
+}</code></pre>
+      </div>
+
+      <h3>3. Test It</h3>
+
+      <p><strong>macOS/iOS:</strong> Settings → Accessibility → Motion → Reduce Motion</p>
+      <p><strong>Windows:</strong> Settings → Ease of Access → Display → Show animations</p>
+      <p><strong>Android:</strong> Settings → Accessibility → Remove animations</p>
+
+      <div class="highlight-box">
+        <h4>🧪 Testing Tip: Browser DevTools</h4>
+        <p>In Chrome/Edge DevTools → Rendering tab → Emulate CSS media feature → prefers-reduced-motion: reduce</p>
+      </div>
+
+      <h2>What Works (And What Doesn't)</h2>
+
+      <h3>✅ What We Got Right</h3>
+      <ul>
+        <li><strong>Complete removal</strong> - No subtle motion left behind</li>
+        <li><strong>High specificity</strong> - <code>!important</code> ensures override</li>
+        <li><strong>Canvas disabling</strong> - <code>display: none</code> stops CPU usage</li>
+        <li><strong>Static alternatives</strong> - No content is lost, just motion</li>
+      </ul>
+
+      <h3>⚠️ What We Learned the Hard Way</h3>
+      <ul>
+        <li><strong>Don't rely on animationend events</strong> - They won't fire with reduced motion</li>
+        <li><strong>Test with real devices</strong> - DevTools emulation doesn't catch everything</li>
+        <li><strong>Consider reduced transparency too</strong> - Some users need high contrast</li>
+        <li><strong>Avoid <code>pointer-events: none</code></code></strong> - Makes static fallbacks unusable</li>
+      </ul>
+
+      <h2>Why This Matters for Tool Builders</h2>
+      <p>Neorgon is infrastructure. If a user can't access the hub, they can't access the tools. A timezone converter that requires login is broken. A hub that makes users dizzy is broken.</p>
+
+      <p><strong>Accessibility isn't a feature. It's infrastructure.</strong></p>
+
+      <p>Every tool we build—every animation, every hover effect, every physics simulation—should ask: "What happens when motion is removed?" If the answer is "it breaks," we need to redesign.</p>
+
+      <h2>The Rule We Now Live By</h2>
+
+      <div class="highlight-box">
+        <blockquote>
+          <p><strong>"Motion is an enhancement, not a requirement."</strong></p>
+          <p>If your UI breaks without motion, you haven't built an animation—you've built a dependency.</p>
+        </blockquote>
+      </div>
+
+      <p>This principle guides everything: tool interactions, hover states, loading indicators. Motion should make things <em>better</em>, not <em>possible</em>.</p>
+
+      <h2>What You Can Do Right Now</h2>
+
+      <ol>
+        <li><strong>Audit your site</strong> - Find every animation, transition, and canvas</li>
+        <li><strong>Add the media query</strong> - Start with the blanket <code>animation-duration</code> rule</li>
+        <li><strong>Test it</strong> - Enable it on your device, see what breaks</li>
+        <li><strong>Fix the breaks</strong> - Make sure static fallbacks work</li>
+        <li><strong>Document it</strong> - Show users you care about accessibility</li>
+      </ol>
+
+      <p>It takes an afternoon. It helps half your users. It's one of the highest ROI accessibility improvements you can make.</p>
+
+      <h2>Further Reading</h2>
+      <ul>
+        <li><a href="https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions.html">WCAG 2.1: Animation from Interactions</a></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion">MDN: prefers-reduced-motion</a></li>
+        <li><a href="https://webkit.org/blog/7551/responsive-design-for-motion/">WebKit: Responsive Design for Motion</a></li>
+        <li><a href="https://source.opennews.org/articles/motion-sick/">Source: Your Interactive Makes Me Sick</a></li>
+      </ul>
+
+    </article>
+
+    <!-- Author Box -->
+    <div class="article-footer">
+      <div class="author-box">
+        <div class="author-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div class="author-info">
+          <h4>Neorgon Engineering</h4>
+          <p>Building open-source tools for real problems. No paywalls, no signup, no nonsense.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-line"></div>
+    <div class="footer-content">
+      <div class="footer-left">
+        <a href="https://ehq.cl/" class="footer-logo" aria-label="Energon Hub">
+          <img src="/assets/icons/energon-logo.png" alt="Energon" width="24" height="24">
+          <span>Neorgon</span>
+        </a>
+        <span class="footer-tagline">Made for Real Problems</span>
+      </div>
+      <div class="footer-right">
+        <a href="/" class="footer-link">Tools</a>
+        <a href="/about.html" class="footer-link">About</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="https://github.com/lucianoadonis/neorgon" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- JavaScript for starfield -->
+<script src="/js/starfield.js"></script>
+
+</body>
+</html>
