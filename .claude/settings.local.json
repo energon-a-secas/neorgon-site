@@ -1,6 +1,13 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(make serve:*)",
+      "Bash(sleep:*)",
+      "Bash(curl:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

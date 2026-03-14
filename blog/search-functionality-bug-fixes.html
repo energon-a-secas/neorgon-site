@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="dark">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>When Search Breaks: The Physics of Moving Cards on our open-source Hub - Neorgon Blog</title>
+  <meta name="description" content="How we fixed a race-condition bug in our search functionality that was causing cards to disappear when clearing the search. Lessons in DOM manipulation and state management.">
+  <meta property="og:title" content="When Search Breaks: The Physics of Moving Cards">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://neorgon.com/blog/search-functionality-bug-fixes.html">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://neorgon.com/blog/search-functionality-bug-fixes.html">
+  <meta name="theme-color" content="#000912">
+  <!-- Google tag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTF349S8R5"></script>
+  <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-HTF349S8R5');</script>
+  <script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .post-header { max-width: 780px; margin: 0 auto; padding: 60px 40px 40px; text-align: center; }
+    .post-meta-bar { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); }
+    .post-category { padding: 4px 12px; background: rgba(176,21,176,.12); border: 1px solid rgba(176,21,176,.2); border-radius: 12px; color: #B015B0; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .post-title { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 16px; line-height: 1.2; color: var(--text-primary); }
+    .post-excerpt { font-size: 1.2rem; color: var(--text-secondary); line-height: 1.5; max-width: 600px; margin: 0 auto 40px; }
+    .article-content { max-width: 780px; margin: 0 auto; padding: 0 40px 80px; }
+    article { font-size: 1.1rem; line-height: 1.8; color: var(--text-secondary); }
+    article h2 { font-size: 1.75rem; font-weight: 600; margin: 48px 0 24px; color: var(--text-primary); }
+    article h3 { font-size: 1.4rem; font-weight: 600; margin: 32px 0 16px; color: var(--text-primary); }
+    article p { margin: 24px 0; }
+    article strong { color: var(--text-primary); font-weight: 600; }
+    article a { color: #B015B0; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    article a:hover { text-decoration-thickness: 2px; }
+    article code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.95em; background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; }
+    article pre { background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 8px; padding: 20px; overflow-x: auto; margin: 24px 0; }
+    article pre code { background: none; border: none; padding: 0; border-radius: 0; }
+    article blockquote { border-left: 3px solid #B015B0; padding: 16px 24px; margin: 24px 0; background: rgba(176,21,176,.05); font-style: italic; }
+    article ul, article ol { margin: 24px 0; padding-left: 24px; }
+    article li { margin: 8px 0; }
+    .code-block { margin: 32px 0; }
+    .code-label { display: inline-block; padding: 6px 12px; background: rgba(176,21,176,.15); border: 1px solid rgba(176,21,176,.2); border-radius: 4px 4px 0 0; color: #B015B0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+    .highlight-box { padding: 24px; background: linear-gradient(135deg, rgba(176,21,176,.05) 0%, rgba(61,0,128,.05) 100%); border: 1px solid rgba(176,21,176,.2); border-radius: 12px; margin: 32px 0; }
+    .highlight-box h4 { color: var(--text-primary); margin-bottom: 12px; font-size: 1.1rem; }
+    .hour-box { background: rgba(255,255,255,.03); border-left: 3px solid #B015B0; padding: 16px; margin: 16px 0; }
+    .hour-label { color: #B015B0; font-weight: 600; font-size: 1.1rem; }
+    .article-footer { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); }
+    .author-box { display: flex; align-items: center; gap: 16px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .author-info h4 { color: var(--text-primary); margin-bottom: 4px; }
+    .author-info p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+    .nav-back { position: absolute; top: 20px; left: 20px; z-index: 20; }
+    .back-button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; transition: all .2s ease; }
+    .back-button:hover { background: var(--surface-hover); border-color: rgba(176,21,176,.5); color: var(--text-primary); }
+    .back-button svg { width: 16px; height: 16px; }
+    @media (max-width: 768px) { .post-title { font-size: 2rem; } .post-header { padding: 40px 20px 30px; } .article-content { padding: 0 20px 60px; } }
+    @media (prefers-reduced-motion: reduce) { .back-button { transition: none !important; } }
+  </style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="page">
+  <nav class="nav-back">
+    <a href="/blog/" class="back-button" aria-label="Back to blog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Blog
+    </a>
+  </nav>
+
+  <header class="post-header">
+    <div class="post-meta-bar">
+      <time datetime="2026-03-14">March 14, 2026</time>
+      <span>·</span>
+      <span>8 min read</span>
+    </div>
+
+    <div class="post-category">Engineering</div>
+
+    <h1 class="post-title">When Search Breaks: The Physics of Moving Cards on Our Open-Source Hub</h1>
+
+    <p class="post-excerpt">
+      How we fixed a race-condition bug in our search functionality that was causing cards to disappear when clearing the search. Lessons in DOM manipulation and state management when you have 18 tools and no JavaScript framework.
+    </p>
+  </header>
+
+  <main class="article-content">
+    <article>
+      <p>We built <a href="https://neorgon.com">neorgon.com</a> to showcase 18 open-source tools we've built over the past few years. The hub is deceptively simple: a searchable grid of cards, each linking to a tool. Under the hood, we've added physics simulations, draggable reordering, and animated search results. It's all vanilla JavaScript—no React, no Vue, no framework. Just plain old DOM manipulation.</p>
+
+      <p>And that's where things went wrong.</p>
+
+      <h2>The Bug Report</h2>
+
+      <p>"The search bar is failing. Originally it was working, but the current fix damaged the result filtering and when you delete or cancel the search no cards are displayed."</p>
+
+      <p>Classic bug report: it was working, then it broke. The user types something in, gets filtered results, clears the search, and... nothing. A blank page where 18 tools used to be.</p>
+
+      <h2>The Setup: How Search Works</h2>
+
+      <p>Before we dive into the bug, let's understand the architecture. Our hub is split into "groups"—Planning, DevOps, Data, Productivity, etc. Each group has a label and a <code>.sites-grid</code> container with cards. We use CSS Grid for layout:</p>
+
+      <div class="code-block">
+        <span class="code-label">HTML Structure</span>
+        <pre><code>&lt;div class="card-group" data-group="planning"&gt;
+  &lt;h3 class="group-label"&gt;Planning&lt;/h3&gt;
+  &lt;div class="sites-grid"&gt;
+    &lt;a class="site-card" data-card-id="pathfinder"&gt;...&lt;/a&gt;
+    &lt;a class="site-card" data-card-id="skillmap"&gt;...&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+
+      <p>The search functionality did two things:</p>
+
+      <ol>
+        <li><strong>Filtering:</strong> When you type, cards that don't match get a <code>.search-hidden</code> class (<code>display: none !important</code>).</li>
+        <li><strong>Consolidation:</strong> Matching cards get moved from their groups into a special "search results grid" at the top of the page.</li>
+      </ol>
+
+      <p>Why move cards? We wanted a clean, unified results view. No group labels, no empty sections—just the matching cards in one grid.</p>
+
+      <p>When you clear the search, the code should:</p>
+
+      <ol>
+        <li>Move all cards back to their original groups</li>
+        <li>Remove the <code>.search-hidden</code> class</li>
+        <li>Remove group indicators</li>
+        <li>Hide the search results grid</li>
+      </ol>
+
+      <p>Simple, right? <em>Wrong</em>.</p>
+
+      <h2>The Problem: Race Conditions and Stale State</h2>
+
+      <p>Here was the original code (simplified):</p>
+
+      <div class="code-block">
+        <span class="code-label">The Buggy Code</span>
+        <pre><code>function doFilter() {
+  // Rebuild card collection and index
+  var currentCards = Array.from(document.querySelectorAll('.site-card'));
+
+  if (!query) {
+    // Clearing search - move cards back
+    var searchGrid = document.getElementById('searchResultsGrid');
+    if (searchGrid && searchGrid.children.length > 0) {
+      var cardsInGrid = Array.from(searchGrid.children);
+      cardsInGrid.forEach(function (c) {
+        var group = findOriginalGroup(c.dataset.cardId);
+        if (group) group.appendChild(c); // BUG #1
+      });
+    }
+
+    // Then make all cards visible
+    currentCards.forEach(function (c) {
+      c.classList.remove('search-hidden');
+    });
+    return;
+  }
+
+  // ... filtering logic
+}</code></pre>
+      </div>
+
+      <h3>The Three Fatal Bugs</h3>
+
+      <h4>Bug #1: DOM References vs. Live Collections</h4>
+
+      <p>Here's the first problem: <code>currentCards</code> is created at the start of the function. It captures all cards that exist in the DOM right now—including cards that are <em>already in the search grid</em>.</p>
+
+      <p>Then, we move cards from the search grid back to their groups. But <code>currentCards</code> still has references to those cards in their <em>old positions</em>.</p>
+
+      <p>When we try to make all cards visible by iterating through <code>currentCards</code>, we're operating on stale references. If a card has moved, we might be manipulating a node that's no longer where we think it is—or worse, manipulating the <em>same</em> card twice.</p>
+
+      <h4>Bug #2: Appending to the Wrong Container</h4>
+
+      <p>Look at line 11: <code>group.appendChild(c)</code>. What's <code>group</code>? It's the <em>group container</em>:</p>
+
+      <pre><code>&lt;div class="card-group" data-group="planning"&gt;
+  &lt;h3 class="group-label"&gt;...&lt;/h3&gt;
+  &lt;div class="sites-grid"&gt;  // We want to append here!
+    &lt;!-- cards --&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+      <p>We were appending cards directly to the <code>.card-group</code> div, not the <code>.sites-grid</code> container. This broke the layout completely. Cards appeared outside the grid, CSS selectors failed, and everything looked broken.</p>
+
+      <h4>Bug #3: The Missing Moving Cards</h4>
+
+      <p>The third bug was the most subtle. When you searched and got results, cards moved into the search grid. When you cleared the search, we moved them back. But here's the sequence:</p>
+
+      <ol>
+        <li>User types "planning" → 2 cards match → they move to search grid</li>
+        <li>User clears search → we iterate <code>currentCards</code> → but <code>currentCards</code> was built from cards <em>before</em> we cleared the search grid</li>
+        <li>The cards that were in the search grid are still in the grid, but now we reference them as if they're in their original groups</li>
+      </ol>
+
+      <p>Result: some cards ended up in limbo—copied into the search grid during filtering, but never moved back during cleanup.</p>
+
+      <div class="highlight-box">
+        <h4>The Root Cause</h4>
+        <p>The real problem wasn't the code—it was <em>when</em> we ran the code. We were rebuilding the DOM while trying to filter based on the old DOM state.</p>
+      </div>
+
+      <h2>The Fix: Clear, Build, Filter</h2>
+
+      <p>The solution was to enforce a strict order:</p>
+
+      <div class="code-block">
+        <span class="code-label">The Fixed Logic</span>
+        <pre><code>function doFilter() {
+  var q = input.value.trim().toLowerCase();
+
+  // 1. BEFORE ANYTHING: Clean up from previous searches
+  var searchGrid = document.getElementById('searchResultsGrid');
+  if (searchGrid && searchGrid.children.length > 0) {
+    var cardsInGrid = Array.from(searchGrid.children);
+    cardsInGrid.forEach(function (c) {
+      var group = findOriginalGroup(c.dataset.cardId);
+      if (group) {
+        var sitesGrid = group.querySelector('.sites-grid');
+        if (sitesGrid) sitesGrid.appendChild(c); // Correct container!
+        else group.appendChild(c); // Fallback
+      }
+      c.classList.remove('search-hidden');
+      var indicator = c.querySelector('.card-group-indicator');
+      if (indicator) indicator.remove();
+    });
+    searchGrid.style.display = 'none';
+  }
+
+  // 2. NOW rebuild the collection from clean state
+  var currentCards = Array.from(document.querySelectorAll('.site-card'));
+
+  if (!q) {
+    // 3. No search - make everything visible
+    allGroups.forEach(function (g) {
+      g.classList.remove('group-hidden');
+      var cardsInGroup = g.querySelectorAll('.site-card');
+      cardsInGroup.forEach(function (c) {
+        c.classList.remove('search-hidden');
+      });
+    });
+    document.body.classList.remove('search-active');
+    return;
+  }
+
+  // 4. Filtering logic only runs on a clean state
+  isFiltering = true;
+  // ... rest of the filtering code
+}</code></pre>
+      </div>
+
+      <h3>Key Changes</h3>
+
+      <ol>
+        <li><strong>Cleanup first:</strong> Move cards back to groups <em>before</em> rebuilding the index</li>
+        <li><strong>Correct containers:</strong> Append to <code>.sites-grid</code>, not the group wrapper</li>
+        <li><strong>Clean state:</strong> Only after cleanup do we query for "current" cards</li>
+        <li><strong>Defensive filtering:</strong> When clearing search, iterate through actual groups, not the stale <code>currentCards</code> array</li>
+      </ol>
+
+      <h2>Lessons Learned</h2>
+
+      <h3>1. DOM State is Expensive</h3>
+
+      <p>In React or Vue, you'd have a virtual DOM and reactive state. In vanilla JavaScript, you have the <em>actual</em> DOM. Every <code>querySelectorAll</code> is a live look at the DOM. If you're moving elements around, your collections become stale the moment you append a child.</p>
+
+      <p>Solution: Establish a clear "source of truth" and rebuild it at the right time. For us, that's after we've restored all cards to their original positions.</p>
+
+      <h3>2. Defensive Programming > Clever Programming</h3>
+
+      <p>The original code was trying to be efficient: <em>"I'll just grab all cards once and reuse that collection."</em> But efficiency doesn't matter if it's wrong.</p>
+
+      <p>The fixed code queries the DOM multiple times. It's "slower" but it's <em>correct</em>. In client-side JavaScript, querying 30 elements is nanoseconds. Being wrong is forever.</p>
+
+      <h3>3. The Devil is in the DOM Structure</h3>
+
+      <p>We had <code>.card-group</code> → <code>.sites-grid</code> → <code>.site-card</code>. The extra wrapper seemed clean, but it meant we needed to be precise about where cards live. If you can simplify your DOM structure, do it. Every wrapper is another place to lose track of children.</p>
+
+      <h3>4. Console.log is Your Friend</h3>
+
+      <p>When debugging this, I added console logs everywhere:</p>
+
+      <div class="code-block">
+        <span class="code-label">Debugging Output</span>
+        <pre><code>console.log('Cards in DOM:', document.querySelectorAll('.site-card').length);
+console.log('Cards in search grid:', searchGrid.children.length);
+console.log('Current cards array:', currentCards.length);</code></pre>
+      </div>
+
+      <p>Immediately, I saw the mismatch: 18 cards in the DOM, 3 cards in the search grid, but <code>currentCards</code> had 21. Mystery solved: duplicate references.</p>
+
+      <h2>The Bigger Picture</h2>
+
+      <p>This bug taught us something about building "simple" tools: <strong>state management is hard, even without state.</strong> We weren't using Redux, MobX, or even React's useState. We just had cards in the DOM. And yet, we still managed to create a race condition.</p>
+
+      <p>It reminded me of the classic computer science wisdom: <em>"There are two hard things in computer science: cache invalidation, naming things, and off-by-one errors."</em> We hit the trifecta:</p>
+
+      <ul>
+        <li><strong>Cache invalidation:</strong> Our <code>currentCards</code> array was a cache of DOM state that we never invalidated</li>
+        <li><strong>Naming things:</strong> <code>findOriginalGroup</code> didn't check if the card was <em>currently in</em> a group</li>
+        <li><strong>Off-by-one errors:</strong> We were appending to the wrong container, misaligning our entire layout</li>
+      </ul>
+
+      <h2>Bonus: Real-Time Visual Feedback</h2>
+
+      <p>One of the cooler parts of our hub is the physics-based search visualization. When you search, matching category "pills" zoom to the center, while non-matching ones drift to the edges. It's a subtle UX touch that makes search feel alive.</p>
+
+      <p>Here's how it works in the fixed code:</p>
+
+      <div class="code-block">
+        <span class="code-label">Physics Simulation</span>
+        <pre><code>pills.forEach(function (p) {
+  if (isFiltering) {
+    if (p.matched) {
+      // Attract to center
+      var dx = centerX - p.x;
+      var dy = centerY - p.y;
+      p.vx += dx * 0.003;
+      p.vy += dy * 0.003;
+    } else {
+      // Drift to orbit position
+      var angle = (i / pills.length) * Math.PI * 2;
+      p._orbitX = centerX + Math.cos(angle) * radius;
+      p._orbitY = centerY + Math.sin(angle) * radius;
+      // ... spring physics to orbit
+    }
+  }
+  // ... damping, boundary checks, etc.
+});</code></pre>
+      </div>
+
+      <p>The physics makes the search experience feel responsive and playful. But it also adds another layer of state: pill positions, velocities, orbit targets. If we lose track of our cards, we lose the visual feedback too.</p>
+
+      <div class="highlight-box">
+        <h4>Pro Tip</h4>
+        <p>When you add physics or animations, you're adding <em>temporal state</em>. The DOM at frame 1 is different from frame 60. Make sure your filtering logic doesn't interrupt the physics simulation mid-tick.</p>
+      </div>
+
+      <h2>Conclusion</h2>
+
+      <p>Fixing this bug was a reminder that "simple" UIs hide complex state management. We weren't building a real-time collaborative editor or a multiplayer game. We were just moving cards around. And yet, we still managed to create race conditions, stale state, and layout bugs.</p>
+
+      <p>The fix wasn't about adding Redux or rewriting in React. It was about being <em>explicit</em>:</p>
+
+      <ul>
+        <li>Explicit about DOM state vs. in-memory state</li>
+        <li>Explicit about when to rebuild collections</li>
+        <li>Explicit about which container holds which children</li>
+        <li>Explicit about cleanup before new operations</li>
+      </ul>
+
+      <p>Sometimes the best code isn't clever—it's clear.</p>
+
+      <p>And if you're wondering: yes, the search works now. Try it at <a href="https://neorgon.com">neorgon.com</a>. Type something, hit backspace, and watch the cards swarm back like starlings. It's beautiful when it works.</p>
+
+      <div class="article-footer">
+        <div class="author-box">
+          <div class="author-info">
+            <h4>Neorgon Engineering</h4>
+            <p>We build open-source tools and write about the bugs we fix along the way. This blog post was generated from an actual bug report and fix session.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+</div>
+
+<script src="js/starfield.js"></script>
+</body>
+</html>

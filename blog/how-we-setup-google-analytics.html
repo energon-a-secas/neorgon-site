@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="dark">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How We Set Up Google Analytics for Privacy-First Tracking - Neorgon Blog</title>
+  <meta name="description" content="A complete guide to implementing Google Analytics with Content Security Policy, privacy considerations, and dual tracking with Plausible Analytics.">
+  <meta property="og:title" content="How We Set Up Google Analytics for Privacy-First Tracking">
+  <meta property="og:description" content="Complete guide to GA setup with CSP, privacy considerations, and dual tracking.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://neorgon.com/blog/how-we-setup-google-analytics.html">
+  <meta property="og:site_name" content="Neorgon">
+  <meta property="og:image" content="https://neorgon.com/og-preview.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="How We Set Up Google Analytics for Privacy-First Tracking">
+  <meta name="twitter:description" content="Complete guide to GA setup with CSP, privacy considerations, and dual tracking.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://neorgon.com/blog/how-we-setup-google-analytics.html">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#000912">
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTF349S8R5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HTF349S8R5');
+  </script>
+
+  <!-- Privacy-first analytics -->
+  <script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .post-header { max-width: 780px; margin: 0 auto; padding: 60px 40px 40px; text-align: center; }
+    .post-meta-bar { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); }
+    .post-category { padding: 4px 12px; background: rgba(176,21,176,.12); border: 1px solid rgba(176,21,176,.2); border-radius: 12px; color: #B015B0; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .post-title { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 16px; line-height: 1.2; color: var(--text-primary); }
+    .post-excerpt { font-size: 1.2rem; color: var(--text-secondary); line-height: 1.5; max-width: 600px; margin: 0 auto 40px; }
+    .article-content { max-width: 780px; margin: 0 auto; padding: 0 40px 80px; }
+    article { font-size: 1.1rem; line-height: 1.8; color: var(--text-secondary); }
+    article h2 { font-size: 1.75rem; font-weight: 600; margin: 48px 0 24px; color: var(--text-primary); }
+    article h3 { font-size: 1.4rem; font-weight: 600; margin: 32px 0 16px; color: var(--text-primary); }
+    article p { margin: 24px 0; }
+    article strong { color: var(--text-primary); font-weight: 600; }
+    article a { color: #B015B0; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    article a:hover { text-decoration-thickness: 2px; }
+    article code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.95em; background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; }
+    article pre { background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 8px; padding: 20px; overflow-x: auto; margin: 24px 0; }
+    article pre code { background: none; border: none; padding: 0; border-radius: 0; }
+    article blockquote { border-left: 3px solid #B015B0; padding: 16px 24px; margin: 24px 0; background: rgba(176,21,176,.05); font-style: italic; }
+    article ul, article ol { margin: 24px 0; padding-left: 24px; }
+    article li { margin: 8px 0; }
+    .code-block { margin: 32px 0; }
+    .code-label { display: inline-block; padding: 6px 12px; background: rgba(176,21,176,.15); border: 1px solid rgba(176,21,176,.2); border-radius: 4px 4px 0 0; color: #B015B0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+    .highlight-box { padding: 24px; background: linear-gradient(135deg, rgba(176,21,176,.05) 0%, rgba(61,0,128,.05) 100%); border: 1px solid rgba(176,21,176,.2); border-radius: 12px; margin: 32px 0; }
+    .highlight-box h4 { color: var(--text-primary); margin-bottom: 12px; font-size: 1.1rem; }
+    .highlight-box ul { margin: 0; padding-left: 20px; }
+    .article-footer { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); }
+    .author-box { display: flex; align-items: center; gap: 16px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .author-info h4 { color: var(--text-primary); margin-bottom: 4px; }
+    .author-info p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+    .nav-back { position: absolute; top: 20px; left: 20px; z-index: 20; }
+    .back-button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; transition: all .2s ease; }
+    .back-button:hover { background: var(--surface-hover); border-color: rgba(176,21,176,.5); color: var(--text-primary); }
+    .back-button svg { width: 16px; height: 16px; }
+    @media (max-width: 768px) { .post-title { font-size: 2rem; } .post-header { padding: 40px 20px 30px; } .article-content { padding: 0 20px 60px; } }
+    @media (prefers-reduced-motion: reduce) { .back-button { transition: none !important; } }
+  </style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="page">
+  <nav class="nav-back">
+    <a href="/blog/" class="back-button" aria-label="Back to blog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Blog
+    </a>
+  </nav>
+
+  <header class="post-header">
+    <div class="post-meta-bar">
+      <time datetime="2026-03-14">March 14, 2026</time>
+      <span>·</span>
+      <span>6 min read</span>
+      <span>·</span>
+      <span class="post-category">Engineering</span>
+    </div>
+    <h1 class="post-title">How We Set Up Google Analytics for Privacy-First Tracking</h1>
+    <p class="post-excerpt">
+      A complete guide to implementing Google Analytics with Content Security Policy, privacy considerations, and dual tracking with Plausible Analytics.
+    </p>
+  </header>
+
+  <main class="article-content">
+    <article>
+
+      <h2>The Dilemma: Insights vs Privacy</h2>
+      <p>We wanted analytics on Neorgon to understand which tools people use, but we didn't want to sacrifice privacy. The obvious choice was a privacy-first solution like Plausible, but we also wanted to experiment with Google Analytics 4 to compare data models.</p>
+
+      <p>So we implemented <strong>both</strong>—and learned how to do it responsibly.</p>
+
+      <div class="highlight-box">
+        <h4>💡 Our Analytics Stack</h4>
+        <ul>
+          <li><strong>Plausible Analytics</strong> - Primary, privacy-first, GDPR-compliant</li>
+          <li><strong>Google Analytics 4</strong> - Secondary, for experimentation and comparison</li>
+          <li><strong>No cookies</strong> - Both use anonymized tracking</li>
+          <li><strong>Content Security Policy</strong> - Locked down to prevent data leakage</li>
+        </ul>
+      </div>
+
+      <h2>Step 1: Basic Google Analytics Setup</h2>
+      <p>Adding GA4 is straightforward. You need two scripts in your <code>&lt;head&gt;</code>:</p>
+
+      <div class="code-block">
+        <div class="code-label">head (immediately after charset meta)</div>
+        <pre><code>&lt;!-- Google tag (gtag.js) --&gt;
+&lt;script async src="https://www.googletagmanager.com/gtag/js?id=G-HTF349S8R5"&gt;&lt;/script&gt;
+&lt;script&gt;
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-HTF349S8R5');
+&lt;/script&gt;</code></pre>
+      </div>
+
+      <p>The first script loads the library. The second initializes tracking. Replace <code>G-HTF349S8R5</code> with your Measurement ID from Google Analytics.</p>
+
+      <h2>Step 2: Content Security Policy Configuration</h2>
+      <p>This is where most people mess up. GA requires specific CSP directives to work:</p>
+
+      <div class="code-block">
+        <div class="code-label">meta http-equiv="Content-Security-Policy"</div>
+        <pre><code>&lt;meta http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline'
+          https://www.googletagmanager.com
+          https://www.google-analytics.com;
+        img-src 'self' data:
+          https://www.google-analytics.com
+          https://www.googletagmanager.com;
+        connect-src https://www.google-analytics.com
+                   https://www.googletagmanager.com
+      "&gt;</code></pre>
+      </div>
+
+      <h3>What Each Directive Does:</h3>
+      <ul>
+        <li><code>script-src</code> - Allows GA's JavaScript to load and execute</li>
+        <li><code>img-src</code> - GA uses pixel images for tracking</li>
+        <li><code>connect-src</code> - Required for event collection API calls</li>
+        <li><code>'unsafe-inline'</code> - GA uses inline scripts (unavoidable)</li>
+      </ul>
+
+      <div class="highlight-box">
+        <h4>⚠️ Security Warning</h4>
+        <p>We use <code>'unsafe-inline'</code> because GA requires it. To mitigate risk:</p>
+        <ul>
+          <li>Keep GA script in <code>&lt;head&gt;</code> (immediately after meta tags)</li>
+          <li>Restrict other inline scripts to non-GA pages</li>
+          <li>Use CSP nonces for other inline scripts if needed</li>
+        </ul>
+      </div>
+
+      <h2>Step 3: Dual Tracking with Plausible</h2>
+      <p>Plausible is our primary analytics. It's lightweight, open-source, and GDPR-compliant:</p>
+
+      <div class="code-block">
+        <div class="code-label">head (after GA)</div>
+        <pre><code>&lt;!-- Privacy-first analytics --&gt;
+&lt;script defer data-domain="neorgon.com"
+        src="https://plausible.io/js/script.js"&gt;&lt;/script&gt;</code></pre>
+      </div>
+
+      <p>Key differences from GA:</p>
+      <ul>
+        <li><code>defer</code> attribute - Loads after page render (non-blocking)</li>
+        <li><code>data-domain</code> - Your domain, auto-detected</li>
+        <li><strong>No cookies</strong> - Uses localStorage, not cookies</li>
+        <li><strong>1KB script</strong> vs GA's 50KB+</li>
+      </ul>
+
+      <h2>Step 4: Testing Your Setup</h2>
+
+      <h3>1. Check Browser Console</h3>
+      <p>Open DevTools → Console. Look for:</p>
+      <ul>
+        <li>✅ No CSP violations</li>
+        <li>✅ GA library loads (no 404s)</li>
+        <li>✅ Plausible script loads</li>
+      </ul>
+
+      <h3>2. Verify Network Requests</h3>
+      <p>DevTools → Network tab:</p>
+      <ul>
+        <li>Filter: <code>google-analytics</code> - Should see <code>collect?v=2...</code> requests</li>
+        <li>Filter: <code>plausible</code> - Should see <code>api/event</code> requests</li>
+        <li>Both should return HTTP 200</li>
+      </ul>
+
+      <h3>3. Check Analytics Dashboards</h3>
+      <ul>
+        <li><strong>Plausible:</strong> Real-time tab shows immediate visits</li>
+        <li><strong>GA4:</strong> Reports → Realtime (updates every few seconds)</li>
+      </ul>
+
+      <h2>Privacy Considerations</h2>
+
+      <h3>What We Track (And Don't)</h3>
+      <div class="code-block">
+        <div class="code-label">Tracked</div>
+        <ul>
+          <li>✓ Page views and unique visitors</li>
+          <li>✓ Referrer sources (where users come from)</li>
+          <li>✓ Device type (mobile/desktop)</li>
+          <li>✓ Geographic region (country/city)</li>
+          <li>✓ Tool usage patterns (which cards get clicked)</li>
+        </ul>
+
+        <div class="code-label">Not Tracked</div>
+        <ul>
+          <li>✗ Individual IP addresses (anonymized)</li>
+          <li>✗ Personal data or form inputs</li>
+          <li>✗ Cross-site tracking</li>
+          <li>✗ Individual user profiles</li>
+          <li>✗ Demographic data</li>
+        </ul>
+      </div>
+
+      <h3>GDPR Compliance Checklist</h3>
+      <ul>
+        <li>✅ <strong>No cookies</strong> - Both trackers are cookie-less</li>
+        <li>✅ <strong>Anonymized IPs</strong> - GA4 auto-anonymizes last octet</li>
+        <li>✅ <strong>No personal data</strong> - We don't ask for it</li>
+        <li>✅ <strong>Transparent</strong> - This blog post is our privacy policy</li>
+        <li>✅ <strong>Opt-out</strong> - Users can block scripts with ad blockers</li>
+      </ul>
+
+      <h2>Comparing The Data Models</h2>
+
+      <p>After running both for a week, here's what we learned:</p>
+
+      <div class="code-block">
+        <div class="code-label">Plausible (Privacy-First)</div>
+        <ul>
+          <li>✅ Immediate real-time data</li>
+          <li>✅ Simple, focused dashboard</li>
+          <li>✅ Open source (can self-host)</li>
+          <li>✅ No data sampling</li>
+          <li>⚠️ Limited historical analysis</li>
+        </ul>
+
+        <div class="code-label">Google Analytics 4</div>
+        <ul>
+          <li>✅ Powerful segmentation and funnels</li>
+          <li>✅ Integration with Google Ads</li>
+          <li>✅ Advanced attribution modeling</li>
+          <li>✅ Free for most use cases</li>
+          <li>⚠️ Complex UI, steep learning curve</li>
+          <li>⚠️ Data sampling on high traffic</li>
+        </ul>
+      </div>
+
+      <h2>Troubleshooting Common Issues</h2>
+
+      <h3>Issue: CSP Violations</h3>
+      <p><strong>Error:</strong> <code>Refused to load the script...</code></p>
+      <p><strong>Fix:</strong> Add all GA domains to your CSP directives</p>
+
+      <h3>Issue: No Data in GA</h3>
+      <p><strong>Check:</strong> Measurement ID is correct, no ad blocker, CSP allows images</p>
+      <p><strong>Debug:</strong> Use GA Debugger Chrome extension</p>
+
+      <h3>Issue: Data Discrepancy Between Plausible and GA</h3>
+      <p><strong>Normal:</strong> Different tracking methodologies, expect 10-20% variance</p>
+      <p><strong>Plausible:</strong> Counts unique visitors more conservatively</p>
+      <p><strong>GA:</strong> Uses sessions and engaged sessions</p>
+
+      <h2>Our Recommendation</h2>
+
+      <div class="highlight-box">
+        <blockquote>
+          <p><strong>For most projects: Use Plausible only.</strong></p>
+          <p>It's simpler, privacy-respecting, and gives you 90% of what you need.</p>
+          <br>
+          <p><strong>For complex funnels/attribution: Use GA4 + Plausible.</strong></p>
+          <p>Plausible for day-to-day, GA4 for deep analysis when needed.</p>
+        </blockquote>
+      </div>
+
+      <h2>Further Reading</h2>
+      <ul>
+        <li><a href="https://plausible.io/vs-google-analytics">Plausible vs Google Analytics</a></li>
+        <li><a href="https://support.google.com/analytics/answer/10089681?hl=en">GA4 Measurement ID Setup</a></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP">MDN: Content Security Policy</a></li>
+        <li><a href="https://web.dev/csp-xss/">web.dev: CSP for XSS Prevention</a></li>
+      </ul>
+
+    </article>
+
+    <div class="article-footer">
+      <div class="author-box">
+        <div class="author-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div class="author-info">
+          <h4>Neorgon Engineering</h4>
+          <p>Building open-source tools for real problems. No paywalls, no signup, no nonsense.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-line"></div>
+    <div class="footer-content">
+      <div class="footer-left">
+        <a href="https://ehq.cl/" class="footer-logo" aria-label="Energon Hub">
+          <img src="/assets/icons/energon-logo.png" alt="Energon" width="24" height="24">
+          <span>Neorgon</span>
+        </a>
+        <span class="footer-tagline">Made for Real Problems</span>
+      </div>
+      <div class="footer-right">
+        <a href="/" class="footer-link">Tools</a>
+        <a href="/about.html" class="footer-link">About</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="https://github.com/lucianoadonis/neorgon" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script src="/js/starfield.js"></script>
+
+</body>
+</html>

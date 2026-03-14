@@ -223,11 +223,24 @@ body {
   justify-content: center;
   font-size: .85rem;
   font-family: var(--font);
-  transition: background .15s, color .15s;
+  transition: background .15s, color .15s, opacity .2s;
   padding: 0;
+  outline: none;
 }
-.hero-search-clear:hover { background: rgba(255,255,255,.12); color: rgba(255,255,255,.6); }
+.hero-search-clear:hover {
+  background: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.6);
+}
+.hero-search-clear:active,
+.hero-search-clear:focus {
+  background: rgba(255,255,255,.18);
+  color: rgba(255,255,255,.8);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.15);
+}
 .hero-search-clear.show { display: flex; }
+.hero-search-clear:active {
+  transform: translateY(-50%) scale(0.95);
+}
 
 /* Keyboard hint */
 .search-hint {
@@ -324,6 +337,24 @@ body {
   display: none;
 }
 .search-no-results.show { display: block; }
+
+/* ── Search results grid ─────────────────────────────────────────────── */
+.search-results-grid {
+  display: none; /* Hidden by default, shown during search */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 20px 0 40px 0;
+  padding: 0 20px;
+}
+
+body.search-active .search-results-grid {
+  display: grid !important;
+}
+
+/* Hide original card groups when search grid is active */
+body.search-active .sites-section > .card-group {
+  display: none;
+}
 
 /* ── Sites grid ──────────────────────────────────────────────────────── */
 .sites-section {
@@ -1863,4 +1894,53 @@ body.evangelion-bg .hero-search-icon { color: rgba(128,0,255,.3); }
   #constellationCanvas {
     display: none !important;
   }
+}
+
+/* ── Unified search mode ─────────────────────────────────────────────────
+   When searching, show all cards at same level with compact group indicators
+*/
+body.search-active .card-group {
+  margin-bottom: 8px; /* Tight spacing between groups */
+}
+
+body.search-active .group-label {
+  font-size: 0.6rem; /* Smaller labels */
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+body.search-active .sites-grid {
+  gap: 12px; /* Tighter card spacing */
+}
+
+/* Hide group labels when only 1-2 cards in group during search */
+body.search-active .card-group:not(:has(.site-card:not(.search-hidden) ~ .site-card:not(.search-hidden) ~ .site-card:not(.search-hidden))) .group-label {
+  display: none;
+}
+
+/* Compact group indicator on cards during search */
+.card-group-indicator {
+  display: none; /* Hidden by default */
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--card-accent);
+  color: var(--bg);
+  opacity: 0.9;
+  z-index: 2;
+}
+
+body.search-active .card-group-indicator {
+  display: block; /* Show during search */
+}
+
+/* For cards in groups with only 1-2 items, make indicator more prominent */
+body.search-active .card-group:not(:has(.site-card:not(.search-hidden) ~ .site-card:not(.search-hidden) ~ .site-card:not(.search-hidden))) .card-group-indicator {
+  opacity: 1;
+  font-size: 0.65rem;
+  padding: 3px 8px;
 }

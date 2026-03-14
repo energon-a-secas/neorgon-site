@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="dark">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Physics Behind Those Floating Category Pills - Neorgon Blog</title>
+  <meta name="description" content="Deep dive into Neorgon's physics-simulated search category pills: spring physics, collision detection, and performance optimization.">
+  <meta property="og:title" content="The Physics Behind Those Floating Category Pills">
+  <meta property="og:description" content="Technical deep dive into spring physics, collision detection, and performance optimization.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://neorgon.com/blog/the-physics-behind-floating-pills.html">
+  <meta property="og:site_name" content="Neorgon">
+  <meta property="og:image" content="https://neorgon.com/og-preview.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Physics Behind Those Floating Category Pills">
+  <meta name="twitter:description" content="Technical deep dive into spring physics and performance optimization.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://neorgon.com/blog/the-physics-behind-floating-pills.html">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#000912">
+
+  <!-- Google tag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTF349S8R5"></script>
+  <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-HTF349S8R5');</script>
+  <script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .post-header { max-width: 780px; margin: 0 auto; padding: 60px 40px 40px; text-align: center; }
+    .post-meta-bar { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); }
+    .post-category { padding: 4px 12px; background: rgba(176,21,176,.12); border: 1px solid rgba(176,21,176,.2); border-radius: 12px; color: #B015B0; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .post-title { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 16px; line-height: 1.2; color: var(--text-primary); }
+    .post-excerpt { font-size: 1.2rem; color: var(--text-secondary); line-height: 1.5; max-width: 600px; margin: 0 auto 40px; }
+    .article-content { max-width: 780px; margin: 0 auto; padding: 0 40px 80px; }
+    article { font-size: 1.1rem; line-height: 1.8; color: var(--text-secondary); }
+    article h2 { font-size: 1.75rem; font-weight: 600; margin: 48px 0 24px; color: var(--text-primary); }
+    article h3 { font-size: 1.4rem; font-weight: 600; margin: 32px 0 16px; color: var(--text-primary); }
+    article p { margin: 24px 0; }
+    article strong { color: var(--text-primary); font-weight: 600; }
+    article a { color: #B015B0; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    article a:hover { text-decoration-thickness: 2px; }
+    article code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.95em; background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; }
+    article pre { background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 8px; padding: 20px; overflow-x: auto; margin: 24px 0; }
+    article pre code { background: none; border: none; padding: 0; border-radius: 0; }
+    article blockquote { border-left: 3px solid #B015B0; padding: 16px 24px; margin: 24px 0; background: rgba(176,21,176,.05); font-style: italic; }
+    article ul, article ol { margin: 24px 0; padding-left: 24px; }
+    article li { margin: 8px 0; }
+    .code-block { margin: 32px 0; }
+    .code-label { display: inline-block; padding: 6px 12px; background: rgba(176,21,176,.15); border: 1px solid rgba(176,21,176,.2); border-radius: 4px 4px 0 0; color: #B015B0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+    .highlight-box { padding: 24px; background: linear-gradient(135deg, rgba(176,21,176,.05) 0%, rgba(61,0,128,.05) 100%); border: 1px solid rgba(176,21,176,.2); border-radius: 12px; margin: 32px 0; }
+    .highlight-box h4 { color: var(--text-primary); margin-bottom: 12px; font-size: 1.1rem; }
+    .article-footer { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); }
+    .author-box { display: flex; align-items: center; gap: 16px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .author-info h4 { color: var(--text-primary); margin-bottom: 4px; }
+    .author-info p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+    .nav-back { position: absolute; top: 20px; left: 20px; z-index: 20; }
+    .back-button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; transition: all .2s ease; }
+    .back-button:hover { background: var(--surface-hover); border-color: rgba(176,21,176,.5); color: var(--text-primary); }
+    .back-button svg { width: 16px; height: 16px; }
+    @media (max-width: 768px) { .post-title { font-size: 2rem; } .post-header { padding: 40px 20px 30px; } .article-content { padding: 0 20px 60px; } }
+    @media (prefers-reduced-motion: reduce) { .back-button { transition: none !important; } }
+  </style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="page">
+  <nav class="nav-back">
+    <a href="/blog/" class="back-button" aria-label="Back to blog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Blog
+    </a>
+  </nav>
+
+  <header class="post-header">
+    <div class="post-meta-bar">
+      <time datetime="2026-03-14">March 14, 2026</time>
+      <span>·</span>
+      <span>12 min read</span>
+      <span>·</span>
+      <span class="post-category">Engineering</span>
+    </div>
+    <h1 class="post-title">The Physics Behind Those Floating Category Pills</h1>
+    <p class="post-excerpt">Deep dive into Neorgon's physics-simulated search category pills: spring physics, collision detection, and performance optimization in vanilla JavaScript.</p>
+  </header>
+
+  <main class="article-content">
+    <article>
+      <h2>Why Physics Simulation?</h2>
+      <p>When we built the search interface for Neorgon, we wanted categories that felt alive—not static buttons, but objects with weight and momentum. The result: 10 floating pills that orbit, collide, and settle into place using real physics principles.</p>
+
+      <div class="highlight-box">
+        <h4>💡 The Design Goal</h4>
+        <p>Make search categories feel like planets in orbit—distinct, interactive, and responsive to user input with organic, natural motion.</p>
+      </div>
+
+      <h2>The Physics System Architecture</h2>
+      <p>The simulation runs on a 60fps game loop using <code>requestAnimationFrame</code>. Each pill is an object with:</p>
+
+      <div class="code-block">
+        <div class="code-label">Core Physics Properties</div>
+        <pre><code>var pill = {
+  x: 150,        // Current position X
+  y: 100,        // Current position Y
+  vx: 0.5,       // Velocity X (pixels/frame)
+  vy: -0.3,      // Velocity Y (pixels/frame)
+  homeX: 150,    // Rest position X
+  homeY: 100,    // Rest position Y
+  mass: 1.0      // Mass (affects collision response)
+};</code></pre>
+      </div>
+
+      <h2>1. Spring Physics (The Home Force)</h2>
+      <p>Each pill is attached to its "home" position with an invisible spring. When displaced, it wants to return home.</p>
+
+      <div class="code-block">
+        <div class="code-label">Spring Force Calculation</div>
+        <pre><code>// Hooke's Law: F = -k * x
+var dx = pill.homeX - pill.x;
+var dy = pill.homeY - pill.y;
+var k = 0.008; // Spring constant (stiffness)
+
+pill.vx += dx * k;
+pill.vy += dy * k;</code></pre>
+      </div>
+
+      <p><strong>Making it feel natural:</strong> The spring constant <code>k = 0.008</code> is deliberately soft. We want drift, not snap-back. This creates that lazy, orbital feeling.</p>
+
+      <h2>2. Orbital Drift (Fake Orbital Mechanics)</h2>
+      <p>To prevent pills from just sitting still, we add layered sine wave motion:</p>
+
+      <div class="code-block">
+        <div class="code-label">Double-layered Orbital Drift</div>
+        <pre><code>// Two sine waves at different frequencies
+time1 += 0.012 + (i % 3) * 0.003;
+time2 += 0.007 + (i % 4) * 0.002;
+
+pill.vx += Math.sin(time1) * 0.04;
+pill.vy += Math.cos(time1 * 0.7) * 0.03;
+pill.vx += Math.cos(time2) * 0.015;
+pill.vy += Math.sin(time2 * 1.3) * 0.012;</code></pre>
+      </div>
+
+      <p>The result: Each pill follows an unpredictable but smooth path, like a planet perturbed by other gravitational bodies.</p>
+
+      <h2>3. Collision Detection and Response</h2>
+      <p>When pills get too close, they repel each other with a soft force:</p>
+
+      <div class="code-block">
+        <div class="code-label">Soft Repulsion Algorithm</div>
+        <pre><code>pills.forEach(function(other) {
+  if (other === pill) return;
+
+  var dx = pill.x - other.x;
+  var dy = pill.y - other.y;
+  var dist = Math.sqrt(dx * dx + dy * dy);
+  var minDist = 85; // Minimum separation
+
+  if (dist < minDist) {
+    var t = (minDist - dist) / minDist;
+    var force = t * t * 0.2; // Quadratic falloff
+
+    pill.vx += (dx / dist) * force;
+    pill.vy += (dy / dist) * force;
+  }
+});</code></pre>
+      </div>
+
+      <p><strong>The quadratic falloff (<code>t * t</code>):</strong> Pills only push hard when very close. This prevents the system from exploding while maintaining personal space.</p>
+
+      <h2>4. Damping (Energy Loss)</h2>
+      <p>Without damping, pills would oscillate forever. We apply velocity decay each frame:</p>
+
+      <div class="code-block">
+        <div class="code-label">Velocity Damping</div>
+        <pre><code>var damp = 0.96; // 4% energy loss per frame
+pill.vx *= damp;
+pill.vy *= damp;</code></pre>
+      </div>
+
+      <p>This creates the "settling" effect. Pills eventually calm down unless disturbed.</p>
+
+      <h2>5. Soft Bounds (Container Walls)</h2>
+      <p>Instead of hard walls that cause jarring bounces, we use gentle nudges:</p>
+
+      <div class="code-block">
+        <div class="code-label">Soft Boundary Force</div>
+        <pre><code>if (pill.x < 20) {
+  pill.vx += (20 - pill.x) * 0.05; // Gentle pull
+}
+if (pill.x > W - 20) {
+  pill.vx += (W - 20 - pill.x) * 0.05;
+}</code></pre>
+      </div>
+
+      <h2>Search Interaction: Planet Zoom</h2>
+      <p>When you click a category pill, it "zooms" like a planet approaching:</p>
+
+      <div class="code-block">
+        <div class="code-label">Animated Scale via Physics</div>
+        <pre><code>pill._zoomScale = 1;
+
+function animateZoom(now) {
+  var t = Math.min(1, (now - start) / 450);
+  pill._zoomScale = 1 + 0.4 * Math.sin(t * Math.PI);
+
+  if (t < 1) requestAnimationFrame(animateZoom);
+  else pill._zoomScale = 1;
+}</code></pre>
+      </div>
+
+      <p>Applied during render: <code>transform: translate(...) scale(pill._zoomScale)</code></p>
+
+      <h2>Performance Optimization</h2>
+
+      <h3>1. Spatial Partitioning (Fake)</h3>
+      <p>Instead of checking every pill against every other pill (O(n²)), we only check when close:</p>
+
+      <div class="code-block">
+        <div class="code-label">Distance Culling</div>
+        <pre><code>// Only check if within bounding box
+if (Math.abs(pill.x - other.x) > 150) return;
+if (Math.abs(pill.y - other.y) > 150) return;
+
+// Then do expensive sqrt distance check
+var dist = Math.sqrt(dx * dx + dy * dy);</code></pre>
+      </div>
+
+      <h3>2. GPU-Accelerated Transforms</h3>
+      <p>Never modify <code>left</code> or <code>top</code>. Always use <code>transform</code>:</p>
+
+      <div class="code-block">
+        <div class="code-label">GPU Compositing</div>
+        <pre><code>// ❌ BAD - triggers layout
+pill.el.style.left = pill.x + 'px';
+pill.el.style.top = pill.y + 'px';
+
+// ✅ GOOD - GPU composited
+pill.el.style.transform =
+  `translate(${pill.x}px, ${pill.y}px)`;</code></pre>
+      </div>
+
+      <h3>3. Fixed Timestep with Interpolation</h3>
+      <p>Physics runs at consistent speed regardless of frame rate:</p>
+
+      <div class="code-block">
+        <div class="code-label">Delta Time Normalization</div>
+        <pre><code>function tick(timestamp) {
+  var deltaTime = timestamp - lastTime;
+  lastTime = timestamp;
+
+  // Normalize forces for 60fps
+  var dtFactor = Math.min(deltaTime / 16.67, 2);
+
+  pills.forEach(function(pill) {
+    pill.vx += forceX * dtFactor;
+    pill.vy += forceY * dtFactor;
+  });
+
+  requestAnimationFrame(tick);
+}</code></pre>
+      </div>
+
+      <h2>Filtering State: Matching vs Non-Matching</h2>
+      <p>When searching, matched pills attract to center while others drift to periphery:</p>
+
+      <div class="code-block">
+        <div class="code-label">Dual Behavior System</div>
+        <pre><code>if (pill.matched) {
+  // Attract to center
+  var dx = centerX - pill.x;
+  var dy = centerY - pill.y;
+  pill.vx += dx * 0.003;
+  pill.vy += dy * 0.003;
+} else {
+  // Assign to orbital position
+  if (!pill._orbitX) {
+    var angle = (i / pills.length) * Math.PI * 2;
+    pill._orbitX = centerX + Math.cos(angle) * 200;
+    pill._orbitY = centerY + Math.sin(angle) * 200;
+  }
+
+  var dx = pill._orbitX - pill.x;
+  var dy = pill._orbitY - pill.y;
+  pill.vx += dx * 0.008;
+  pill.vy += dy * 0.008;
+}</code></pre>
+      </div>
+
+      <h2>What Makes It Feel "Right"</h2>
+
+      <p>After weeks of tweaking, we discovered the magic formula:</p>
+
+      <div class="highlight-box">
+        <h4>🎯 The Physics Sweet Spot</h4>
+        <ul>
+          <li><strong>Spring constant (0.008):</strong> Weak enough to drift, strong enough to return</li>
+          <li><strong>Damping (0.96):</strong> Loses energy slowly, maintains liveliness</li>
+          <li><strong>Repulsion (0.2):</strong> One-fifth of spring force, maintains spacing without fighting</li>
+          <li><strong>Drift amplitude (0.04):</strong> Just enough to see motion, not enough to distract</li>
+        </ul>
+      </div>
+
+      <h2>Lessons Learned</h2>
+
+      <h3>1. Physics is Subjective</h3>
+      <p>"Correct" physics feels wrong. Real springs overshoot and oscillate. Our springs have magical damping that feels natural in UI.</p>
+
+      <h3>2. Performance is Design</h3>
+      <p>The most beautiful animation is useless if it drops frames. We built performance constraints first, then designed within them.</p>
+
+      <h3>3. Defaults Matter</h3>
+      <p>The initial positions are randomly distributed but constrained. We generate 10 layouts and pick the most balanced one.</p>
+
+      <div class="code-block">
+        <div class="code-label">Smart Initialization</div>
+        <pre><code>function randomPositions(count, minDist) {
+  var attempts = 0;
+  do {
+    var positions = generateRandom(count);
+    var minDistance = computeMinDistance(positions);
+    attempts++;
+  } while (minDistance < minDist && attempts < 200);
+
+  return positions; // Best we could find
+}</code></pre>
+      </div>
+
+      <h2>Alternative: When to Skip Physics</h2>
+      <p>Physics simulation is overkill for many UIs. Consider these simpler alternatives:</p>
+
+      <div class="highlight-box">
+        <h4>🤔 When Physics is Worth It</h4>
+        <p><strong>Use physics when:</strong></p>
+        <ul>
+          <li>You have many interactive elements (10+ categories)</li>
+          <li>Users frequently filter/rearrange items</li>
+          <li>You want emergent, unpredictable behavior</li>
+        </ul>
+
+        <p><strong>Skip physics when:</strong></p>
+        <ul>
+          <li>You have static categories</li>
+          <li>Performance is critical (mobile)</li>
+          <li>You need precise control</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <div class="article-footer">
+      <div class="author-box">
+        <div class="author-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div class="author-info">
+          <h4>Neorgon Engineering</h4>
+          <p>Building open-source tools for real problems. No paywalls, no signup, no nonsense.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-line"></div>
+    <div class="footer-content">
+      <div class="footer-left">
+        <a href="https://ehq.cl/" class="footer-logo" aria-label="Energon Hub">
+          <img src="/assets/icons/energon-logo.png" alt="Energon" width="24" height="24">
+          <span>Neorgon</span>
+        </a>
+        <span class="footer-tagline">Made for Real Problems</span>
+      </div>
+      <div class="footer-right">
+        <a href="/" class="footer-link">Tools</a>
+        <a href="/about.html" class="footer-link">About</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="https://github.com/lucianoadonis/neorgon" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script src="/js/starfield.js"></script>
+
+</body>
+</html>
