@@ -8,8 +8,8 @@
   --text-muted: rgba(143,160,192,.65);
   --border: rgba(255,255,255,.08);
   --border-glow: rgba(255,255,255,.15);
-  --surface: rgba(255,255,255,.03);
-  --surface-hover: rgba(255,255,255,.06);
+  --surface: rgba(255,255,255,.12);
+  --surface-hover: rgba(255,255,255,.18);
   --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -417,7 +417,7 @@ body.search-active .sites-section > .card-group {
 /* ── Site card ───────────────────────────────────────────────────────── */
 .site-card {
   position: relative;
-  background: var(--surface);
+  background: rgba(0, 12, 24, .82);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 28px;
@@ -427,6 +427,7 @@ body.search-active .sites-section > .card-group {
   gap: 12px;
   overflow: hidden;
   transition: border-color .2s, box-shadow .3s, opacity .35s ease, transform .35s ease;
+  box-shadow: 0 0 18px rgba(0, 0, 0, .6);
 }
 
 /* Neon glow on hover via custom prop */
@@ -1572,6 +1573,38 @@ body.matrix-bg .hero-section { text-shadow: 0 0 20px rgba(0,0,0,.8); }
   opacity: 0;
 }
 #interventionCanvas.active { opacity: 1; }
+
+/* ── Egg Background (YouTube Video) ───────────── */
+.video-background {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  opacity: 0;
+  transition: opacity 1.2s;
+  overflow: hidden !important;
+}
+.video-background.active {
+  opacity: 0.8; /* Slightly dimmed to match other backgrounds better */
+}
+.video-background iframe {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 130% !important;
+  height: 130% !important;
+  min-width: 130% !important;
+  min-height: 130% !important;
+  border: none !important;
+  transform: translate(-50%, -50%) !important;
+  pointer-events: none !important;
+  filter: brightness(0.8) contrast(1.2); /* Brighter and higher contrast */
+}
 
 body.intervention-bg { color: #1a1a1a; background: #ededea; }
 

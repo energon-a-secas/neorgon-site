@@ -7,7 +7,8 @@
     stars:        'NkNy9qDWiAw',
     intervention: 'EQLJ1I3CFfg',
     matrix:       'ZIjfK4MGrGI',
-    evangelion:   'zWJEHuUZ-fA'
+    evangelion:   'zWJEHuUZ-fA',
+    egg:          'FeMlswU1Pms'
   };
 
   let playing = false;
@@ -140,6 +141,9 @@
   /* Called by settings when background changes */
   window._neoMusicSwitch = function (mode) {
     if (getPrefs().musicAutoMatch === false) return;
+    // Don't auto-switch if user has manually selected egg track
+    const prefs = getPrefs();
+    if (prefs.musicTrack === 'egg') return;
     if (playing) doPlay(TRACKS[mode] || TRACKS.stars);
   };
 

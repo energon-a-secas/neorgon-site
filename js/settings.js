@@ -96,13 +96,16 @@
         if (window.matrixOff) window.matrixOff();
         if (window.interventionOff) window.interventionOff();
         if (window.evangelionOff) window.evangelionOff();
+        if (window.eggOff) window.eggOff();
       } else {
         if (window.matrixKill) window.matrixKill();
         if (window.interventionKill) window.interventionKill();
         if (window.evangelionKill) window.evangelionKill();
+        if (window.eggKill) window.eggKill();
         if (mode === 'matrix' && window.matrixOn) window.matrixOn();
         if (mode === 'intervention' && window.interventionOn) window.interventionOn();
         if (mode === 'evangelion' && window.evangelionOn) window.evangelionOn();
+        if (mode === 'egg' && window.eggOn) window.eggOn();
       }
 
       /* Switch music to match background */
@@ -111,6 +114,10 @@
 
     /* Restore saved bg */
     bgBtns.forEach(b => b.classList.toggle('active', b.dataset.bg === prefs.bg));
+    const eggBg = document.getElementById('eggBackground');
+    if (eggBg && prefs.bg === 'egg') {
+      setTimeout(() => { eggBg.classList.add('active'); }, 100);
+    }
     if (prefs.bg === 'matrix') {
       setTimeout(() => { if (window.matrixOn) window.matrixOn(); }, 100);
     } else if (prefs.bg === 'intervention') {

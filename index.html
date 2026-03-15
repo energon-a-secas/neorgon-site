@@ -11,7 +11,7 @@
     gtag('config', 'G-HTF349S8R5');
   </script>
   <meta name="color-scheme" content="dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com https://www.google-analytics.com https://www.googletagmanager.com">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev; connect-src https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com https://www.google-analytics.com https://www.googletagmanager.com ws://localhost:* http://localhost:*; frame-src https://www.youtube.com https://www.youtube-nocookie.com">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <title>Neorgon | Made for Real Problems</title>
@@ -63,6 +63,7 @@
 <canvas id="matrixCanvas"></canvas>
 <canvas id="interventionCanvas"></canvas>
 <canvas id="evangelionCanvas"></canvas>
+<div id="eggBackground" class="video-background"></div>
 
 <!-- NERV Warning Overlay -->
 <div class="nerv-warning-overlay" id="nervWarningOverlay">
@@ -957,6 +958,7 @@
       <button data-bg="matrix">Matrix</button>
       <button data-bg="intervention">L</button>
       <button data-bg="evangelion">EVA</button>
+      <button data-bg="egg">Egg</button>
     </div>
   </div>
   <div class="settings-divider"></div>
@@ -971,6 +973,7 @@
       <button data-track="matrix">Digital</button>
       <button data-track="intervention">L</button>
       <button data-track="evangelion">EVA</button>
+      <button data-track="egg">Egg</button>
     </div>
   </div>
   <div class="settings-divider"></div>
@@ -1018,6 +1021,7 @@
 <script src="js/matrix.js"></script>
 <script src="js/intervention.js"></script>
 <script src="js/evangelion.js"></script>
+<script src="js/egg.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/previews.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
