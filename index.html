@@ -15,15 +15,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <title>Neorgon | Made for Real Problems</title>
-  <meta name="description" content="We made 18 tools and forgot to add a paywall. Open-source, no signup, no nonsense.">
+  <meta name="description" content="We made 24 tools and forgot to add a paywall. Open-source, no signup, no nonsense.">
   <meta property="og:title" content="Neorgon: Made for Real Problems">
-  <meta property="og:description" content="We made 18 tools and forgot to add a paywall.">
+  <meta property="og:description" content="We made 24 tools and forgot to add a paywall.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://neorgon.com/">
   <meta property="og:site_name" content="Neorgon">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Neorgon: Made for Real Problems">
-  <meta name="twitter:description" content="We made 18 tools and forgot to add a paywall.">
+  <meta name="twitter:description" content="We made 24 tools and forgot to add a paywall.">
   <meta name="twitter:image" content="https://neorgon.com/og-preview.jpg">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://neorgon.com/">
@@ -49,7 +49,7 @@
     "@type": "WebSite",
     "name": "Neorgon",
     "url": "https://neorgon.com/",
-    "description": "We made 18 tools and forgot to add a paywall. Open-source, no signup, no nonsense.",
+    "description": "We made 24 tools and forgot to add a paywall. Open-source, no signup, no nonsense.",
     "author": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" }
   }
   </script>
@@ -123,7 +123,7 @@
       <span class="neon-word" id="heroTyping"></span><span class="typing-cursor" id="typingCursor"></span>
     </h1>
     <p class="hero-sub">
-      We made 18 tools and forgot to add a paywall.
+      We made <span id="toolCount">24</span> tools and forgot to add a paywall.
     </p>
     <div class="hero-search-wrap">
       <input class="hero-search" id="heroSearch" type="text" placeholder="Search tools, tags, or keywords…" aria-label="Search tools" autocomplete="off" spellcheck="false">
@@ -234,10 +234,30 @@
         </div>
       </a>
 
+      <!-- SafeGuard -->
+      <a class="site-card" data-card-id="safeguard"
+         href="https://safeguard.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         style="--card-glow: rgba(248,113,113,.3); --card-glow-border: rgba(248,113,113,.35); --card-accent: #f87171;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/safeguard.svg" class="card-site-icon" alt="SafeGuard" width="28" height="28" loading="lazy"></div>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">safeguard.neorgon.com</div>
+          <h3 class="card-name">SafeGuard</h3>
+          <div class="card-desc">Step-by-step guides to harden your Apple, Google, and mobile accounts. Bilingual EN/ES.</div>
+          <div class="card-tags">
+            <span class="card-tag">Security</span>
+            <span class="card-tag">Guides</span>
+            <span class="card-tag">Bilingual</span>
+          </div>
+        </div>
+      </a>
+
       <!-- Lockdown -->
       <a class="site-card" data-card-id="lockdown"
          href="https://lockdown.neorgon.com/" target="_blank" rel="noopener noreferrer"
-         style="--card-glow: rgba(248,113,113,.3); --card-glow-border: rgba(248,113,113,.35); --card-accent: #f87171;">
+         style="--card-glow: rgba(249,115,22,.3); --card-glow-border: rgba(249,115,22,.35); --card-accent: #f97316;">
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/lockdown.svg" class="card-site-icon" alt="Lockdown" width="28" height="28" loading="lazy"></div>
@@ -245,11 +265,10 @@
           </div>
           <div class="card-domain">lockdown.neorgon.com</div>
           <h3 class="card-name">Lockdown</h3>
-          <div class="card-desc">Step-by-step guides to harden your Apple, Google, and mobile accounts. Bilingual EN/ES.</div>
+          <div class="card-desc">Scan any site for exposed endpoints, missing headers, and security gaps. Download a hardening report.</div>
           <div class="card-tags">
             <span class="card-tag">Security</span>
-            <span class="card-tag">Guides</span>
-            <span class="card-tag">Bilingual</span>
+            <span class="card-tag">Scanner</span>
           </div>
         </div>
       </a>
@@ -1026,5 +1045,12 @@
 <script src="js/previews.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
 <script defer src="js/sortable.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var count = document.querySelectorAll('.site-card:not(.external-card):not(.ghost-card)').length;
+    var el = document.getElementById('toolCount');
+    if (el && count > 0) el.textContent = count;
+  });
+</script>
 </body>
 </html>
