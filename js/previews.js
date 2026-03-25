@@ -21,6 +21,8 @@
     rushq: 'rushq.gif',
     ehq: 'ehq.gif',
     'resume-forge': 'resume-forge.gif',
+    tubestack: 'tubestack.gif',
+    stackrank: 'stackrank.gif',
   };
 
   /* Global flag — settings panel sets this */
