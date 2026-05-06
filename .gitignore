@@ -17,3 +17,4 @@ package-lock.json
 # ── Secrets — never commit ────────────────────────────────────────────────────
 .env
 .env.*
+server.log
