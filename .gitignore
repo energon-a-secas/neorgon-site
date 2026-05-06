@@ -4,17 +4,16 @@
 # ── Playwright MCP (Claude Code browser automation — screenshots, logs) ───────
 .playwright-mcp/
 
-# ── Node (local tooling only — these projects have no npm dependencies) ───────
+# ── Playwright test artifacts ─────────────────────────────────────────────────
+test-results/
+playwright-report/
+blob-report/
+
+# ── Node ──────────────────────────────────────────────────────────────────────
 node_modules/
 npm-debug.log*
+package-lock.json
 
 # ── Secrets — never commit ────────────────────────────────────────────────────
 .env
 .env.*
-
-# ── Prevent deployment of dev files ──────────────────────────────────────────
-package.json
-.claudeignore
-
-# Claude AI guidance (maintained centrally in .claude/project-claudes/)
-CLAUDE.md
