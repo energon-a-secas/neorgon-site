@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-15T12:00:00.000Z",
+  "title": "Design System: Neorgon Hub",
+  "extensions": {
+    "colorMeta": {
+      "void-bg": {
+        "role": "neutral",
+        "displayName": "Void Navy",
+        "canonical": "oklch(18% 0.04 264)",
+        "tonalRamp": [
+          "oklch(12% 0.05 264)",
+          "oklch(14% 0.045 264)",
+          "oklch(16% 0.042 264)",
+          "oklch(18% 0.04 264)",
+          "oklch(22% 0.035 264)",
+          "oklch(28% 0.03 264)",
+          "oklch(35% 0.025 264)",
+          "oklch(42% 0.02 264)"
+        ]
+      },
+      "accent-indigo": {
+        "role": "primary",
+        "displayName": "Signal Indigo",
+        "canonical": "oklch(67% 0.17 277)",
+        "tonalRamp": [
+          "oklch(35% 0.12 277)",
+          "oklch(42% 0.13 277)",
+          "oklch(50% 0.14 277)",
+          "oklch(58% 0.155 277)",
+          "oklch(67% 0.17 277)",
+          "oklch(72% 0.14 277)",
+          "oklch(78% 0.11 277)",
+          "oklch(85% 0.08 277)"
+        ]
+      },
+      "accent-plasma": {
+        "role": "secondary",
+        "displayName": "Plasma Violet",
+        "canonical": "oklch(72% 0.21 305)",
+        "tonalRamp": [
+          "oklch(35% 0.18 305)",
+          "oklch(45% 0.19 305)",
+          "oklch(55% 0.2 305)",
+          "oklch(63% 0.205 305)",
+          "oklch(72% 0.21 305)",
+          "oklch(78% 0.17 305)",
+          "oklch(84% 0.12 305)",
+          "oklch(90% 0.08 305)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero title only; optional gradient-clipped accent span."
+      },
+      "label": {
+        "displayName": "Rail label",
+        "purpose": "Section and domain microcopy; uppercase wide tracking."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-ambient",
+        "value": "0 0 18px rgba(0,0,0,0.6)",
+        "purpose": "Default resting tool cards."
+      },
+      {
+        "name": "card-drag",
+        "value": "0 12px 40px rgba(0,0,0,0.6), 0 0 0 2px rgba(160,80,255,0.4)",
+        "purpose": "Sortable drag lift state."
+      },
+      {
+        "name": "search-focus",
+        "value": "0 0 0 3px rgba(192,132,252,0.1), 0 0 24px rgba(192,132,252,0.08)",
+        "purpose": "Hero search keyboard focus."
+      },
+      {
+        "name": "panel-depth",
+        "value": "0 8px 40px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.04)",
+        "purpose": "Floating panels and modals."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-snap",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "Playful logo and micro-interactions."
+      },
+      {
+        "name": "ease-card-enter",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Card entrance stagger from grid."
+      }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "900px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Tool card",
+      "kind": "card",
+      "refersTo": "site-card",
+      "description": "Hub catalog cell with per-card CSS variables for accent and glow.",
+      "html": "<a class=\"ds-site-card\" href=\"#\" style=\"--card-accent:#34d399;--card-glow:rgba(52,211,153,.3);--card-glow-border:rgba(52,211,153,.35);\"><span class=\"ds-site-card-inner\"><span class=\"ds-card-domain\">decisionwheel.neorgon.com</span><span class=\"ds-card-name\">Decision Wheel</span><span class=\"ds-card-desc\">Spin up priorities with a customizable wheel.</span><span class=\"ds-card-tags\"><span class=\"ds-card-tag\">Tools</span></span></span></a>",
+      "css": ".ds-site-card { position:relative; display:flex; flex-direction:column; gap:12px; max-width:340px; padding:28px; border-radius:16px; text-decoration:none; color:#f0f4ff; background:rgba(0,12,24,.82); border:1px solid rgba(255,255,255,.08); box-shadow:0 0 18px rgba(0,0,0,.6); transition:border-color .2s, box-shadow .3s; overflow:hidden; } .ds-site-card:hover { border-color:var(--card-glow-border,rgba(255,255,255,.2)); box-shadow:0 0 24px rgba(0,0,0,.65), 0 0 0 1px var(--card-glow-border,rgba(255,255,255,.15)); } .ds-site-card:focus-visible { outline:2px solid #818cf8; outline-offset:4px; } .ds-card-domain { font-size:.72rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--card-accent,#818cf8); } .ds-card-name { font-size:1.05rem; font-weight:700; line-height:1.3; } .ds-card-desc { font-size:.875rem; color:#8fa0c0; line-height:1.6; } .ds-card-tags { display:flex; flex-wrap:wrap; gap:6px; } .ds-card-tag { font-size:.68rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:3px 8px; border-radius:10px; color:var(--card-accent,#818cf8); border:1px solid color-mix(in srgb, var(--card-accent,#818cf8) 30%, transparent); background:color-mix(in srgb, var(--card-accent,#818cf8) 8%, transparent); }"
+    },
+    {
+      "name": "Hero search",
+      "kind": "input",
+      "refersTo": "hero-search",
+      "description": "Frosted catalog search with plasma focus ring.",
+      "html": "<div class=\"ds-search-wrap\"><input class=\"ds-hero-search\" type=\"search\" placeholder=\"Filter tools…\" aria-label=\"Search tools\" /></div>",
+      "css": ".ds-search-wrap { max-width:480px; } .ds-hero-search { width:100%; box-sizing:border-box; padding:14px 44px; border-radius:14px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.04); color:#f0f4ff; font-size:.95rem; outline:none; transition:border-color .25s, box-shadow .25s, background .25s; } .ds-hero-search::placeholder { color:rgba(255,255,255,.4); } .ds-hero-search:hover { border-color:rgba(255,255,255,.14); } .ds-hero-search:focus { border-color:rgba(192,132,252,.45); box-shadow:0 0 0 3px rgba(192,132,252,.1), 0 0 24px rgba(192,132,252,.08); background:rgba(255,255,255,.06); }"
+    },
+    {
+      "name": "Hero badge",
+      "kind": "chip",
+      "refersTo": "hero-badge",
+      "description": "Uppercase status chip with pulsing dot.",
+      "html": "<div class=\"ds-hero-badge\"><span class=\"ds-hero-badge-dot\" aria-hidden=\"true\"></span><span>Built different · Shipped anyway</span></div>",
+      "css": ".ds-hero-badge { display:inline-flex; align-items:center; gap:7px; padding:5px 14px; border-radius:20px; background:rgba(120,0,255,.12); border:1px solid rgba(160,80,255,.25); color:#c084fc; font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; } .ds-hero-badge-dot { width:6px; height:6px; border-radius:50%; background:#c084fc; }"
+    },
+    {
+      "name": "Skip link",
+      "kind": "nav",
+      "refersTo": "skip-link",
+      "description": "Keyboard-first jump to tools grid.",
+      "html": "<a class=\"ds-skip-link\" href=\"#tools\">Skip to tools</a>",
+      "css": ".ds-skip-link { position:relative; display:inline-block; padding:8px 16px; background:#818cf8; color:#000000; font-weight:600; font-size:.875rem; border-radius:0 0 8px 8px; text-decoration:none; } .ds-skip-link:focus { outline:2px solid #f0f4ff; outline-offset:2px; }"
+    },
+    {
+      "name": "Header icon control",
+      "kind": "button",
+      "refersTo": "hero-search",
+      "description": "Circular ghost icon button used in site header.",
+      "html": "<a class=\"ds-header-icon\" href=\"#\" aria-label=\"GitHub\">GH</a>",
+      "css": ".ds-header-icon { width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; border:1px solid transparent; color:rgba(255,255,255,.85); text-decoration:none; font-size:.7rem; font-weight:700; transition:color .2s, border-color .2s, background .2s; } .ds-header-icon:hover { color:#ffffff; border-color:rgba(255,255,255,.15); background:rgba(255,255,255,.18); } .ds-header-icon:focus-visible { outline:2px solid #818cf8; outline-offset:2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Constellation Catalog",
+    "overview": "Neorgon reads as mission control in deep space: a void field, faint grid, slow starfield, and a constellation of tool cards where each destination gets its own accent hue (set inline via CSS variables). The UI is dark-first for contrast against neon waypoints and long scan sessions. Density is catalog-forward: section rails, uppercase micro-labels, and a responsive auto-fill grid keep tools scannable. Motion supports discovery but defers to prefers-reduced-motion for ambient layers.",
+    "keyCharacteristics": [
+      "Per-tool accent injection through CSS variables on each card; default fallback indigo #818cf8.",
+      "Tonal depth from true void #000912 through semi-opaque card shells and soft borders.",
+      "Glass touches reserved for the hero search and small floating controls.",
+      "Focus and skip use the same indigo language as default accents.",
+      "Typography is a single humanist-geometric sans stack with a steep weight ladder on the hero."
+    ],
+    "rules": [
+      {
+        "name": "The Per-Card Beacon Rule",
+        "body": "Each tool card sets its own --card-accent, --card-glow, and --card-glow-border in inline style. Do not collapse the hub to a single brand accent for cards.",
+        "section": "colors"
+      },
+      {
+        "name": "The Void-First Rule",
+        "body": "Background stays at or near #000912. Do not introduce pure #000000 or pure #ffffff fields.",
+        "section": "colors"
+      },
+      {
+        "name": "The One-Stack Rule",
+        "body": "Do not introduce a second display serif or a monospace marketing font on the hub.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glow-Is-State Rule",
+        "body": "Neon glows intensify on interaction. Static chrome should not read brighter than interactive elements.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the tool grid as the honest center of gravity; hero and atmosphere exist to route into #tools.",
+      "Do assign each new tool card explicit --card-accent, --card-glow, and --card-glow-border values consistent with the hub registry.",
+      "Do respect prefers-reduced-motion for starfield and decorative canvases.",
+      "Do pair icon-only header controls with aria-label and keep :focus-visible indigo ring visible."
+    ],
+    "donts": [
+      "Don't bury the catalog behind generic SaaS landing patterns that PRODUCT.md forbids: hero metrics blocks, endless identical icon-plus-blurb grids with no real links, or modal newsletter traps on first paint.",
+      "Don't ship the interchangeable AI-wrapper look from PRODUCT.md: purple gradients on white, stock robot illustrations, or vague 10x productivity slabs.",
+      "Don't use dark patterns from PRODUCT.md: fake urgency, signup walls for read-only discovery, or ads disguised as tools.",
+      "Don't flatten the hub into corporate trust-center blandness.",
+      "Don't use border-left or border-right thicker than 1px as a decorative accent stripe on cards or list rows.",
+      "Don't add new gradient-text marketing spans outside the existing hero word treatment."
+    ]
+  }
+}

@@ -4,8 +4,8 @@
   --bg: #000912;
   --font: 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --text-primary: #f0f4ff;
-  --text-secondary: #8fa0c0;
-  --text-muted: rgba(143,160,192,.65);
+  --text-secondary: #9eb0d4;
+  --text-muted: rgba(172, 188, 218, 0.78);
   --border: rgba(255,255,255,.08);
   --border-glow: rgba(255,255,255,.15);
   --surface: rgba(255,255,255,.12);
@@ -391,7 +391,7 @@ body.search-active .sites-section > .card-group {
   display: flex;
   align-items: center;
   gap: 8px;
-  opacity: .7;
+  opacity: 0.86;
   transition: opacity .3s;
 }
 .card-group:hover .group-label {
