@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   if (typeof Sortable === 'undefined') return;
   document.body.classList.add('drag-enabled');
-  const grids = document.querySelectorAll('.card-group .sites-grid');
+  const grids = document.querySelectorAll('.card-group:not(#catalogSearchMerged) .sites-grid');
   grids.forEach(grid => {
     Sortable.create(grid, {
       animation: 200,

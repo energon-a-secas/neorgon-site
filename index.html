@@ -90,7 +90,7 @@
 
   <!-- Header -->
   <header class="site-header">
-    <a class="logo-wrap" href="https://neorgon.com/" target="_blank" rel="noopener noreferrer">
+    <a class="logo-wrap" href="https://neorgon.com/">
       <picture>
         <source srcset="energon-classic-logo.webp" type="image/webp">
         <img src="energon-classic-logo.png" class="logo-img" alt="Energon" width="36" height="36">
@@ -130,9 +130,16 @@
   <script src="js/hero.js"></script>
 
   <!-- Sites -->
-  <main class="sites-section" id="tools" aria-label="Platforms and tools">
+  <main class="sites-section" id="tools" aria-labelledby="catalog-heading">
+    <h2 id="catalog-heading" class="visually-hidden">Tool catalog</h2>
     <div class="search-no-results" id="searchNoResults" role="status">No tools match your search.</div>
     <div class="search-count" id="searchCount" aria-live="polite"></div>
+
+    <!-- Single combined grid while search is active (cards reparented via JS) -->
+    <div id="catalogSearchMerged" class="card-group catalog-search-merge catalog-merge-empty" style="--group-color: #818cf8" aria-labelledby="catalog-search-merge-heading">
+      <h2 id="catalog-search-merge-heading" class="group-label"><span class="group-dot"></span> Matches</h2>
+      <div class="sites-grid" id="catalogSearchMergedGrid"></div>
+    </div>
 
     <!-- ── Planning ────────────────────────────────────────────── -->
     <div class="card-group" data-group="planning" style="--group-color: #4ade80">
@@ -141,7 +148,7 @@
 
       <!-- Pathfinder (featured) -->
       <a class="site-card" data-card-id="pathfinder"
-         href="https://pathfinder.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://pathfinder.neorgon.com/"
          style="--card-glow: rgba(74,222,128,.3); --card-glow-border: rgba(74,222,128,.35); --card-accent: #4ade80;">
         <div class="card-content">
           <div class="card-top">
@@ -161,7 +168,7 @@
 
       <!-- Skill Map -->
       <a class="site-card" data-card-id="skillmap"
-         href="https://skillmap.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://skillmap.neorgon.com/"
          style="--card-glow: rgba(167,139,250,.3); --card-glow-border: rgba(167,139,250,.35); --card-accent: #a78bfa;">
         <div class="card-content">
           <div class="card-top">
@@ -188,7 +195,7 @@
 
       <!-- Infra Drills -->
       <a class="site-card" data-card-id="infradrills"
-         href="https://infradrills.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://infradrills.neorgon.com/"
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #fbbf24;">
         <div class="card-content">
           <div class="card-top">
@@ -208,7 +215,7 @@
 
       <!-- Snippets -->
       <a class="site-card" data-card-id="snippets"
-         href="https://snippets.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://snippets.neorgon.com/"
          style="--card-glow: rgba(250,204,21,.3); --card-glow-border: rgba(250,204,21,.35); --card-accent: #facc15;">
         <div class="card-content">
           <div class="card-top">
@@ -228,7 +235,7 @@
 
       <!-- SafeGuard -->
       <a class="site-card" data-card-id="safeguard"
-         href="https://safeguard.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://safeguard.neorgon.com/"
          style="--card-glow: rgba(248,113,113,.3); --card-glow-border: rgba(248,113,113,.35); --card-accent: #f87171;">
         <div class="card-content">
           <div class="card-top">
@@ -248,7 +255,7 @@
 
       <!-- Lockdown -->
       <a class="site-card" data-card-id="lockdown"
-         href="https://lockdown.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://lockdown.neorgon.com/"
          style="--card-glow: rgba(249,115,22,.3); --card-glow-border: rgba(249,115,22,.35); --card-accent: #f97316;">
         <div class="card-content">
           <div class="card-top">
@@ -293,15 +300,15 @@
           </div>
         </div>
         <div class="card-subtool-popup">
-          <a class="subtool-item" href="https://jsonstudio.neorgon.com/" target="_blank" rel="noopener noreferrer" title="Build JSON with drag-and-drop blocks">
+          <a class="subtool-item" href="https://jsonstudio.neorgon.com/" title="Build JSON with drag-and-drop blocks">
             <span class="subtool-name">JSON Builder</span>
             <span class="subtool-desc">Visual block-based JSON schema editor</span>
           </a>
-          <a class="subtool-item" href="https://jsonstudio.neorgon.com/visualizer/" target="_blank" rel="noopener noreferrer" title="Explore, filter, and pivot JSON in a table">
+          <a class="subtool-item" href="https://jsonstudio.neorgon.com/visualizer/" title="Explore, filter, and pivot JSON in a table">
             <span class="subtool-name">JSON Visualizer</span>
             <span class="subtool-desc">Explore, filter, and pivot any JSON dataset</span>
           </a>
-          <a class="subtool-item" href="https://jsonstudio.neorgon.com/scrambler/" target="_blank" rel="noopener noreferrer" title="Anonymise JSON for safe sharing">
+          <a class="subtool-item" href="https://jsonstudio.neorgon.com/scrambler/" title="Anonymise JSON for safe sharing">
             <span class="subtool-name">Data Scrambler</span>
             <span class="subtool-desc">Type-preserving JSON anonymiser for safe sharing</span>
           </a>
@@ -328,7 +335,7 @@
           </div>
         </div>
         <div class="card-subtool-popup">
-          <a class="subtool-item" href="https://references.neorgon.com/" target="_blank" rel="noopener noreferrer">
+          <a class="subtool-item" href="https://references.neorgon.com/">
             <span class="subtool-name">Reference Matrix</span>
             <span class="subtool-desc">Browse all references with live regex playground</span>
           </a>
@@ -349,7 +356,7 @@
 
       <!-- Presentation Sage -->
       <a class="site-card" data-card-id="slides"
-         href="https://slides.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://slides.neorgon.com/"
          style="--card-glow: rgba(251,146,60,.3); --card-glow-border: rgba(251,146,60,.35); --card-accent: #fb923c;">
         <div class="card-content">
           <div class="card-top">
@@ -369,7 +376,7 @@
 
       <!-- OG Studio -->
       <a class="site-card" data-card-id="ogstudio"
-         href="https://ogstudio.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://ogstudio.neorgon.com/"
          style="--card-glow: rgba(163,230,53,.3); --card-glow-border: rgba(163,230,53,.35); --card-accent: #a3e635;">
         <div class="card-content">
           <div class="card-top">
@@ -407,11 +414,11 @@
           </div>
         </div>
         <div class="card-subtool-popup">
-          <a class="subtool-item" href="https://agentlore.neorgon.com/" target="_blank" rel="noopener noreferrer" title="Browse all tutorials">
+          <a class="subtool-item" href="https://agentlore.neorgon.com/" title="Browse all tutorials">
             <span class="subtool-name">Browse tutorials</span>
             <span class="subtool-desc">Search and filter by category, tool, and difficulty</span>
           </a>
-          <a class="subtool-item" href="https://agentlore.neorgon.com/path/" target="_blank" rel="noopener noreferrer" title="Guided learning path">
+          <a class="subtool-item" href="https://agentlore.neorgon.com/path/" title="Guided learning path">
             <span class="subtool-name">Learning path</span>
             <span class="subtool-desc">Step-by-step path for Claude Code and Cursor</span>
           </a>
@@ -420,7 +427,7 @@
 
       <!-- UI Anatomy -->
       <a class="site-card" data-card-id="anatomy"
-         href="https://anatomy.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://anatomy.neorgon.com/"
          style="--card-glow: rgba(125,211,252,.3); --card-glow-border: rgba(125,211,252,.35); --card-accent: #7dd3fc;">
         <div class="card-content">
           <div class="card-top">
@@ -440,7 +447,7 @@
 
       <!-- Resume Forge -->
       <a class="site-card" data-card-id="resume-forge"
-         href="https://resume.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://resume.neorgon.com/"
          style="--card-glow: rgba(139,92,246,.3); --card-glow-border: rgba(139,92,246,.35); --card-accent: #8b5cf6;">
         <div class="card-content">
           <div class="card-top">
@@ -460,7 +467,7 @@
 
       <!-- Stack Rank -->
       <a class="site-card" data-card-id="stackrank"
-         href="https://stackrank.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://stackrank.neorgon.com/"
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #f59e0b;">
         <div class="card-content">
           <div class="card-top">
@@ -505,11 +512,11 @@
           </div>
         </div>
         <div class="card-subtool-popup">
-          <a class="subtool-item" href="https://decisionwheel.neorgon.com/" target="_blank" rel="noopener noreferrer">
+          <a class="subtool-item" href="https://decisionwheel.neorgon.com/">
             <span class="subtool-name">🎯 Blame Game</span>
             <span class="subtool-desc">Spin the wheel to find out who's responsible today</span>
           </a>
-          <a class="subtool-item" href="https://decisionwheel.neorgon.com/?settings" target="_blank" rel="noopener noreferrer">
+          <a class="subtool-item" href="https://decisionwheel.neorgon.com/?settings">
             <span class="subtool-name">🛠️ Make Your Own</span>
             <span class="subtool-desc">Build a custom wheel with your own options and messages</span>
           </a>
@@ -518,7 +525,7 @@
 
       <!-- Meme Vault -->
       <a class="site-card" data-card-id="memes"
-         href="https://memes.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://memes.neorgon.com/"
          style="--card-glow: rgba(244,63,94,.3); --card-glow-border: rgba(244,63,94,.35); --card-accent: #f43f5e;">
         <div class="card-content">
           <div class="card-top">
@@ -556,11 +563,11 @@
           </div>
         </div>
         <div class="card-subtool-popup">
-          <a class="subtool-item" href="https://clientsays.neorgon.com/" target="_blank" rel="noopener noreferrer">
+          <a class="subtool-item" href="https://clientsays.neorgon.com/">
             <span class="subtool-name">Client Says</span>
             <span class="subtool-desc">Timezone converter for remote teams</span>
           </a>
-          <a class="subtool-item" href="https://clientsays.neorgon.com/jargon/" target="_blank" rel="noopener noreferrer">
+          <a class="subtool-item" href="https://clientsays.neorgon.com/jargon/">
             <span class="subtool-name">Decoded</span>
             <span class="subtool-desc">Corporate jargon translator</span>
           </a>
@@ -586,7 +593,7 @@
           </div>
         </div>
         <div class="card-subtool-popup">
-          <a class="subtool-item" href="https://emojis.neorgon.com/" target="_blank" rel="noopener noreferrer">
+          <a class="subtool-item" href="https://emojis.neorgon.com/">
             <span class="subtool-name">Emoji Archive</span>
             <span class="subtool-desc">Browse, search and download all 202 emojis</span>
           </a>
@@ -599,7 +606,7 @@
 
       <!-- Guild Hall -->
       <a class="site-card" data-card-id="guildhall"
-         href="https://guildhall.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://guildhall.neorgon.com/"
          style="--card-glow: rgba(251,146,60,.3); --card-glow-border: rgba(251,146,60,.35); --card-accent: #fb923c;">
         <div class="card-content">
           <div class="card-top">
@@ -619,7 +626,7 @@
 
       <!-- Team Play -->
       <a class="site-card" data-card-id="teamplay"
-         href="https://teamplay.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://teamplay.neorgon.com/"
          style="--card-glow: rgba(13,148,136,.3); --card-glow-border: rgba(13,148,136,.35); --card-accent: #0d9488;">
         <div class="card-content">
           <div class="card-top">
@@ -667,7 +674,7 @@
 
       <!-- Vibe Check -->
       <a class="site-card" data-card-id="vibecheck"
-         href="https://interviews.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://interviews.neorgon.com/"
          style="--card-glow: rgba(56,189,248,.3); --card-glow-border: rgba(56,189,248,.35); --card-accent: #38bdf8;">
         <div class="card-content">
           <div class="card-top">
@@ -686,7 +693,7 @@
 
       <!-- Character Sheet -->
       <a class="site-card" data-card-id="charactersheet"
-         href="https://charactersheet.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://charactersheet.neorgon.com/"
          style="--card-glow: rgba(232,121,249,.3); --card-glow-border: rgba(232,121,249,.35); --card-accent: #e879f9;">
         <div class="card-content">
           <div class="card-top">
@@ -706,7 +713,7 @@
 
       <!-- Parla -->
       <a class="site-card" data-card-id="parla"
-         href="https://parla.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://parla.neorgon.com/"
          style="--card-glow: rgba(52,211,153,.3); --card-glow-border: rgba(52,211,153,.35); --card-accent: #34d399;">
         <div class="card-content">
           <div class="card-top">
@@ -726,7 +733,7 @@
 
       <!-- Playbook -->
       <a class="site-card" data-card-id="playbook"
-         href="https://playbook.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://playbook.neorgon.com/"
          style="--card-glow: rgba(16,185,129,.3); --card-glow-border: rgba(16,185,129,.35); --card-accent: #10b981;">
         <div class="card-content">
           <div class="card-top">
@@ -746,7 +753,7 @@
 
       <!-- TubeStack -->
       <a class="site-card" data-card-id="tubestack"
-         href="https://tubestack.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://tubestack.neorgon.com/"
          style="--card-glow: rgba(103,232,249,.3); --card-glow-border: rgba(103,232,249,.35); --card-accent: #67e8f9;">
         <div class="card-content">
           <div class="card-top">
@@ -774,7 +781,7 @@
 
       <!-- BuyHacks -->
       <a class="site-card" data-card-id="buyhacks"
-         href="https://buyhacks.neorgon.com/" target="_blank" rel="noopener noreferrer"
+         href="https://buyhacks.neorgon.com/"
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #f59e0b;">
         <div class="card-content">
           <div class="card-top">
@@ -889,7 +896,7 @@
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
         </div>
-        <a class="card-content ghost-revealed" href="https://autopilot.neorgon.com/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
+        <a class="card-content ghost-revealed" href="https://autopilot.neorgon.com/" style="text-decoration:none;color:inherit;">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/autopilot.svg" class="card-site-icon" alt="Autopilot" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
@@ -913,7 +920,7 @@
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
         </div>
-        <a class="card-content ghost-revealed" href="https://rushq.neorgon.com/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
+        <a class="card-content ghost-revealed" href="https://rushq.neorgon.com/" style="text-decoration:none;color:inherit;">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/rush-q-cards.svg" class="card-site-icon" alt="Rush Q Cards" width="28" height="28" loading="lazy"></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>

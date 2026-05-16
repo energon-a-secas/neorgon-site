@@ -11,6 +11,13 @@
   --surface: rgba(255,255,255,.12);
   --surface-hover: rgba(255,255,255,.18);
   --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --layout-gutter: clamp(18px, 3.6vw, 32px);
+  --layout-section-bottom: clamp(44px, 7vw, 64px);
+  --layout-stack-gap: 24px;
+  --layout-grid-gap: 11px;
+  --layout-card-pad: 21px;
+  --layout-card-inner-gap: 9px;
+  --catalog-max-width: 1160px;
 }
 
 body {
@@ -67,7 +74,7 @@ body {
 
 /* ── Header ──────────────────────────────────────────────────────────── */
 .site-header {
-  padding: 20px 40px;
+  padding: 14px var(--layout-gutter);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -112,7 +119,7 @@ body {
 /* ── Hero ────────────────────────────────────────────────────────────── */
 .hero {
   text-align: center;
-  padding: 60px 40px 36px;
+  padding: clamp(36px, 6vw, 48px) var(--layout-gutter) clamp(24px, 3.5vw, 32px);
 }
 
 .hero-badge {
@@ -128,7 +135,7 @@ body {
   font-weight: 600;
   letter-spacing: .08em;
   text-transform: uppercase;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 }
 #badgeText {
   transition: opacity .4s ease;
@@ -149,7 +156,7 @@ body {
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -.02em;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   color: var(--text-primary);
 }
 .hero-heading .neon-word {
@@ -169,13 +176,13 @@ body {
 /* ── Search bar ─────────────────────────────────────────────────────── */
 .hero-search-wrap {
   position: relative;
-  max-width: 480px;
-  margin: 28px auto 0;
+  max-width: 440px;
+  margin: 22px auto 0;
 }
 .hero-search {
   width: 100%;
-  padding: 14px 44px 14px 44px;
-  border-radius: 14px;
+  padding: 12px 40px 12px 40px;
+  border-radius: 12px;
   border: 1px solid rgba(255,255,255,.1);
   background: rgba(255,255,255,.04);
   backdrop-filter: blur(12px);
@@ -265,7 +272,7 @@ body {
 .search-count {
   font-size: .72rem;
   color: rgba(255,255,255,.35);
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   height: 16px;
   transition: opacity .2s;
 }
@@ -274,9 +281,9 @@ body {
 /* ── Floating tag constellation ────────────────────────────────────── */
 .constellation-box {
   position: relative;
-  max-width: 720px;
-  height: clamp(120px, 18vw, 220px);
-  margin: 16px auto 0;
+  max-width: min(680px, 100%);
+  height: clamp(108px, 16vw, 200px);
+  margin: 12px auto 0;
   overflow: visible;
 }
 .constellation-canvas {
@@ -331,36 +338,18 @@ body {
 }
 .search-no-results {
   text-align: center;
-  padding: 60px 20px;
+  padding: 44px 16px;
   color: var(--text-muted);
   font-size: .95rem;
   display: none;
 }
 .search-no-results.show { display: block; }
 
-/* ── Search results grid ─────────────────────────────────────────────── */
-.search-results-grid {
-  display: none; /* Hidden by default, shown during search */
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin: 20px 0 40px 0;
-  padding: 0 20px;
-}
-
-body.search-active .search-results-grid {
-  display: grid !important;
-}
-
-/* Hide original card groups when search grid is active */
-body.search-active .sites-section > .card-group {
-  display: none;
-}
-
 /* ── Sites grid ──────────────────────────────────────────────────────── */
 .sites-section {
   flex: 1;
-  padding: 0 40px 80px;
-  max-width: 1100px;
+  padding: 0 var(--layout-gutter) var(--layout-section-bottom);
+  max-width: var(--catalog-max-width);
   margin: 0 auto;
   width: 100%;
 }
@@ -371,12 +360,12 @@ body.search-active .sites-section > .card-group {
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 /* ── Card groups ──────────────────────────────────────────────────────── */
 .card-group {
-  margin-bottom: 36px;
+  margin-bottom: var(--layout-stack-gap);
 }
 .card-group:last-child {
   margin-bottom: 0;
@@ -387,7 +376,7 @@ body.search-active .sites-section > .card-group {
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--group-color, var(--text-muted));
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -408,10 +397,23 @@ body.search-active .sites-section > .card-group {
   display: none !important;
 }
 
+/* While filtering: one merged grid; hide native category rows */
+body:not(.search-active) #catalogSearchMerged {
+  display: none !important;
+}
+
+body.search-active #catalogSearchMerged.catalog-merge-empty {
+  display: none !important;
+}
+
+body.search-active #tools > .card-group.catalog-native-suppressed {
+  display: none !important;
+}
+
 .sites-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: var(--layout-grid-gap);
 }
 
 /* ── Site card ───────────────────────────────────────────────────────── */
@@ -419,15 +421,15 @@ body.search-active .sites-section > .card-group {
   position: relative;
   background: rgba(0, 12, 24, .82);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px;
+  border-radius: 14px;
+  padding: var(--layout-card-pad);
   text-decoration: none;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--layout-card-inner-gap);
   overflow: hidden;
   transition: border-color .2s, box-shadow .3s, opacity .35s ease, transform .35s ease;
-  box-shadow: 0 0 18px rgba(0, 0, 0, .6);
+  box-shadow: 0 0 14px rgba(0, 0, 0, .52);
 }
 
 /* Neon glow on hover via custom prop */
@@ -435,7 +437,7 @@ body.search-active .sites-section > .card-group {
   content: '';
   position: absolute;
   inset: -1px;
-  border-radius: 17px;
+  border-radius: 15px;
   background: linear-gradient(135deg, var(--card-glow, rgba(120,0,255,.3)), transparent 60%);
   opacity: 0;
   transition: opacity .3s;
@@ -449,7 +451,7 @@ body.search-active .sites-section > .card-group {
 .site-card::after {
   content: '';
   position: absolute;
-  top: 0; left: 20px; right: 20px;
+  top: 0; left: 17px; right: 17px;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--card-glow, rgba(160,80,255,.5)), transparent);
   opacity: 0;
@@ -457,7 +459,7 @@ body.search-active .sites-section > .card-group {
 }
 .site-card:hover::after { opacity: 1; }
 
-.card-content { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; }
+.card-content { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--layout-card-inner-gap); }
 
 .card-top {
   display: flex;
@@ -465,8 +467,8 @@ body.search-active .sites-section > .card-group {
   justify-content: space-between;
 }
 .card-icon-wrap {
-  width: 44px; height: 44px;
-  border-radius: 12px;
+  width: 40px; height: 40px;
+  border-radius: 11px;
   display: flex; align-items: center; justify-content: center;
   font-size: 1.4rem;
   background: var(--surface-hover);
@@ -531,7 +533,7 @@ body.search-active .sites-section > .card-group {
 .card-preview {
   position: absolute;
   inset: 0;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
@@ -569,7 +571,7 @@ body.search-active .sites-section > .card-group {
 .card-subtool-popup {
   position: absolute;
   inset: 0;
-  border-radius: 16px;
+  border-radius: 14px;
   background: rgba(4,7,20,.92);
   backdrop-filter: blur(12px);
   display: flex;
@@ -606,7 +608,7 @@ body.search-active .sites-section > .card-group {
 .secret-trigger {
   display: flex;
   justify-content: center;
-  padding: 40px 0 8px;
+  padding: 28px 0 6px;
 }
 .secret-btn {
   position: relative;
@@ -1080,7 +1082,7 @@ body.warp-active .orb {
 /* ── Footer ──────────────────────────────────────────────────────────── */
 .site-footer {
   text-align: center;
-  padding: 20px 40px 32px;
+  padding: 16px var(--layout-gutter) 26px;
   color: rgba(255,255,255,.45);
   font-size: .78rem;
   line-height: 1.8;
@@ -1089,17 +1091,17 @@ body.warp-active .orb {
 
 /* ── Responsive ──────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .sites-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .sites-grid { grid-template-columns: repeat(auto-fill, minmax(236px, 1fr)); }
 }
 
 @media (max-width: 600px) {
-  .site-header { padding: 16px 20px; }
-  .hero { padding: 60px 20px 30px; }
-  .sites-section { padding: 0 20px 60px; }
+  .site-header { padding: 12px 18px; }
+  .hero { padding: 40px 18px 26px; }
+  .sites-section { padding: 0 18px clamp(44px, 12vw, 56px); }
   .sites-grid { grid-template-columns: 1fr; }
-  .card-group { margin-bottom: 28px; }
+  .card-group { margin-bottom: 22px; }
 
-  .hero-search-wrap { margin-top: 20px; }
+  .hero-search-wrap { margin-top: 18px; }
   .hero-search { font-size: .88rem; padding: 12px 40px; }
   .search-hint { display: none; }
   .constellation-box { height: clamp(100px, 22vw, 160px); }
@@ -1148,6 +1150,19 @@ body.drag-enabled .sites-grid .site-card:active { cursor: grabbing; }
 .site-card:focus-visible {
   outline-offset: 4px;
   border-color: var(--card-glow-border, rgba(255,255,255,.2));
+}
+
+/* ── Visually hidden (accessible headings, captions) ─────────────────── */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ── Skip link ──────────────────────────────────────────────────────── */
@@ -1929,51 +1944,49 @@ body.evangelion-bg .hero-search-icon { color: rgba(128,0,255,.3); }
   }
 }
 
-/* ── Unified search mode ─────────────────────────────────────────────────
-   When searching, show all cards at same level with compact group indicators
-*/
-body.search-active .card-group {
-  margin-bottom: 8px; /* Tight spacing between groups */
-}
-
-body.search-active .group-label {
-  font-size: 0.6rem; /* Smaller labels */
-  margin-bottom: 8px;
-  opacity: 0.5;
-}
-
+/* ── Search-active layout ─────────────────────────────────────────────
+   Fixed column tracks: auto-fill + 1fr stretches few matches into wide
+   “swimlanes”; keep card width stable and center the shorter row. */
 body.search-active .sites-grid {
-  gap: 12px; /* Tighter card spacing */
+  grid-template-columns: repeat(auto-fill, minmax(268px, 268px));
+  justify-content: center;
 }
 
-/* Hide group labels when only 1-2 cards in group during search */
-body.search-active .card-group:not(:has(.site-card:not(.search-hidden) ~ .site-card:not(.search-hidden) ~ .site-card:not(.search-hidden))) .group-label {
-  display: none;
+@media (max-width: 768px) {
+  body.search-active .sites-grid {
+    grid-template-columns: repeat(auto-fill, minmax(236px, 236px));
+  }
 }
 
-/* Compact group indicator on cards during search */
-.card-group-indicator {
-  display: none; /* Hidden by default */
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 0.6rem;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 10px;
-  background: var(--card-accent);
-  color: var(--bg);
-  opacity: 0.9;
-  z-index: 2;
+@media (max-width: 600px) {
+  body.search-active .sites-grid {
+    grid-template-columns: 1fr;
+    justify-content: stretch;
+  }
 }
 
-body.search-active .card-group-indicator {
-  display: block; /* Show during search */
+/* FLIP / rise motion during filter */
+@keyframes catalog-rise-in {
+  from {
+    opacity: 0.55;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* For cards in groups with only 1-2 items, make indicator more prominent */
-body.search-active .card-group:not(:has(.site-card:not(.search-hidden) ~ .site-card:not(.search-hidden) ~ .site-card:not(.search-hidden))) .card-group-indicator {
-  opacity: 1;
-  font-size: 0.65rem;
-  padding: 3px 8px;
+.site-card.catalog-rise-in {
+  animation: catalog-rise-in 0.44s var(--ease-snap) both;
+}
+
+.site-card.catalog-flip-active {
+  z-index: 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-card.catalog-rise-in {
+    animation: none;
+  }
 }

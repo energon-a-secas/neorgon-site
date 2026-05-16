@@ -18,3 +18,6 @@ package-lock.json
 .env
 .env.*
 server.log
+
+
+.impeccable/critique/

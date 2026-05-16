@@ -8,9 +8,27 @@
   if (!input || !box || !canvas) return;
   const ctx = canvas.getContext('2d');
 
-  const allGroups = Array.from(document.querySelectorAll('.card-group'));
+  const catalogMain = document.getElementById('tools');
+  const mergedGroup = document.getElementById('catalogSearchMerged');
+  const mergedGrid = mergedGroup ? mergedGroup.querySelector('.sites-grid') : null;
+  const nativeGroups = Array.from(document.querySelectorAll('#tools > .card-group:not(#catalogSearchMerged)'));
+
   let cards = Array.from(document.querySelectorAll('.site-card[data-card-id]'));
   const ghost = cards.filter(c => c.classList.contains('ghost-card')).map(c => c.dataset.cardId);
+
+  var catalogCardsOrdered = [];
+  if (catalogMain) {
+    catalogMain.querySelectorAll('.card-group:not(#catalogSearchMerged) .sites-grid').forEach(function (grid) {
+      grid.querySelectorAll('.site-card[data-card-id]').forEach(function (card) {
+        catalogCardsOrdered.push(card);
+      });
+    });
+  }
+
+  const nativeGridByCard = new WeakMap();
+  catalogCardsOrdered.forEach(function (card) {
+    nativeGridByCard.set(card, card.parentElement);
+  });
 
   /* Build searchable index */
   const buildIndex = function() {
@@ -45,21 +63,6 @@
     { label: 'Platforms',     color: '#64748b', ids: ['github','gitlab','dockerhub'], keywords: 'platforms github gitlab docker hub containers images repos code open source private ci cd pipelines' },
     { label: 'Game',          color: '#e879f9', ids: ['rushq'], keywords: 'game strategy rush q cards corporate' },
   ];
-
-  /* Track original group for each card */
-  function initOriginalGroups() {
-    allGroups.forEach(function (group) {
-      var groupLabel = group.querySelector('.group-label');
-      if (!groupLabel) return;
-      var groupName = groupLabel.textContent.trim();
-
-      var cardsInGroup = group.querySelectorAll('.site-card[data-card-id]');
-      cardsInGroup.forEach(function (card) {
-        // Store the original group name on the card
-        card.dataset.originalGroup = groupName;
-      });
-    });
-  }
 
   /* ── Floating pills (physics) ───────────────────────────────── */
   var W = 0, H = 0;
@@ -104,6 +107,7 @@
 
     CATEGORIES.forEach(function (cat, i) {
       var el = document.createElement('button');
+      el.type = 'button';
       el.className = 'tag-pill';
       el.textContent = cat.label;
       el.style.color = cat.color;
@@ -315,46 +319,103 @@
   }
 
   /* ── Search / filter ────────────────────────────────────────── */
+  function syncCatalogMerge(matchedIds) {
+    if (!mergedGroup || !mergedGrid || catalogCardsOrdered.length === 0) return;
+
+    nativeGroups.forEach(function (g) {
+      g.classList.add('catalog-native-suppressed');
+    });
+
+    catalogCardsOrdered.forEach(function (card) {
+      var id = card.dataset.cardId;
+      var match = matchedIds.has(id);
+      var home = nativeGridByCard.get(card);
+      if (match) {
+        card.classList.remove('search-hidden');
+        mergedGrid.appendChild(card);
+      } else {
+        card.classList.add('search-hidden');
+        if (home && card.parentElement !== home) {
+          home.appendChild(card);
+        }
+      }
+    });
+
+    var visibleTools = catalogCardsOrdered.filter(function (c) {
+      return matchedIds.has(c.dataset.cardId) && !ghost.includes(c.dataset.cardId);
+    }).length;
+
+    mergedGroup.classList.toggle('catalog-merge-empty', visibleTools === 0);
+  }
+
+  function restoreCatalogNativeLayout() {
+    nativeGroups.forEach(function (g) {
+      g.classList.remove('catalog-native-suppressed');
+    });
+    if (mergedGroup) mergedGroup.classList.add('catalog-merge-empty');
+    catalogCardsOrdered.forEach(function (card) {
+      card.classList.remove('search-hidden');
+      var home = nativeGridByCard.get(card);
+      if (home) home.appendChild(card);
+    });
+  }
+
   function updateGroupVisibility() {
-    allGroups.forEach(function (group) {
+    if (document.body.classList.contains('search-active')) return;
+    nativeGroups.forEach(function (group) {
       var visibleCards = group.querySelectorAll('.site-card[data-card-id]:not(.search-hidden)');
       group.classList.toggle('group-hidden', visibleCards.length === 0);
     });
   }
 
-  /* Create search results grid container */
-  function createSearchGrid() {
-    var existing = document.getElementById('searchResultsGrid');
-    if (existing) return existing;
-
-    var grid = document.createElement('div');
-    grid.id = 'searchResultsGrid';
-    grid.className = 'search-results-grid';
-    grid.style.display = 'none';
-
-    // Insert at the beginning of sites-section
-    var section = document.querySelector('.sites-section');
-    if (section) {
-      section.insertBefore(grid, section.firstChild);
-    } else {
-      document.body.appendChild(grid);
-    }
-    return grid;
+  function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
-  /* Add group indicators to cards */
-  function initGroupIndicators() {
-    allGroups.forEach(function (group) {
-      var labelEl = group.querySelector('.group-label');
-      if (!labelEl) return;
-      var categoryName = labelEl.textContent.trim();
-      var cards = group.querySelectorAll('.site-card[data-card-id]');
-      cards.forEach(function (card) {
-        if (card.querySelector('.card-group-indicator')) return; // Already added
-        var indicator = document.createElement('div');
-        indicator.className = 'card-group-indicator';
-        indicator.textContent = categoryName;
-        card.appendChild(indicator);
+  /**
+   * After filter DOM updates: FLIP cards that stayed visible (slide into new grid
+   * slots); subtle rise-in for newly revealed matches (motion toward search).
+   */
+  function runFilterMotion(flipPairs, riseEls) {
+    if (prefersReducedMotion()) return;
+    requestAnimationFrame(function () {
+      flipPairs.forEach(function (pair) {
+        var el = pair.el;
+        var first = pair.first;
+        var last = el.getBoundingClientRect();
+        var dx = first.left - last.left;
+        var dy = first.top - last.top;
+        if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+
+        el.classList.add('catalog-flip-active');
+        el.style.transition = 'none';
+        el.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+        requestAnimationFrame(function () {
+          el.style.transition = 'transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          el.style.transform = '';
+          var settled = false;
+          function cleanup() {
+            if (settled) return;
+            settled = true;
+            el.classList.remove('catalog-flip-active');
+            el.style.transition = '';
+            el.style.transform = '';
+          }
+          el.addEventListener('transitionend', function te(ev) {
+            if (ev.propertyName !== 'transform') return;
+            el.removeEventListener('transitionend', te);
+            cleanup();
+          });
+          window.setTimeout(cleanup, 520);
+        });
+      });
+
+      riseEls.forEach(function (el) {
+        el.classList.add('catalog-rise-in');
+        el.addEventListener('animationend', function onEnd() {
+          el.removeEventListener('animationend', onEnd);
+          el.classList.remove('catalog-rise-in');
+        }, { once: true });
       });
     });
   }
@@ -363,44 +424,31 @@
     var q = input.value.trim().toLowerCase();
     clearBtn.classList.toggle('show', q.length > 0);
 
-    // Before doing anything, ensure cards are in their proper places (not stuck in search grid)
-    var searchGrid = document.getElementById('searchResultsGrid');
-    if (searchGrid && searchGrid.children.length > 0) {
-      var cardsInGrid = Array.from(searchGrid.children);
-      cardsInGrid.forEach(function (c) {
-        var group = findOriginalGroup(c.dataset.cardId);
-        if (group) {
-          var sitesGrid = group.querySelector('.sites-grid');
-          if (sitesGrid) sitesGrid.appendChild(c);
-          else group.appendChild(c);
-          c.classList.remove('search-hidden');
-          var indicator = c.querySelector('.card-group-indicator');
-          if (indicator) indicator.remove();
-        }
-      });
-      searchGrid.style.display = 'none';
-    }
-
-    // Rebuild card collection and index each time since cards move around
     var currentCards = Array.from(document.querySelectorAll('.site-card[data-card-id]'));
     var currentIndex = buildIndex();
 
     if (!q) {
-      isFiltering = false;
-      /* Show all cards and groups, hide search grid */
-
-      // Make sure all cards in all groups are visible and clean
-      allGroups.forEach(function (g) {
-        g.classList.remove('group-hidden');
-        var cardsInGroup = g.querySelectorAll('.site-card[data-card-id]');
-        cardsInGroup.forEach(function (c) {
-          c.classList.remove('search-hidden');
-          var indicator = c.querySelector('.card-group-indicator');
-          if (indicator) indicator.remove();
+      var clearFlip = [];
+      if (!prefersReducedMotion() && document.body.classList.contains('search-active') && mergedGrid) {
+        mergedGrid.querySelectorAll('.site-card[data-card-id]').forEach(function (el) {
+          clearFlip.push({ el: el, first: el.getBoundingClientRect() });
         });
+      }
+
+      isFiltering = false;
+
+      restoreCatalogNativeLayout();
+
+      nativeGroups.forEach(function (g) {
+        g.classList.remove('group-hidden');
       });
 
-      // Reset pill state
+      currentCards.forEach(function (c) {
+        if (!nativeGridByCard.has(c)) {
+          c.classList.remove('search-hidden');
+        }
+      });
+
       pills.forEach(function (p) {
         p.matched = false; p.repelled = false;
         p._orbitX = 0; p._orbitY = 0;
@@ -411,77 +459,60 @@
       document.body.classList.remove('search-active');
       noResults.classList.remove('show');
       countEl.textContent = '';
+
+      updateGroupVisibility();
+
+      if (clearFlip.length) {
+        runFilterMotion(clearFlip, []);
+      }
       return;
     }
 
     isFiltering = true;
     document.body.classList.add('search-active');
 
-    /* Check which categories match */
     pills.forEach(function (p) {
       var catMatch = p.cat.label.toLowerCase().includes(q) ||
                      p.cat.keywords.includes(q);
       p.matched = catMatch;
     });
 
-    /* Check which cards match (text search + category membership) */
     var matchedIds = new Set();
     pills.forEach(function (p) {
       if (p.matched) p.cat.ids.forEach(function (id) { matchedIds.add(id); });
     });
-    /* Also direct text search on cards */
     currentIndex.forEach(function (item) {
       if (item.text.includes(q)) matchedIds.add(item.id);
     });
 
-    /* Show/hide cards in place (no reordering — groups provide structure) */
-    var visible = 0;
-    var total = currentIndex.filter(function (i) { return !ghost.includes(i.id); }).length;
+    var flipPairs = [];
+    var riseEls = [];
+    catalogCardsOrdered.forEach(function (c) {
+      var id = c.dataset.cardId;
+      if (!matchedIds.has(id)) return;
+      var wasShown = !c.classList.contains('search-hidden');
+      if (wasShown) flipPairs.push({ el: c, first: c.getBoundingClientRect() });
+      else riseEls.push(c);
+    });
 
-    // Create search grid container
-    var searchGrid = createSearchGrid();
-    searchGrid.innerHTML = ''; // Clear previous results
-
-    var visibleCards = [];
     currentCards.forEach(function (c) {
+      if (nativeGridByCard.has(c)) return;
       var id = c.dataset.cardId;
       if (matchedIds.has(id)) {
         c.classList.remove('search-hidden');
-        if (!ghost.includes(id)) visible++;
-
-        // Update group indicator with correct category
-        var group = findOriginalGroup(id);
-        if (group) {
-          var groupLabel = group.querySelector('.group-label');
-          if (groupLabel) {
-            // Update or create group indicator
-            var indicator = c.querySelector('.card-group-indicator');
-            if (!indicator) {
-              indicator = document.createElement('div');
-              indicator.className = 'card-group-indicator';
-              c.appendChild(indicator);
-            }
-            indicator.textContent = groupLabel.textContent.trim();
-          }
-        }
-
-        visibleCards.push(c);
       } else {
         c.classList.add('search-hidden');
       }
     });
 
-    // Move visible cards to search grid
-    if (visibleCards.length > 0) {
-      visibleCards.forEach(function (card) {
-        searchGrid.appendChild(card);
-      });
-      searchGrid.style.display = 'grid';
-    } else {
-      searchGrid.style.display = 'none';
-    }
+    syncCatalogMerge(matchedIds);
 
-    /* Also update pill match state for pills not matched by label but by card overlap */
+    var visible = currentIndex.filter(function (i) {
+      return matchedIds.has(i.id) && !ghost.includes(i.id);
+    }).length;
+
+    var total = currentIndex.filter(function (i) { return !ghost.includes(i.id); }).length;
+
     pills.forEach(function (p) {
       if (!p.matched) {
         p.matched = p.cat.ids.some(function (id) { return matchedIds.has(id); });
@@ -496,50 +527,25 @@
       countEl.textContent = visible + ' of ' + total + ' tools';
     }
 
-    // Hide groups that have no visible cards
     updateGroupVisibility();
-  }
 
-  /* Helper to find original group for a card */
-  function findOriginalGroup(cardId) {
-    // First try: if card is already in a group, return that group
-    var card = document.querySelector('[data-card-id="' + cardId + '"]');
-    if (card) {
-      var parent = card.closest('.card-group');
-      if (parent) return parent;
-    }
-
-    // Main approach: find by stored original group name
-    if (card && card.dataset.originalGroup) {
-      for (var i = 0; i < allGroups.length; i++) {
-        var group = allGroups[i];
-        var groupLabel = group.querySelector('.group-label');
-        if (groupLabel && groupLabel.textContent.trim() === card.dataset.originalGroup) {
-          return group;
-        }
-      }
-    }
-
-    // Last resort: search through all groups for this card (should not be needed if initOriginalGroups worked)
-    for (var i = 0; i < allGroups.length; i++) {
-      var group = allGroups[i];
-      var cardInGroup = group.querySelector('[data-card-id="' + cardId + '"]');
-      if (cardInGroup) return group;
-    }
-    return null;
+    runFilterMotion(flipPairs, riseEls);
   }
 
   input.addEventListener('input', doFilter);
 
-  /* Scroll search bar to top on focus so pills + cards get maximum viewport */
+  /* Scroll hero search into view only when it is largely off-screen */
   var searchWrap = input.closest('.hero-search-wrap');
   input.addEventListener('focus', function () {
-    if (searchWrap) {
-      var offset = searchWrap.getBoundingClientRect().top + window.scrollY - 12;
-      window.scrollTo({ top: offset, behavior: 'smooth' });
+    if (!searchWrap) return;
+    var rect = searchWrap.getBoundingClientRect();
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var margin = 48;
+    if (rect.top < margin || rect.bottom > vh - margin) {
+      var offset = rect.top + window.scrollY - 12;
+      window.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
     }
   });
-
   clearBtn.addEventListener('click', function (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -577,8 +583,6 @@
     resizeCanvas();
     createPills();
     buildConnections();
-    initOriginalGroups(); // Store original group mappings
-    initGroupIndicators();
     tick();
     /* Fade in all pills together — double rAF ensures opacity:0 is painted before transitioning */
     pills.forEach(function (p) {
