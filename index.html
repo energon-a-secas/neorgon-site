@@ -11,7 +11,7 @@
     gtag('config', 'G-HTF349S8R5');
   </script>
   <meta name="color-scheme" content="dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev; connect-src https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com https://www.google-analytics.com https://www.googletagmanager.com ws://localhost:* http://localhost:*; frame-src https://www.youtube.com https://www.youtube-nocookie.com">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev; connect-src https://awesomesites.neorgon.com https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com https://www.google-analytics.com https://www.googletagmanager.com ws://localhost:* http://localhost:*; frame-src https://www.youtube.com https://www.youtube-nocookie.com">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <title>Neorgon | Made for Real Problems</title>
@@ -485,6 +485,26 @@
         </div>
       </a>
 
+      <!-- Awesome Sites -->
+      <a class="site-card" data-card-id="awesomesites"
+         href="https://awesomesites.neorgon.com/"
+         style="--card-glow: rgba(249,115,22,.3); --card-glow-border: rgba(249,115,22,.35); --card-accent: #f97316;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/awesomesites.svg" class="card-site-icon" alt="Awesome Sites" width="28" height="28" loading="lazy"></div>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">awesomesites.neorgon.com</div>
+          <h3 class="card-name">Awesome Sites</h3>
+          <div class="card-desc">Curated external tabs with labeled lists. JSON API feeds featured picks on the hub.</div>
+          <div class="card-tags">
+            <span class="card-tag">Curated</span>
+            <span class="card-tag">Bookmarks</span>
+            <span class="card-tag">API</span>
+          </div>
+        </div>
+      </a>
+
       </div>
     </div>
 
@@ -802,6 +822,13 @@
       </div>
     </div>
 
+
+    <!-- ── Awesome Sites (API feed) ──────────────────────────────── -->
+    <div id="awesomeSitesHubGroup" class="card-group" data-group="awesome-sites" style="--group-color: #f97316" hidden>
+      <h2 class="group-label"><span class="group-dot"></span> Awesome Sites</h2>
+      <div class="sites-grid" id="awesomeSitesHubGrid"></div>
+    </div>
+
     <!-- ── Platforms ─────────────────────────────────────────────── -->
     <div class="card-group" data-group="platforms" style="--group-color: #64748b">
       <h2 class="group-label"><span class="group-dot"></span> Platforms</h2>
@@ -1072,6 +1099,7 @@
 <script src="js/sound.js"></script>
 <script src="js/cursor.js"></script>
 <script src="js/entrance.js"></script>
+<script src="js/awesome-sites-hub.js"></script>
 <script src="js/search.js"></script>
 <div id="ytMusicPlayer" style="position:fixed;left:-9999px;width:1px;height:1px;pointer-events:none;" aria-hidden="true"></div>
 <script src="js/music.js"></script>

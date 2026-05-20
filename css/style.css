@@ -479,6 +479,12 @@ body.search-active #tools > .card-group.catalog-native-suppressed {
   width: 28px; height: 28px; display: block;
   filter: drop-shadow(0 0 3px rgba(227, 38, 228, .7));
 }
+.card-initial {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--card-accent, #818cf8);
+  line-height: 1;
+}
 .card-arrow {
   color: var(--text-muted);
   opacity: 0;
