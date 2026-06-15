@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Neorgon Engineering Blog</title>
+  <link>https://neorgon.com/blog/</link>
+  <description>Engineering decisions, design patterns, and open-source stories.</description>
+  <language>en-us</language>
+  <lastBuildDate>Mon, 15 Jun 2026 15:53:31 GMT</lastBuildDate>
+  <atom:link href="https://neorgon.com/blog/feed.xml" rel="self" type="application/rss+xml" />
+  <item>
+    <title>How We Set Up Google Analytics for Privacy-First Tracking</title>
+    <link>https://neorgon.com/blog/how-we-setup-google-analytics.html</link>
+    <guid>https://neorgon.com/blog/how-we-setup-google-analytics.html</guid>
+    <pubDate>Sat, 14 Mar 2026 00:00:00 GMT</pubDate>
+    <description>A complete guide to implementing Google Analytics with Content Security Policy, privacy considerations, and dual tracking with Plausible Analytics</description>
+  </item>
+  <item>
+    <title>When Search Breaks: The Physics of Moving Cards on our open-source Hub</title>
+    <link>https://neorgon.com/blog/search-functionality-bug-fixes.html</link>
+    <guid>https://neorgon.com/blog/search-functionality-bug-fixes.html</guid>
+    <pubDate>Sat, 14 Mar 2026 00:00:00 GMT</pubDate>
+    <description>How we fixed a race-condition bug in our search functionality that was causing cards to disappear when clearing the search. Lessons in DOM manipulation and state management</description>
+  </item>
+  <item>
+    <title>The Physics Behind Those Floating Category Pills</title>
+    <link>https://neorgon.com/blog/the-physics-behind-floating-pills.html</link>
+    <guid>https://neorgon.com/blog/the-physics-behind-floating-pills.html</guid>
+    <pubDate>Sat, 14 Mar 2026 00:00:00 GMT</pubDate>
+    <description>Deep dive into Neorgon's physics-simulated search category pills: spring physics, collision detection, and performance optimization</description>
+  </item>
+  <item>
+    <title>Why We Built Prefers-Reduced-Motion Into Every Animation</title>
+    <link>https://neorgon.com/blog/why-we-care-about-motion-accessibility.html</link>
+    <guid>https://neorgon.com/blog/why-we-care-about-motion-accessibility.html</guid>
+    <pubDate>Sat, 14 Mar 2026 00:00:00 GMT</pubDate>
+    <description>Motion-heavy UIs look great but can cause real harm. Here's how we built a comprehensive reduced-motion mode into Neorgon's hub and why accessibility-first engineering matters</description>
+  </item>
+  <item>
+    <title>Building 31 Tools: A Monorepo Architecture That Actually Works</title>
+    <link>https://neorgon.com/blog/monorepo-architecture-18-tools.html</link>
+    <guid>https://neorgon.com/blog/monorepo-architecture-18-tools.html</guid>
+    <pubDate>Fri, 13 Mar 2026 00:00:00 GMT</pubDate>
+    <description>How we structured a 31-tool monorepo with zero shared dependencies, modular ES modules, and a template system that makes new tools take 2 hours, not 2 days</description>
+  </item>
+  <item>
+    <title>Why We Chose Glassmorphism (And How to Implement It Accessibly)</title>
+    <link>https://neorgon.com/blog/glassmorphism-design-accessibility.html</link>
+    <guid>https://neorgon.com/blog/glassmorphism-design-accessibility.html</guid>
+    <pubDate>Thu, 12 Mar 2026 00:00:00 GMT</pubDate>
+    <description>Glassmorphism looks cool, but it's tricky to get right. Here's how we implemented it across 31 tools while maintaining color contrast, readability, and reduced-motion support</description>
+  </item>
+  <item>
+    <title>From Idea to Tool in 48 Hours: The Neorgon Build Process</title>
+    <link>https://neorgon.com/blog/from-idea-to-tool-in-48-hours.html</link>
+    <guid>https://neorgon.com/blog/from-idea-to-tool-in-48-hours.html</guid>
+    <pubDate>Wed, 11 Mar 2026 00:00:00 GMT</pubDate>
+    <description>How we ship new tools fast: a repeatable 48-hour process from idea validation to deployment, documentation, and hub registration</description>
+  </item>
+</channel>
+</rss>

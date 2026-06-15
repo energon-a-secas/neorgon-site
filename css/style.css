@@ -1958,8 +1958,8 @@ body.evangelion-bg .hero-search-icon { color: rgba(128,0,255,.3); }
   /* Disable starfield */
   #starfield { display: none !important; }
 
-  /* Disable matrix rain, intervention canvas */
-  #matrix, .intervention-canvas { display: none !important; }
+  /* Disable matrix rain, intervention, and evangelion canvases */
+  #matrixCanvas, #interventionCanvas, #evangelionCanvas { display: none !important; }
 
   /* Disable physics-based pills animation - make them static */
   .tag-pill {
@@ -2060,4 +2060,78 @@ body.search-active .sites-grid {
 .footer-link:focus-visible {
   color: rgba(255,255,255,.72);
   text-decoration: underline;
+}
+:root {
+  --neo-footer-bg: rgba(255, 255, 255, 0.03);
+  --neo-footer-border: rgba(255, 255, 255, 0.1);
+  --neo-footer-text: rgba(255, 255, 255, 0.6);
+  --neo-footer-hover: rgba(255, 255, 255, 0.9);
+  --neo-accent: #B015B0;
+}
+
+.neorgon-footer {
+  width: 100%;
+  padding: 24px 20px;
+  margin-top: auto;
+  border-top: 1px solid var(--neo-footer-border);
+  background: var(--neo-footer-bg);
+  backdrop-filter: blur(8px);
+}
+
+.neorgon-footer-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.neorgon-footer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--neo-footer-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--neo-footer-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.neorgon-footer-btn:hover {
+  background: rgba(176, 21, 176, 0.12);
+  border-color: rgba(176, 21, 176, 0.35);
+  color: var(--neo-footer-hover);
+}
+
+.neorgon-footer-btn svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .neorgon-footer-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .neorgon-footer-btn {
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neorgon-footer-btn {
+    transition: none !important;
+  }
+}
+.neorgon-footer-note {
+  max-width: 720px;
+  margin: 16px auto 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
 }

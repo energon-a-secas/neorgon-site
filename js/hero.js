@@ -39,6 +39,7 @@
     'Works offline \u00b7 Works online \u00b7 Just works',
     'Not another SaaS \u00b7 You\'re welcome',
   ];
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   let idx = 0;
   setInterval(function () {
     el.style.opacity = '0';

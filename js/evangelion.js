@@ -203,18 +203,32 @@
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, W, H);
 
-    animId = requestAnimationFrame(draw);
+    if (!reducedMotion.matches) animId = requestAnimationFrame(draw);
   }
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   window.addEventListener('resize', () => { if (active) resize(); });
 
   /* ── Intro transition ────────────────────────────────────── */
   window.evangelionOn = function () {
     if (active || introActive) return;
-    introActive = true;
     resize();
     canvas.style.opacity = '1';
     canvas.classList.add('active');
+
+    if (reducedMotion.matches) {
+      document.getElementById('starfield').style.opacity = '0';
+      document.body.classList.add('evangelion-bg');
+      active = true;
+      frame = 0;
+      const W = canvas.width, H = canvas.height;
+      initReticles(W, H);
+      draw();
+      return;
+    }
+
+    introActive = true;
 
     let introFrame = 0;
     const INTRO_DURATION = 80;
@@ -413,6 +427,15 @@
     if (window._neoSoundEnabled !== false && window._neoSoundPing) {
       const freqs = lvl === 'red' ? [300, 200, 300, 200] : [250, 180, 250];
       freqs.forEach((f, i) => setTimeout(() => window._neoSoundPing(f, 0.15), i * 200));
+    }
+
+    if (reducedMotion.matches) {
+      overlay.querySelectorAll('.nerv-bar').forEach(b => b.style.opacity = '1');
+      setTimeout(() => {
+        warningActive = false;
+        overlay.classList.remove('active');
+      }, cfg.duration);
+      return;
     }
 
     let wFrame = 0;

@@ -81,17 +81,29 @@
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, W, H);
 
-    animId = requestAnimationFrame(draw);
+    if (!reducedMotion.matches) animId = requestAnimationFrame(draw);
   }
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   window.addEventListener('resize', () => { if (active) resize(); });
 
   window.interventionOn = function () {
     if (active || introActive) return;
-    introActive = true;
     resize();
     canvas.style.opacity = '1';
     canvas.classList.add('active');
+
+    if (reducedMotion.matches) {
+      document.getElementById('starfield').style.opacity = '0';
+      document.body.classList.add('intervention-bg');
+      active = true;
+      frame = 0;
+      draw();
+      return;
+    }
+
+    introActive = true;
 
     /* Broadcast takeover intro — glitch → static → white → L */
     let introFrame = 0;
