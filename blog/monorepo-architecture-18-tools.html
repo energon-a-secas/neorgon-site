@@ -4,9 +4,12 @@
   <meta charset="UTF-8">
   <meta name="color-scheme" content="dark">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Building 18 Tools: A Monorepo Architecture That Actually Works - Neorgon Blog</title>
-  <meta name="description" content="How we structured a 18-tool monorepo with zero shared dependencies, modular ES modules, and a template system that makes new tools take 2 hours, not 2 days.">
-  <meta property="og:title" content="Building 18 Tools: A Monorepo Architecture That Actually Works">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' https://esm.sh cdn.jsdelivr.net cdnjs.cloudflare.com https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.convex.cloud https://img.clerk.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com; connect-src 'self' https://*.convex.cloud https://*.clerk.accounts.dev https://*.accounts.dev https://clerk-telemetry.com https://api.clerk.com https://challenges.cloudflare.com https://*.workers.dev https://www.google-analytics.com https://www.googletagmanager.com https://plausible.io; frame-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.accounts.dev https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self' blob:">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <title>Building 31 Tools: A Monorepo Architecture That Actually Works - Neorgon Blog</title>
+  <meta name="description" content="How we structured a 31-tool monorepo with zero shared dependencies, modular ES modules, and a template system that makes new tools take 2 hours, not 2 days">
+  <meta property="og:title" content="Building 31 Tools: A Monorepo Architecture That Actually Works">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://neorgon.com/blog/monorepo-architecture-18-tools.html">
   <meta property="og:site_name" content="Neorgon">
@@ -16,6 +19,21 @@
   <!-- Google tag -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTF349S8R5"></script>
   <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-HTF349S8R5');</script>
+    <!-- Article schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Building 31 Tools: A Monorepo Architecture That Actually Works",
+    "description": "How we structured a 31-tool monorepo with zero shared dependencies, modular ES modules, and a template system that makes new tools take 2 hours, not 2 days",
+    "image": "https://neorgon.com/og-preview.jpg",
+    "author": { "@type": "Organization", "name": "Neorgon" },
+    "publisher": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" },
+    "datePublished": "2026-03-13",
+    "dateModified": "2026-03-13",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://neorgon.com/blog/monorepo-architecture-18-tools.html" }
+  }
+  </script>
   <script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/css/style.css">
@@ -80,9 +98,9 @@
       <span>·</span>
       <span class="post-category">Architecture</span>
     </div>
-    <h1 class="post-title">Building 18 Tools: A Monorepo Architecture That Actually Works</h1>
+    <h1 class="post-title">Building 31 Tools: A Monorepo Architecture That Actually Works</h1>
     <p class="post-excerpt">
-      How we structured a 18-tool monorepo with zero shared dependencies, modular ES modules, and a template system that makes new tools take 2 hours, not 2 days.
+      How we structured a 31-tool monorepo with zero shared dependencies, modular ES modules, and a template system that makes new tools take 2 hours, not 2 days.
     </p>
   </header>
 
@@ -123,7 +141,7 @@
 ├── neorgon-site/               # The hub (uses _template)
 ├── json-builder-site/          # Independent tool
 ├── presentation-sage/          # Independent tool
-└── ...18 tools total</code></pre>
+└── ...31 tools total</code></pre>
       </div>
 
       <p><strong>Key insight:</strong> Each tool is completely self-contained. They don't import from each other. They don't share node_modules. They're independent apps that happen to live in the same Git repo.</p>
@@ -275,7 +293,7 @@ window._toolReady = true // Signal loaded</code></pre>
       <p>We don't need orchestrated builds. Each tool deploys independently.</p>
 
       <h3>❌ Shared Components</h3>
-      <p>No <code>@neorgon/ui</code> package. Copy-paste is simpler than versioning.</p>
+      <p>No heavy shared component library. We keep a tiny <code>@neorgon/ui</code> package for cross-site footers only. Copy-paste is still simpler than versioning UI logic.</p>
 
       <h3>❌ Microservices</h3>
       <p>Each tool is a static site. No servers, no Docker, no Kubernetes.</p>
@@ -306,12 +324,12 @@ git mv js/shared-utils.js js/shared/utils.js
 
       <h2>Real Numbers</h2>
 
-      <p>After 18 tools, here's what the monorepo looks like:</p>
+      <p>After 31 tools, here's what the monorepo looks like:</p>
 
       <div class="code-block">
         <div class="code-label">Repository Stats</div>
         <ul>
-          <li>📁 18 tool directories</li>
+          <li>📁 31 tool directories</li>
           <li>📄 1,200 total files</li>
           <li>💾 4.2MB total (including assets)</li>
           <li>⚡ Average tool size: 230KB</li>

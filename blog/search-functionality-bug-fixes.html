@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
   <meta name="color-scheme" content="dark">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' https://esm.sh cdn.jsdelivr.net cdnjs.cloudflare.com https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.convex.cloud https://img.clerk.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com; connect-src 'self' https://*.convex.cloud https://*.clerk.accounts.dev https://*.accounts.dev https://clerk-telemetry.com https://api.clerk.com https://challenges.cloudflare.com https://*.workers.dev https://www.google-analytics.com https://www.googletagmanager.com https://plausible.io; frame-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.accounts.dev https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self' blob:">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>When Search Breaks: The Physics of Moving Cards on our open-source Hub - Neorgon Blog</title>
-  <meta name="description" content="How we fixed a race-condition bug in our search functionality that was causing cards to disappear when clearing the search. Lessons in DOM manipulation and state management.">
+  <meta name="description" content="How we fixed a race-condition bug in our search functionality that was causing cards to disappear when clearing the search. Lessons in DOM manipulation and state management">
   <meta property="og:title" content="When Search Breaks: The Physics of Moving Cards">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://neorgon.com/blog/search-functionality-bug-fixes.html">
@@ -15,6 +18,21 @@
   <!-- Google tag -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTF349S8R5"></script>
   <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-HTF349S8R5');</script>
+    <!-- Article schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "When Search Breaks: The Physics of Moving Cards on our open-source Hub",
+    "description": "How we fixed a race-condition bug in our search functionality that was causing cards to disappear when clearing the search. Lessons in DOM manipulation and state management",
+    "image": "https://neorgon.com/og-preview.jpg",
+    "author": { "@type": "Organization", "name": "Neorgon" },
+    "publisher": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" },
+    "datePublished": "2026-03-14",
+    "dateModified": "2026-03-14",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://neorgon.com/blog/search-functionality-bug-fixes.html" }
+  }
+  </script>
   <script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/css/style.css">
@@ -85,13 +103,13 @@
     <h1 class="post-title">When Search Breaks: The Physics of Moving Cards on Our Open-Source Hub</h1>
 
     <p class="post-excerpt">
-      How we fixed a race-condition bug in our search functionality that was causing cards to disappear when clearing the search. Lessons in DOM manipulation and state management when you have 18 tools and no JavaScript framework.
+      How we fixed a race-condition bug in our search functionality that was causing cards to disappear when clearing the search. Lessons in DOM manipulation and state management when you have 31 tools and no JavaScript framework.
     </p>
   </header>
 
   <main class="article-content">
     <article>
-      <p>We built <a href="https://neorgon.com">neorgon.com</a> to showcase 18 open-source tools we've built over the past few years. The hub is deceptively simple: a searchable grid of cards, each linking to a tool. Under the hood, we've added physics simulations, draggable reordering, and animated search results. It's all vanilla JavaScript—no React, no Vue, no framework. Just plain old DOM manipulation.</p>
+      <p>We built <a href="https://neorgon.com">neorgon.com</a> to showcase 31 open-source tools we've built over the past few years. The hub is deceptively simple: a searchable grid of cards, each linking to a tool. Under the hood, we've added physics simulations, draggable reordering, and animated search results. It's all vanilla JavaScript—no React, no Vue, no framework. Just plain old DOM manipulation.</p>
 
       <p>And that's where things went wrong.</p>
 
@@ -99,7 +117,7 @@
 
       <p>"The search bar is failing. Originally it was working, but the current fix damaged the result filtering and when you delete or cancel the search no cards are displayed."</p>
 
-      <p>Classic bug report: it was working, then it broke. The user types something in, gets filtered results, clears the search, and... nothing. A blank page where 18 tools used to be.</p>
+      <p>Classic bug report: it was working, then it broke. The user types something in, gets filtered results, clears the search, and... nothing. A blank page where 31 tools used to be.</p>
 
       <h2>The Setup: How Search Works</h2>
 

@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
   <meta name="color-scheme" content="dark">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' https://esm.sh cdn.jsdelivr.net cdnjs.cloudflare.com https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.convex.cloud https://img.clerk.com https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com; connect-src 'self' https://*.convex.cloud https://*.clerk.accounts.dev https://*.accounts.dev https://clerk-telemetry.com https://api.clerk.com https://challenges.cloudflare.com https://*.workers.dev https://www.google-analytics.com https://www.googletagmanager.com https://plausible.io; frame-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.accounts.dev https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self' blob:">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>From Idea to Tool in 48 Hours: The Neorgon Build Process - Neorgon Blog</title>
-  <meta name="description" content="How we ship new tools fast: a repeatable 48-hour process from idea validation to deployment, documentation, and hub registration.">
+  <meta name="description" content="How we ship new tools fast: a repeatable 48-hour process from idea validation to deployment, documentation, and hub registration">
   <meta property="og:title" content="From Idea to Tool in 48 Hours: The Neorgon Build Process">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://neorgon.com/blog/from-idea-to-tool-in-48-hours.html">
@@ -15,6 +18,21 @@
   <!-- Google tag -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTF349S8R5"></script>
   <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-HTF349S8R5');</script>
+    <!-- Article schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "From Idea to Tool in 48 Hours: The Neorgon Build Process",
+    "description": "How we ship new tools fast: a repeatable 48-hour process from idea validation to deployment, documentation, and hub registration",
+    "image": "https://neorgon.com/og-preview.jpg",
+    "author": { "@type": "Organization", "name": "Neorgon" },
+    "publisher": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" },
+    "datePublished": "2026-03-11",
+    "dateModified": "2026-03-11",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://neorgon.com/blog/from-idea-to-tool-in-48-hours.html" }
+  }
+  </script>
   <script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/css/style.css">
@@ -322,7 +340,7 @@ gh-pages -d .  # Deploy to GitHub Pages</code></pre>
 
       <h2>The Numbers</h2>
 
-      <p>After 18 tools built this way:</p>
+      <p>After 31 tools built this way:</p>
 
       <div class="code-block">
         <div class="code-label">Stats</div>

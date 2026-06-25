@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="color-scheme" content="dark">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>How We Set Up Google Analytics for Privacy-First Tracking - Neorgon Blog</title>
-  <meta name="description" content="A complete guide to implementing Google Analytics with Content Security Policy, privacy considerations, and dual tracking with Plausible Analytics.">
+  <meta name="description" content="A complete guide to implementing Google Analytics with Content Security Policy, privacy considerations, and dual tracking with Plausible Analytics">
   <meta property="og:title" content="How We Set Up Google Analytics for Privacy-First Tracking">
-  <meta property="og:description" content="Complete guide to GA setup with CSP, privacy considerations, and dual tracking.">
+  <meta property="og:description" content="Complete guide to GA setup with CSP, privacy considerations, and dual tracking">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://neorgon.com/blog/how-we-setup-google-analytics.html">
   <meta property="og:site_name" content="Neorgon">
@@ -16,7 +18,7 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="How We Set Up Google Analytics for Privacy-First Tracking">
-  <meta name="twitter:description" content="Complete guide to GA setup with CSP, privacy considerations, and dual tracking.">
+  <meta name="twitter:description" content="Complete guide to GA setup with CSP, privacy considerations, and dual tracking">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://neorgon.com/blog/how-we-setup-google-analytics.html">
   <meta property="og:locale" content="en_US">
@@ -32,6 +34,21 @@
   </script>
 
   <!-- Privacy-first analytics -->
+    <!-- Article schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "How We Set Up Google Analytics for Privacy-First Tracking",
+    "description": "A complete guide to implementing Google Analytics with Content Security Policy, privacy considerations, and dual tracking with Plausible Analytics",
+    "image": "https://neorgon.com/og-preview.jpg",
+    "author": { "@type": "Organization", "name": "Neorgon" },
+    "publisher": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" },
+    "datePublished": "2026-03-14",
+    "dateModified": "2026-03-14",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://neorgon.com/blog/how-we-setup-google-analytics.html" }
+  }
+  </script>
   <script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">

@@ -53,13 +53,14 @@
   /* ── Curated categories ─────────────────────────────────────── */
   const CATEGORIES = [
     { label: 'Planning',      color: '#4ade80', ids: ['pathfinder','skillmap'], keywords: 'planning visual canvas export learning roadmap pathfinder skill map strategy' },
-    { label: 'DevOps',        color: '#fbbf24', ids: ['infradrills','snippets','lockdown'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell infra drills snippets lockdown security scanner endpoints headers' },
+    { label: 'DevOps',        color: '#fbbf24', ids: ['infradrills','snippets','lockdown','runbook'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell infra drills snippets lockdown security scanner endpoints headers incident runbook alert response on-call checklist' },
     { label: 'Data',          color: '#2dd4bf', ids: ['jsonstudio','references'], keywords: 'data editor privacy api search json reference matrix scrambler viewer visualizer' },
-    { label: 'Productivity',  color: '#a78bfa', ids: ['slides','ogstudio','resume-forge','stackrank','awesomesites'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio resume forge gaming pdf psn steam stack rank priority lists drag drop collaboration awesome sites curated bookmarks external api whiteboard' },
+    { label: 'Productivity',  color: '#a78bfa', ids: ['slides','ogstudio','resume-forge','stackrank','awesomesites','promptforge'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio resume forge gaming pdf psn steam stack rank priority lists drag drop collaboration awesome sites curated bookmarks external api whiteboard prompt forge ai prompts context pathfinder agent lore' },
     { label: 'Learning',      color: '#67e8f9', ids: ['agentlore','safeguard','anatomy'], keywords: 'learning tutorials ai agent claude cursor mcp commands skills path security hardening safeguard guides ui anatomy wireframe components interface design' },
     { label: 'Fun',           color: '#f472b6', ids: ['decisionwheel','memes','clientsays','emojis','guildhall','gamebin','youtube'], keywords: 'fun randomizer community upload wheel spin memes timezone translator jargon client says decoded emoji archive search guild hall quests monster hunter gamified teams gamebin game bin steam lists curate profile youtube video overflow' },
-    { label: 'Social',        color: '#38bdf8', ids: ['vibecheck','charactersheet','parla','playbook','tubestack'], keywords: 'social interviews scoring vibe check behavioral personality export character sheet know parla slang latin american regional language playbook career advice tech job hunting bilingual english spanish tubestack youtube channels discovery engineers match community' },
+    { label: 'Social',        color: '#38bdf8', ids: ['vibecheck','hiringpack','charactersheet','parla','playbook','tubestack'], keywords: 'social interviews scoring vibe check behavioral personality export character sheet know parla slang latin american regional language playbook career advice tech job hunting bilingual english spanish tubestack youtube channels discovery engineers match community hiring pack resume bullets follow-up' },
     { label: 'Lifehacks',     color: '#f59e0b', ids: ['buyhacks'], keywords: 'lifehacks community reviews buyhacks buy hacks products shopping' },
+    { label: 'Health',        color: '#059669', ids: ['headmap'], keywords: 'health head pain migraine headache sinus tension eye strain allergy flu tmj map 3d visualization share' },
     { label: 'Platforms',     color: '#64748b', ids: ['github','gitlab','dockerhub'], keywords: 'platforms github gitlab docker hub containers images repos code open source private ci cd pipelines' },
     { label: 'Game',          color: '#e879f9', ids: ['rushq'], keywords: 'game strategy rush q cards corporate' },
   ];
@@ -67,6 +68,7 @@
   /* ── Floating pills (physics) ───────────────────────────────── */
   var W = 0, H = 0;
   var pills = [];
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   var canvasPad = 30; /* extra canvas bleed on each side */
   function resizeCanvas() {
@@ -315,7 +317,7 @@
       ctx.stroke();
     });
 
-    requestAnimationFrame(tick);
+    if (!reducedMotion.matches) requestAnimationFrame(tick);
   }
 
   /* ── Search / filter ────────────────────────────────────────── */

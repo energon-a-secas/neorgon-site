@@ -111,11 +111,21 @@
     animId = requestAnimationFrame(draw);
   }
 
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
   window.addEventListener('resize', () => { if (active) resize(); });
 
   /* Activate matrix */
   function matrixOn() {
     if (active) return;
+    if (reducedMotion.matches) {
+      active = true;
+      canvas.classList.add('active');
+      document.body.classList.add('matrix-bg');
+      document.getElementById('starfield').style.opacity = '0';
+      mCtx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
     active = true;
     collapsing = false;
     resize();

@@ -68,7 +68,7 @@
 
   /* ── Playback ───────────────────────────────────────────────────── */
   function doPlay(videoId) {
-    if (!player || !playerReady) { pendingPlay = true; return; }
+    if (!player || !playerReady) { pendingPlay = true; loadYouTubeApi(); return; }
 
     /* Mute first so browsers allow autoplay, then restore volume */
     player.mute();
@@ -95,6 +95,15 @@
   }
 
   /* ── YouTube IFrame API ─────────────────────────────────────────── */
+  let apiRequested = false;
+  function loadYouTubeApi() {
+    if (apiRequested) return;
+    apiRequested = true;
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+  }
+
   window.onYouTubeIframeAPIReady = function () {
     /* No initial videoId — start empty so the first loadVideoById
        is always a clean user-gesture-triggered action.
