@@ -1,0 +1,13 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="#E326E4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Door frame -->
+    <rect x="16" y="8" width="32" height="48" rx="2"/>
+    <!-- Door panel split -->
+    <line x1="32" y1="8" x2="32" y2="56"/>
+    <!-- Handles -->
+    <circle cx="28" cy="32" r="1.6" fill="#E326E4" stroke="none"/>
+    <circle cx="36" cy="32" r="1.6" fill="#E326E4" stroke="none"/>
+    <!-- Doorman's cap above the threshold -->
+    <path d="M24 6 h16 M26 6 a6 4 0 0 1 12 0"/>
+  </g>
+</svg>

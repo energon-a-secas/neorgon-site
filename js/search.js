@@ -52,7 +52,7 @@
 
   /* ── Curated categories ─────────────────────────────────────── */
   const CATEGORIES = [
-    { label: 'Planning',      color: '#4ade80', ids: ['pathfinder','skillmap'], keywords: 'planning visual canvas export learning roadmap pathfinder skill map strategy' },
+    { label: 'Planning',      color: '#4ade80', ids: ['pathfinder','skillmap','doorman'], keywords: 'planning visual canvas export learning roadmap pathfinder skill map strategy doorman build vs buy duplicate vendor deliverable cost estimate scope tokens engineers reverse engineer doorman fallacy' },
     { label: 'DevOps',        color: '#fbbf24', ids: ['infradrills','snippets','lockdown','runbook'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell infra drills snippets lockdown security scanner endpoints headers incident runbook alert response on-call checklist' },
     { label: 'Data',          color: '#2dd4bf', ids: ['jsonstudio','references'], keywords: 'data editor privacy api search json reference matrix scrambler viewer visualizer' },
     { label: 'Productivity',  color: '#a78bfa', ids: ['slides','ogstudio','resume-forge','stackrank','awesomesites','promptforge'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio resume forge gaming pdf psn steam stack rank priority lists drag drop collaboration awesome sites curated bookmarks external api whiteboard prompt forge ai prompts context pathfinder agent lore' },
@@ -61,6 +61,7 @@
     { label: 'Social',        color: '#38bdf8', ids: ['vibecheck','hiringpack','charactersheet','parla','playbook','tubestack'], keywords: 'social interviews scoring vibe check behavioral personality export character sheet know parla slang latin american regional language playbook career advice tech job hunting bilingual english spanish tubestack youtube channels discovery engineers match community hiring pack resume bullets follow-up' },
     { label: 'Lifehacks',     color: '#f59e0b', ids: ['buyhacks'], keywords: 'lifehacks community reviews buyhacks buy hacks products shopping' },
     { label: 'Health',        color: '#059669', ids: ['headmap'], keywords: 'health head pain migraine headache sinus tension eye strain allergy flu tmj map 3d visualization share' },
+    { label: 'Growth',        color: '#fcd34d', ids: ['mettle'], keywords: 'growth mettle reasoning maturity self assessment introspection virtues courage wisdom tolerance eloquence imagination rank probe character moral compass private' },
     { label: 'Platforms',     color: '#64748b', ids: ['github','gitlab','dockerhub'], keywords: 'platforms github gitlab docker hub containers images repos code open source private ci cd pipelines' },
     { label: 'Game',          color: '#e879f9', ids: ['rushq'], keywords: 'game strategy rush q cards corporate' },
   ];
@@ -586,16 +587,43 @@
     createPills();
     buildConnections();
     tick();
-    /* Fade in all pills together — double rAF ensures opacity:0 is painted before transitioning */
-    pills.forEach(function (p) {
+
+    if (reducedMotion.matches) {
+      pills.forEach(function (p) { p.el.style.opacity = ''; });
+      return;
+    }
+
+    /* Entrance: staggered fade + gentle scale-pop so the pills visibly
+       materialize into the constellation one by one. Scale rides the
+       physics-applied transform via _zoomScale so it never fights the
+       per-frame position updates. */
+    pills.forEach(function (p, i) {
+      var delay = i * 70;
       p.el.style.opacity = '0';
-      p.el.style.transition = 'opacity .4s ease';
+      p.el.style.transition = 'opacity .5s ease ' + delay + 'ms';
+      p._zoomScale = 0.55;
+
+      var start = null;
+      var duration = 480;
+      function pop(now) {
+        if (start === null) start = now;
+        var t = (now - start - delay) / duration;
+        if (t < 0) { requestAnimationFrame(pop); return; }
+        if (t >= 1) {
+          p._zoomScale = 1;
+          p.el.style.transition = '';
+          return;
+        }
+        p._zoomScale = 0.55 + 0.45 * (1 - Math.pow(1 - t, 3));
+        requestAnimationFrame(pop);
+      }
+      requestAnimationFrame(pop);
     });
+
+    /* Double rAF ensures opacity:0 is painted before transitioning */
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
-        pills.forEach(function (p) {
-          p.el.style.opacity = '';
-        });
+        pills.forEach(function (p) { p.el.style.opacity = ''; });
       });
     });
   }

@@ -1,0 +1,10 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="#E326E4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Shield: mettle / temper tested under pressure -->
+    <path d="M32 6 L52 13 V30 C52 43 43 52 32 58 C21 52 12 43 12 30 V13 Z"/>
+    <!-- Pentagon: the five virtue axes -->
+    <polygon points="32,18 43,26 39,39 25,39 21,26"/>
+    <!-- Center point: the self -->
+    <circle cx="32" cy="31" r="2.5" fill="#E326E4" stroke="none"/>
+  </g>
+</svg>
