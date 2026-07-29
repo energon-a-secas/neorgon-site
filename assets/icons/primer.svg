@@ -1,0 +1,12 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="#E326E4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Open book: learning by doing -->
+    <path d="M32 18 C26 13 18 13 12 15 V47 C18 45 26 45 32 50"/>
+    <path d="M32 18 C38 13 46 13 52 15 V47 C46 45 38 45 32 50"/>
+    <line x1="32" y1="18" x2="32" y2="50"/>
+    <!-- Spark / node: the ML idea rising off the page -->
+    <circle cx="44" cy="24" r="3" fill="#E326E4" stroke="none"/>
+    <circle cx="52" cy="12" r="2" fill="#E326E4" stroke="none"/>
+    <line x1="44" y1="24" x2="52" y2="12"/>
+  </g>
+</svg>
