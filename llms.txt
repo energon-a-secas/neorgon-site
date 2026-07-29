@@ -1,0 +1,55 @@
+# Neorgon
+
+> Neorgon is a suite of free, no-signup, browser-based tools for software engineers, engineering managers, and remote teams. Every tool runs client-side (most keep data in your browser via localStorage), is fast, and is built to a shared design system. Hub: https://neorgon.com/
+
+Neorgon tools cover planning and strategy, developer utilities, hiring and interviews, team rituals, security, learning, and a few games. Each tool lives on its own subdomain of neorgon.com.
+
+## Tools
+
+- [Agent Lore](https://agentlore.neorgon.com/): AI agent tutorial hub for Claude and Cursor workflows
+- [Autopilot](https://autopilot.neorgon.com/): Visual idle-schedule builder, generates macOS shell commands
+- [Awesome Sites](https://awesomesites.neorgon.com/): Curated external sites with labeled lists; JSON API feeds featured cards on the hub
+- [BriefCard](https://briefcard.neorgon.com/): Customizable battle card builder with game icons, resizable sections, and PNG export
+- [BuyHacks](https://buyhacks.neorgon.com/): Curated product showcase with community votes and life-hack tips
+- [CardForge](https://cardforge.neorgon.com/): Drag-and-drop card designer for the Rush Q game with live preview and cards.json export
+- [Character Sheet](https://charactersheet.neorgon.com/): RPG-style personality interview + card export
+- [Client Says](https://clientsays.neorgon.com/): Timezone converter and jargon translator
+- [Decision Wheel](https://decisionwheel.neorgon.com/): Customizable decision wheel
+- [Doorman](https://doorman.neorgon.com/): Build-vs-buy scoper — estimate the real cost to duplicate a vendor deliverable and price the invisible value a naive estimate skips
+- [Emoji Archive](https://emojis.neorgon.com/): Searchable Slack emoji archive
+- [Failsafe](https://failsafe.neorgon.com/): Build personal emergency protocols with encrypted export and shareable URLs
+- [FitProfile](https://fitprofile.neorgon.com/): Track measurements, brand sizes, and style preferences with shareable URLs
+- [GameBin](https://gamebin.neorgon.com/): Curate and share visual game lists with Steam integration, custom profiles, and community sharing
+- [Guild Hall](https://guildhall.neorgon.com/): Monster Hunter-inspired quest board with ranks, badges, and hunter cards
+- [HeadMap](https://headmap.neorgon.com/): Map head pain on an interactive 3D head — intensity, depth, notes, local episode diary, JSON export, fully private
+- [Hiring Pack](https://hiringpack.neorgon.com/): Interview kits and hiring resources for engineering managers
+- [Incident Runbook](https://runbook.neorgon.com/): Quick-reference incident response runbooks for on-call engineers
+- [Infra Drills](https://infradrills.neorgon.com/): Local AWS, K8s, GitLab CI break-fix challenges
+- [JSON Studio](https://jsonstudio.neorgon.com/): Visual drag-and-drop JSON block editor
+- [Loadout](https://loadout.neorgon.com/): RPG-styled team meeting-load planner — drag people onto weekly meeting blocks and spot overload before it happens
+- [Lockdown](https://lockdown.neorgon.com/): Site security scanner with endpoint discovery and hardening tips
+- [Meme Vault](https://memes.neorgon.com/): Browse, vote, and upload memes
+- [Mettle](https://mettle.neorgon.com/): Reasoning maturity probe — chained failure-and-recovery questions score thinking depth across five virtues, fully local
+- [OG Studio](https://ogstudio.neorgon.com/): Generate 1200x630 social preview images for all Neorgon tools
+- [Parla](https://parla.neorgon.com/): Latin American slang translator with visual word mapping
+- [Pathfinder](https://pathfinder.neorgon.com/): Visual strategy canvas with gap detection and AI prompt export
+- [Playbook](https://playbook.neorgon.com/): Career advice for people in tech, bilingual ES/EN with series navigation
+- [Presentation Sage](https://slides.neorgon.com/): YAML-driven slide editor with PPTX/HTML/Marp export
+- [Primer](https://primer.neorgon.com/): Learn ML, LLMs, and data insights by building small local projects with tested copy-paste code, then scale to the pro stack
+- [Prompt Forge](https://promptforge.neorgon.com/): Prompt engineering workspace and reusable prompt library
+- [Questline](https://questline.neorgon.com/): Operating model as a NieR-style game console with command-palette search and chapter flowchart
+- [Reference Matrix](https://references.neorgon.com/): Enerbot Slack bot references, live regex, JSON API
+- [Resume Forge](https://resume.neorgon.com/): Gaming-inspired resume builder with PSN/Steam stats and PDF export
+- [SafeGuard](https://safeguard.neorgon.com/): Security hardening guides for devices and accounts, bilingual EN/ES
+- [Sitrep](https://sitrep.neorgon.com/): Santiago de Chile situation board — live earthquakes, weather, air quality, Metro status, and official alerts on one tactical board
+- [Skill Map](https://skillmap.neorgon.com/): Visual skill tree and learning path builder
+- [Snippets](https://snippets.neorgon.com/): Curated shell commands and code snippets, search and copy
+- [Stack Rank](https://stackrank.neorgon.com/): Drag-and-drop shared priority lists with URL sharing and collaborative editing
+- [Team Play](https://teamplay.neorgon.com/): Curated games and activities for team building and retros
+- [TubeStack](https://tubestack.neorgon.com/): YouTube channel discovery for engineers — curate stacks, browse peers, match scores
+- [UI Anatomy](https://anatomy.neorgon.com/): Interactive wireframe simulator for learning UI component names
+- [Vibe Check](https://interviews.neorgon.com/): Behavioral interview scorecard with Core Five archetype matching
+
+## About
+
+- [Neorgon hub](https://neorgon.com/): Browse and launch every tool from one page.
