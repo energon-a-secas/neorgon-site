@@ -21,7 +21,7 @@ Neorgon tools cover planning and strategy, developer utilities, hiring and inter
 - [FitProfile](https://fitprofile.neorgon.com/): Track measurements, brand sizes, and style preferences with shareable URLs
 - [GameBin](https://gamebin.neorgon.com/): Curate and share visual game lists with Steam integration, custom profiles, and community sharing
 - [Guild Hall](https://guildhall.neorgon.com/): Monster Hunter-inspired quest board with ranks, badges, and hunter cards
-- [HeadMap](https://headmap.neorgon.com/): Map head pain on an interactive 3D head — intensity, depth, notes, local episode diary, JSON export, fully private
+- [HeadPain](https://headpain.neorgon.com/): Map head pain on an interactive 3D head — intensity, depth, notes, local episode diary, JSON export, fully private
 - [Hiring Pack](https://hiringpack.neorgon.com/): Interview kits and hiring resources for engineering managers
 - [Incident Runbook](https://runbook.neorgon.com/): Quick-reference incident response runbooks for on-call engineers
 - [Infra Drills](https://infradrills.neorgon.com/): Local AWS, K8s, GitLab CI break-fix challenges
@@ -38,16 +38,16 @@ Neorgon tools cover planning and strategy, developer utilities, hiring and inter
 - [Primer](https://primer.neorgon.com/): Learn ML, LLMs, and data insights by building small local projects with tested copy-paste code, then scale to the pro stack
 - [Prompt Forge](https://promptforge.neorgon.com/): Prompt engineering workspace and reusable prompt library
 - [Questline](https://questline.neorgon.com/): Operating model as a NieR-style game console with command-palette search and chapter flowchart
+- [Radar](https://radar.neorgon.com/): Santiago de Chile situation board — live earthquakes, weather, air quality, Metro status, and official alerts on one tactical board
 - [Reference Matrix](https://references.neorgon.com/): Enerbot Slack bot references, live regex, JSON API
 - [Resume Forge](https://resume.neorgon.com/): Gaming-inspired resume builder with PSN/Steam stats and PDF export
 - [SafeGuard](https://safeguard.neorgon.com/): Security hardening guides for devices and accounts, bilingual EN/ES
-- [Sitrep](https://sitrep.neorgon.com/): Santiago de Chile situation board — live earthquakes, weather, air quality, Metro status, and official alerts on one tactical board
 - [Skill Map](https://skillmap.neorgon.com/): Visual skill tree and learning path builder
 - [Snippets](https://snippets.neorgon.com/): Curated shell commands and code snippets, search and copy
 - [Stack Rank](https://stackrank.neorgon.com/): Drag-and-drop shared priority lists with URL sharing and collaborative editing
 - [Team Play](https://teamplay.neorgon.com/): Curated games and activities for team building and retros
 - [TubeStack](https://tubestack.neorgon.com/): YouTube channel discovery for engineers — curate stacks, browse peers, match scores
-- [UI Anatomy](https://anatomy.neorgon.com/): Interactive wireframe simulator for learning UI component names
+- [UI Anatomy](https://uianatomy.neorgon.com/): Interactive wireframe simulator for learning UI component names
 - [Vibe Check](https://interviews.neorgon.com/): Behavioral interview scorecard with Core Five archetype matching
 
 ## About
