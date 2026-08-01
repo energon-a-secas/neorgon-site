@@ -9,7 +9,7 @@ Neorgon tools cover planning and strategy, developer utilities, hiring and inter
 - [Agent Lore](https://agentlore.neorgon.com/): AI agent tutorial hub for Claude and Cursor workflows
 - [Autopilot](https://autopilot.neorgon.com/): Visual idle-schedule builder, generates macOS shell commands
 - [Awesome Sites](https://awesomesites.neorgon.com/): Curated external sites with labeled lists; JSON API feeds featured cards on the hub
-- [BriefCard](https://briefcard.neorgon.com/): Customizable battle card builder with game icons, resizable sections, and PNG export
+- [BattleCard](https://battlecard.neorgon.com/): Sales battle card builder — internal cheat sheets that help sales teams win deals; templates, branding, JSON import/export, share links with game icons, resizable sections, and PNG export
 - [BuyHacks](https://buyhacks.neorgon.com/): Curated product showcase with community votes and life-hack tips
 - [CardForge](https://cardforge.neorgon.com/): Drag-and-drop card designer for the Rush Q game with live preview and cards.json export
 - [Character Sheet](https://charactersheet.neorgon.com/): RPG-style personality interview + card export
