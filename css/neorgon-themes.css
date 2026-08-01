@@ -1,0 +1,53 @@
+/* ══════════════════════════════════════════════════════════════
+   Neorgon Header Kit — themes.css
+   Theme = pure token overrides applied via <html data-theme="…">.
+   Themes are HEADER-SCOPED on purpose: page backgrounds and effects
+   stay site-owned. To add a theme: one block here + one entry in
+   the THEMES array in header.js.
+   ══════════════════════════════════════════════════════════════ */
+
+/* default — magenta nebula. No block needed; :root defaults in
+   header.css ARE the default theme. Attribute is removed when
+   default is active. */
+
+[data-theme="christmas"] {
+  --header-bg-start: #7f1d1d;
+  --header-bg-mid: #14532d;
+  --header-bg-end: #052e16;
+  --header-glass: rgba(5, 46, 22, .45);
+  --header-accent: #fbbf24;
+  --header-border: rgba(251, 191, 36, .25);
+  --header-border-strong: rgba(251, 191, 36, .45);
+  --header-text: #fefce8;
+  --header-text-dim: rgba(254, 252, 232, .65);
+  --header-menu-bg: #14210f;
+  --header-menu-hover: rgba(251, 191, 36, .12);
+}
+
+[data-theme="matrix"] {
+  --header-bg-start: #000000;
+  --header-bg-mid: #001a00;
+  --header-bg-end: #000000;
+  --header-glass: rgba(0, 12, 0, .45);
+  --header-accent: #00ff41;
+  --header-border: rgba(0, 255, 65, .18);
+  --header-border-strong: rgba(0, 255, 65, .4);
+  --header-text: #ccffcc;
+  --header-text-dim: rgba(0, 255, 65, .6);
+  --header-menu-bg: #020a02;
+  --header-menu-hover: rgba(0, 255, 65, .1);
+}
+
+[data-theme="danger"] {
+  --header-bg-start: #450a0a;
+  --header-bg-mid: #7f1d1d;
+  --header-bg-end: #0c0a0a;
+  --header-glass: rgba(69, 10, 10, .45);
+  --header-accent: #f59e0b;
+  --header-border: rgba(245, 158, 11, .25);
+  --header-border-strong: rgba(245, 158, 11, .45);
+  --header-text: #fef2f2;
+  --header-text-dim: rgba(254, 226, 226, .6);
+  --header-menu-bg: #1a0505;
+  --header-menu-hover: rgba(245, 158, 11, .12);
+}

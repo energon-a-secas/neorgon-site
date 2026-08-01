@@ -79,34 +79,16 @@ body {
   flex-direction: column;
 }
 
-/* ── Header ──────────────────────────────────────────────────────────── */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  padding: 14px var(--layout-gutter);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,.06);
-  background: rgba(0,9,18,.55);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-}
-.logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-.logo-img {
-  height: 36px;
-  filter: brightness(0) invert(1);
-  opacity: .9;
-  transition: transform 0.3s var(--ease-snap), opacity .2s;
-}
-.logo-wrap:hover .logo-img { transform: scale(1.1) rotate(-6deg); opacity: 1; }
-.logo-name {
+/* ── Header ────────────────────────────────────────────────────────────
+   Bar, logo, and mobile rules come from the Neorgon Header Kit
+   (css/neorgon-header.css, hub mode). Below: hub-specific bits. */
+.header-logo h1 {
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: .04em;
-  color: var(--text-primary);
 }
+.header-bar .header-logo-img { opacity: .9; }
+.header-bar .header-logo-img:hover { opacity: 1; }
 
 .header-links { display: flex; gap: 8px; align-items: center; }
 .header-link {
@@ -1137,7 +1119,6 @@ body.warp-active .orb {
 }
 
 @media (max-width: 600px) {
-  .site-header { padding: 12px 18px; }
   .hero { padding: 40px 18px 26px; }
   .sites-section { padding: 0 18px clamp(44px, 12vw, 56px); }
   .sites-grid { grid-template-columns: 1fr; }
@@ -1146,8 +1127,31 @@ body.warp-active .orb {
   .hero-search-wrap { margin-top: 18px; }
   .hero-search { font-size: .88rem; padding: 12px 40px; }
   .search-hint { display: none; }
-  .constellation-box { height: clamp(100px, 22vw, 160px); }
-  .tag-pill { font-size: .6rem; padding: 4px 10px; }
+
+  /* Pills: physics constellation → scrollable row on mobile.
+     Wider side padding (24px) + edge fades invite the side-scroll;
+     transform:none !important beats the JS physics inline styles. */
+  .constellation-box {
+    height: auto;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin: 12px -18px 0;
+    padding: 6px 24px 12px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(90deg, transparent, #000 20px, #000 calc(100% - 20px), transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 20px, #000 calc(100% - 20px), transparent);
+  }
+  .constellation-box::-webkit-scrollbar { display: none; }
+  .constellation-canvas { display: none; }
+  .tag-pill {
+    position: static;
+    transform: none !important;
+    flex-shrink: 0;
+    font-size: .65rem;
+    padding: 6px 14px;
+  }
 
   /* Settings panel — full width on mobile */
   .settings-panel { left: 12px; right: 12px; width: auto; }
@@ -1673,9 +1677,9 @@ body.matrix-bg .hero-section { text-shadow: 0 0 20px rgba(0,0,0,.8); }
 body.intervention-bg { color: #1a1a1a; background: #ededea; }
 
 /* Header */
-body.intervention-bg .site-header { border-bottom-color: rgba(0,0,0,.08); background: rgba(237,237,234,.6); }
-body.intervention-bg .logo-img { filter: brightness(0); opacity: .8; }
-body.intervention-bg .logo-name { color: #111; }
+body.intervention-bg .header-bar { --header-glass: rgba(237,237,234,.6); border-bottom-color: rgba(0,0,0,.08); }
+body.intervention-bg .header-logo-img { filter: brightness(0); opacity: .8; }
+body.intervention-bg .header-logo h1 { color: #111; }
 body.intervention-bg .header-link { color: rgba(0,0,0,.6); }
 body.intervention-bg .header-link:hover { color: #000; border-color: rgba(0,0,0,.15); background: rgba(0,0,0,.05); }
 body.intervention-bg .hero-badge { background: rgba(0,0,0,.06); color: #333; border-color: rgba(0,0,0,.1); }
@@ -1766,9 +1770,9 @@ body.intervention-bg .card-name { color: #111; }
 
 body.evangelion-bg { color: #d4c0ff; background: #0a001a; }
 
-body.evangelion-bg .site-header { border-bottom-color: rgba(128,0,255,.15); background: rgba(10,0,26,.6); }
-body.evangelion-bg .logo-img { filter: brightness(0.8) hue-rotate(270deg); }
-body.evangelion-bg .logo-name { color: #d4c0ff; }
+body.evangelion-bg .header-bar { --header-glass: rgba(10,0,26,.6); border-bottom-color: rgba(128,0,255,.15); }
+body.evangelion-bg .header-logo-img { filter: brightness(0.8) hue-rotate(270deg); }
+body.evangelion-bg .header-logo h1 { color: #d4c0ff; }
 body.evangelion-bg .header-link { color: rgba(180,140,255,.7); }
 body.evangelion-bg .header-link:hover { color: #c084fc; border-color: rgba(128,0,255,.3); background: rgba(128,0,255,.08); }
 

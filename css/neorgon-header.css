@@ -1,0 +1,279 @@
+/* ══════════════════════════════════════════════════════════════
+   Neorgon Header Kit — header.css
+   Canonical source: packages/neorgon-ui/header/
+   Vendored per site as css/neorgon-header.css — do not edit copies.
+   Live CDN: https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev/v1.0.0/header/header.css
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Geometry */
+  --header-h: 68px;
+  --header-h-app: 56px;
+  --header-control-h: 40px; /* every header control (buttons, ⋯, palette, home) shares this height */
+
+  /* Palette — themes override these (see themes.css) */
+  --header-bg-start: #B015B0;
+  --header-bg-mid: #3D0080;
+  --header-bg-end: #040714;
+  --header-bg: linear-gradient(in oklch 135deg, var(--header-bg-start) 0%, var(--header-bg-mid) 50%, var(--header-bg-end) 100%);
+  --header-glass: rgba(0, 9, 18, .35);
+  --header-text: #f9f9f9;
+  --header-text-dim: rgba(255, 255, 255, .72);
+  --header-border: rgba(255, 255, 255, .07);
+  --header-border-strong: rgba(255, 255, 255, .22);
+  --header-accent: #e879f9;
+  --header-menu-bg: #10142a;
+  --header-menu-hover: rgba(255, 255, 255, .08);
+}
+
+/* ── Bar ─────────────────────────────────────────────────────── */
+.header-bar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky-header, 200);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  height: var(--header-h);
+  padding: 0 var(--space-6, 24px);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  color: var(--header-text);
+}
+
+/* Mode: hub — transparent cozy glass, no gradient */
+.header-bar[data-header-mode="hub"] {
+  background: var(--header-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Mode: app — slim, auto-hides on scroll down (JS toggles .header-hidden) */
+.header-bar[data-header-mode="app"] {
+  height: var(--header-h-app);
+  transition: transform .25s ease;
+}
+.header-bar[data-header-mode="app"].header-hidden {
+  transform: translateY(-100%);
+}
+
+/* ── Logo block ──────────────────────────────────────────────── */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+.header-logo-img {
+  height: 36px;
+  width: auto;
+  flex-shrink: 0;
+  display: block;
+  filter: brightness(0) invert(1);
+  transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+}
+.header-logo-img:hover { transform: scale(1.14) rotate(-9deg); }
+
+.header-title-link { text-decoration: none; color: inherit; min-width: 0; }
+.header-logo h1 {
+  font-size: 1.2em;
+  font-weight: 600;
+  letter-spacing: .5px;
+  color: var(--header-text);
+  white-space: nowrap;
+}
+.header-subtitle {
+  font-size: .82em;
+  color: var(--header-text-dim);
+  font-weight: 500;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+
+/* ── Right cluster: actions + theme toggle + home ────────────── */
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  min-width: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  position: relative; /* overflow .header-menu anchors here */
+  min-width: 0;
+}
+.header-actions .btn,
+.header-actions .nav-link {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+/* Uniform control row: direct action children match the icon buttons'
+   height so Share / ⋯ / palette / home read as one correlative strip.
+   (Direct-child only — items moved into the ⋯ menu keep menu styling.) */
+.header-actions > .btn,
+.header-actions > .nav-link,
+.header-actions > button,
+.header-actions > a {
+  height: var(--header-control-h);
+  min-height: 0; /* neutralize site-level control minimums (e.g. --control-height) */
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ── Theme toggle ────────────────────────────────────────────── */
+.header-theme { position: relative; display: flex; }
+.header-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--header-control-h);
+  height: var(--header-control-h);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--header-text-dim);
+  cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.header-theme-toggle:hover,
+.header-theme-toggle[aria-expanded="true"] {
+  color: var(--header-text);
+  border-color: var(--header-border-strong);
+  background: var(--header-menu-hover);
+}
+.header-theme-toggle svg { width: 20px; height: 20px; display: block; }
+[data-theme]:not([data-theme=""]) .header-theme-toggle { color: var(--header-accent); }
+
+/* ── Home icon ───────────────────────────────────────────────── */
+.header-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--header-control-h);
+  box-sizing: border-box;
+  padding: 5px;
+  border-radius: 6px;
+  color: var(--header-text-dim);
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: color .2s, background .2s;
+}
+.header-home:hover { color: var(--header-text); background: var(--header-menu-hover); }
+.header-home svg { width: 30px; height: 30px; display: block; }
+
+/* ── Overflow toggle (⋯) — injected by header.js ─────────────── */
+.header-overflow { position: relative; display: flex; }
+.header-overflow[hidden] { display: none; }
+.header-overflow-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: var(--header-control-h);
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid var(--header-border-strong);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--header-text);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.header-overflow-toggle:hover,
+.header-overflow-toggle[aria-expanded="true"] { background: var(--header-menu-hover); }
+
+/* ── Dropdown menu (overflow + theme + Export▾ groups) ─────────
+   Rules: parent gets position:relative; one open at a time; Esc /
+   outside click closes; arrow keys navigate (all handled by header.js) */
+.header-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  max-height: min(60vh, 320px);
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--header-menu-bg);
+  border: 1px solid var(--header-border-strong);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
+  display: none;
+  z-index: 1;
+}
+.header-menu.open { display: block; }
+
+.header-menu .btn,
+.header-menu .nav-link,
+.header-menu button,
+.header-menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 0;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--header-text);
+  font: inherit;
+  font-size: .875rem;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.header-menu .btn:hover,
+.header-menu .nav-link:hover,
+.header-menu button:hover,
+.header-menu a:hover,
+.header-menu [role="menuitem"]:focus-visible {
+  background: var(--header-menu-hover);
+  outline: none;
+}
+.header-menu .badge,
+.header-menu [data-badge] { margin-left: auto; }
+
+/* Theme menu specifics */
+.header-theme-menu .theme-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, .25);
+}
+.header-theme-menu [aria-checked="true"]::after {
+  content: "✓";
+  margin-left: auto;
+  color: var(--header-accent);
+}
+
+/* ── Mobile (≤700px): shrink, hide subtitle, JS moves non-kept
+   action buttons into the ⋯ overflow menu ────────────────────── */
+@media (max-width: 700px) {
+  :root { --header-control-h: 36px; }
+  .header-bar { padding: 0 var(--space-4, 16px); gap: var(--space-2, 8px); }
+  .header-subtitle { display: none; }
+  .header-logo h1 { font-size: 1em; }
+  .header-logo-img { height: 28px; }
+  .header-home svg { width: 26px; height: 26px; }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .header-bar[data-header-mode="app"] { transition: none; }
+  .header-logo-img { transition: none; }
+}
