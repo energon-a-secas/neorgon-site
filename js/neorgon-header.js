@@ -224,8 +224,14 @@
     overflow.appendChild(menu);
     actions.appendChild(overflow);
 
+    /* Movable = any direct child not marked data-keep-mobile. Covers plain
+       buttons/links and grouped controls (.header-btn-group divs, navs) —
+       groups travel into the menu as a unit so their listeners survive. */
     var movable = Array.prototype.filter.call(actions.children, function (el) {
-      return (el.matches('button, a')) && !el.hasAttribute('data-keep-mobile');
+      return el !== overflow &&
+             !el.hasAttribute('data-keep-mobile') &&
+             !el.classList.contains('header-theme') &&
+             el.matches('button, a, div, nav');
     });
 
     return { actions: actions, overflow: overflow, menu: menu, movable: movable };

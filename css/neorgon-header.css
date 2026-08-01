@@ -247,6 +247,29 @@
 .header-menu .badge,
 .header-menu [data-badge] { margin-left: auto; }
 
+/* Grouped controls (.header-btn-group divs / navs) moved into the ⋯ menu
+   render as stacked rows; group chrome (borders, padding, flex) is stripped. */
+.header-menu > div,
+.header-menu > nav {
+  display: block;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.header-menu > div + div,
+.header-menu > nav + nav {
+  border-top: 1px solid var(--header-border);
+  margin-top: 4px;
+  padding-top: 4px;
+}
+.header-menu > div button,
+.header-menu > div a,
+.header-menu > nav button,
+.header-menu > nav a {
+  width: 100%;
+  margin: 0;
+}
+
 /* Theme menu specifics */
 .header-theme-menu .theme-swatch {
   width: 14px;
