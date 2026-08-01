@@ -10,7 +10,7 @@
   if (window.__neoHeaderInit) return;
   window.__neoHeaderInit = true;
 
-  var CDN = 'https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev/v1.0.0';
+  var CDN = 'https://cdn.neorgon.org/v1.0.0';
   var MOBILE = '(max-width: 700px)';
   var COOKIE = 'neo_theme';
 
