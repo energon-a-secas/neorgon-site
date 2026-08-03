@@ -43,7 +43,7 @@ Neorgon tools cover planning and strategy, developer utilities, hiring and inter
 - [Resume Forge](https://resume.neorgon.com/): Gaming-inspired resume builder with PSN/Steam stats and PDF export
 - [SafeGuard](https://safeguard.neorgon.com/): Security hardening guides for devices and accounts, bilingual EN/ES
 - [Skill Map](https://skillmap.neorgon.com/): Visual skill tree and learning path builder
-- [Snippets](https://snippets.neorgon.com/): Curated shell commands and code snippets, search and copy
+- [Snippets](https://snippets.neorgon.com/): 255 curated terminal commands for bash, git, macOS and Windows — search, pin and copy
 - [Stack Rank](https://stackrank.neorgon.com/): Drag-and-drop shared priority lists with URL sharing and collaborative editing
 - [Team Play](https://teamplay.neorgon.com/): Curated games and activities for team building and retros
 - [TubeStack](https://tubestack.neorgon.com/): YouTube channel discovery for engineers — curate stacks, browse peers, match scores

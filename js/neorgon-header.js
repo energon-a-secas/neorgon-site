@@ -296,9 +296,12 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
-  /* Public API — sites and the hub can hook in (e.g. sync page effects) */
+  /* Public API — sites and the hub can hook in (e.g. sync page effects).
+     `list` carries labels/swatches so the footer kit can render its own
+     theme menu from this one registry instead of copying it. */
   window.NeoHeader = {
     themes: THEMES.map(function (t) { return t.id; }),
+    list: THEMES,
     getTheme: currentTheme,
     setTheme: function (name) { applyTheme(name); }
   };

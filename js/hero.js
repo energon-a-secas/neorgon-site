@@ -3,7 +3,7 @@
   const cursor = document.getElementById('typingCursor');
   if (!el) return;
 
-  const text = 'real problems';
+  const text = 'specific problems';
   let i = 0;
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
