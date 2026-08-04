@@ -19,6 +19,8 @@
     { id: 'christmas', label: 'Christmas', swatch: '#16a34a' },
     { id: 'new-year',  label: 'New Year',  swatch: '#fcd34d' },
     { id: 'halloween', label: 'Halloween', swatch: '#f97316' },
+    { id: 'rain',      label: 'Rain',      swatch: '#7dd3fc' },
+    { id: 'sakura',    label: 'Sakura',    swatch: '#fbcfe8' },
     { id: 'matrix',    label: 'Matrix',    swatch: '#00ff41' },
     { id: 'danger',    label: 'Danger',    swatch: '#dc2626' }
   ];

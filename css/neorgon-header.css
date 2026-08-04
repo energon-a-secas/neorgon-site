@@ -15,6 +15,9 @@
   --header-bg-start: #B015B0;
   --header-bg-mid: #3D0080;
   --header-bg-end: #040714;
+  /* Kept here for anything that references the composed gradient, but the
+     authoritative copy is re-declared on .header-bar below — see the note
+     there before changing either. */
   --header-bg: linear-gradient(in oklch 135deg, var(--header-bg-start) 0%, var(--header-bg-mid) 50%, var(--header-bg-end) 100%);
   --header-glass: rgba(0, 9, 18, .35);
   --header-text: #f9f9f9;
@@ -64,6 +67,157 @@ html:not([data-theme]) {
   --header-icon-color: rgba(255, 255, 255, .78);
 }
 
+/* ══════════════════════════════════════════════════════════════
+   SKINS — site-level identity, opt-in per site
+   ────────────────────────────────────────────────────────────
+   A skin replaces the default magenta gradient for ONE site whose
+   own palette clashes with it. Set it in the site's markup:
+
+     <header class="header-bar" data-header-mode="content"
+             data-header-skin="brass">
+
+   This is NOT the theme system. Precedence, by design:
+
+     visitor choice (?theme= / cookie)  >  season (CDN)  >  skin  >  kit default
+
+   Two cascade facts make that ordering work, and both are easy to
+   get wrong:
+
+   1. A declaration ON .header-bar beats a value INHERITED from
+      <html>, whatever the specificity. Visitor themes declare on
+      <html>, so every skin is scoped `html:not([data-theme])` —
+      the moment a visitor picks a theme, all skins stop matching.
+   2. Season rules in season.css carry a matching
+      `[data-header-skin]` selector one step more specific than the
+      skin rules below, so an armed season still flips skinned
+      sites. Do not raise the specificity here without raising it
+      there too, or skinned sites will silently sit out the season.
+
+   Each skin re-tunes the edge ramp and control border for its own
+   surface — those defaults are calibrated to the magenta gradient
+   and are wrong on a black bar.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ink — near-black neutral. The default choice for a site whose
+   palette the magenta gradient fights. */
+html:not([data-theme]) .header-bar[data-header-skin="ink"] {
+  --header-bg-start: #14161c;
+  --header-bg-mid: #0b0d12;
+  --header-bg-end: #050609;
+  --header-glass: rgba(10, 12, 16, .55);
+  --header-accent: #cbd5e1;
+  --header-text: #f4f4f5;
+  --header-text-dim: rgba(255, 255, 255, .78);
+  --header-icon-color: rgba(255, 255, 255, .74);
+  --header-border: rgba(255, 255, 255, .09);
+  --header-border-strong: rgba(255, 255, 255, .24);
+  --header-control-border: rgba(255, 255, 255, .44);
+  --header-menu-bg: #14161c;
+  --header-menu-hover: rgba(255, 255, 255, .09);
+  /* A near-black bar sits close to the page in luminance at BOTH ends,
+     so the edge has to be brighter than the gradient's ramp. */
+  --header-edge-from: rgba(255, 255, 255, .26);
+  --header-edge-to: rgba(255, 255, 255, .26);
+}
+
+/* carbon — flat true black, no gradient. The most restrained option;
+   the hairline does all the separating. */
+html:not([data-theme]) .header-bar[data-header-skin="carbon"] {
+  --header-bg-start: #08080a;
+  --header-bg-mid: #08080a;
+  --header-bg-end: #08080a;
+  --header-glass: rgba(0, 0, 0, .6);
+  --header-accent: #e5e5e5;
+  --header-text: #fafafa;
+  --header-text-dim: rgba(255, 255, 255, .76);
+  --header-icon-color: rgba(255, 255, 255, .72);
+  --header-border: rgba(255, 255, 255, .12);
+  --header-border-strong: rgba(255, 255, 255, .26);
+  --header-control-border: rgba(255, 255, 255, .46);
+  --header-menu-bg: #101012;
+  --header-menu-hover: rgba(255, 255, 255, .1);
+  --header-edge-from: rgba(255, 255, 255, .3);
+  --header-edge-to: rgba(255, 255, 255, .3);
+}
+
+/* brass — warm dark, tuned to incident-runbook's #b8935f / #d8b280
+   accents and its #040714 page background. */
+html:not([data-theme]) .header-bar[data-header-skin="brass"] {
+  --header-bg-start: #2a2114;
+  --header-bg-mid: #16120c;
+  --header-bg-end: #040714;
+  --header-glass: rgba(22, 18, 12, .5);
+  --header-accent: #d8b280;
+  --header-text: #f7f3ea;
+  --header-text-dim: rgba(247, 243, 234, .8);
+  --header-icon-color: rgba(216, 178, 128, .86);
+  --header-border: rgba(216, 178, 128, .2);
+  --header-border-strong: rgba(216, 178, 128, .38);
+  --header-control-border: rgba(216, 178, 128, .55);
+  --header-menu-bg: #17130d;
+  --header-menu-hover: rgba(216, 178, 128, .14);
+  --header-edge-from: rgba(216, 178, 128, .22);
+  --header-edge-to: rgba(216, 178, 128, .34);
+}
+
+/* slate — cool blue-grey. Neutral without going fully black. */
+html:not([data-theme]) .header-bar[data-header-skin="slate"] {
+  --header-bg-start: #33415a;
+  --header-bg-mid: #1e293b;
+  --header-bg-end: #0b1120;
+  --header-glass: rgba(15, 23, 42, .5);
+  --header-accent: #7dd3fc;
+  --header-text: #f1f5f9;
+  --header-text-dim: rgba(241, 245, 249, .8);
+  --header-icon-color: rgba(226, 232, 240, .78);
+  --header-border: rgba(148, 163, 184, .2);
+  --header-border-strong: rgba(148, 163, 184, .36);
+  --header-control-border: rgba(203, 213, 225, .5);
+  --header-menu-bg: #16202f;
+  --header-menu-hover: rgba(148, 163, 184, .16);
+  --header-edge-from: rgba(148, 163, 184, .18);
+  --header-edge-to: rgba(148, 163, 184, .34);
+}
+
+/* aurora — deep teal into cyan. For data/monitoring surfaces. */
+html:not([data-theme]) .header-bar[data-header-skin="aurora"] {
+  --header-bg-start: #0e7490;
+  --header-bg-mid: #0a3d4d;
+  --header-bg-end: #040714;
+  --header-glass: rgba(8, 51, 68, .5);
+  --header-accent: #67e8f9;
+  --header-text: #ecfeff;
+  --header-text-dim: rgba(236, 254, 255, .82);
+  --header-icon-color: rgba(165, 243, 252, .82);
+  --header-border: rgba(103, 232, 249, .2);
+  --header-border-strong: rgba(103, 232, 249, .36);
+  --header-control-border: rgba(165, 243, 252, .5);
+  --header-menu-bg: #07222c;
+  --header-menu-hover: rgba(103, 232, 249, .14);
+  --header-edge-from: rgba(103, 232, 249, .2);
+  --header-edge-to: rgba(103, 232, 249, .32);
+}
+
+/* ember — warm amber into rust. For alert/ops surfaces that want
+   warmth without reading as the danger theme. */
+html:not([data-theme]) .header-bar[data-header-skin="ember"] {
+  --header-bg-start: #9a3412;
+  --header-bg-mid: #4a1608;
+  --header-bg-end: #040714;
+  --header-glass: rgba(74, 22, 8, .5);
+  --header-accent: #fbbf24;
+  --header-text: #fff7ed;
+  --header-text-dim: rgba(255, 247, 237, .82);
+  --header-icon-color: rgba(253, 230, 138, .84);
+  --header-border: rgba(251, 191, 36, .2);
+  --header-border-strong: rgba(251, 191, 36, .36);
+  --header-control-border: rgba(253, 230, 138, .5);
+  --header-menu-bg: #23120a;
+  --header-menu-hover: rgba(251, 191, 36, .14);
+  --header-edge-from: rgba(251, 191, 36, .2);
+  --header-edge-to: rgba(251, 191, 36, .32);
+}
+
 /* ── Bar ─────────────────────────────────────────────────────── */
 .header-bar {
   position: sticky;
@@ -74,6 +228,14 @@ html:not([data-theme]) {
   gap: var(--space-3, 12px);
   height: var(--header-h);
   padding: 0 var(--space-6, 24px);
+  /* Re-composed HERE, not only at :root. A custom property's var()
+     references resolve on the element where that property is declared, so a
+     --header-bg built at :root bakes in :root's start/mid/end and ignores any
+     override made further down the tree. Declaring it on .header-bar means
+     skins (and any site override on the bar) only need to set the three
+     stops. Themes still work: they set the stops on <html>, which inherits
+     down to here before this resolves. */
+  --header-bg: linear-gradient(in oklch 135deg, var(--header-bg-start) 0%, var(--header-bg-mid) 50%, var(--header-bg-end) 100%);
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
   color: var(--header-text);
@@ -200,6 +362,33 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
+}
+
+/* Appearance fallback for action buttons.
+   The kit enforces geometry on .header-actions children but never styled
+   them, so a site that uses the canonical .btn / .nav-link classes without
+   defining them renders a raw browser button inside the header
+   (incident-runbook hit exactly this). Wrapped in :where() so the whole
+   rule has ZERO specificity — every site's own .btn/.nav-link styling
+   still wins, and this only shows through where nothing else applies. */
+:where(.header-actions) > :where(.btn, .nav-link, button, a) {
+  padding: 0 12px;
+  border: 1px solid var(--header-border-strong);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--header-text);
+  font: inherit;
+  font-size: .875rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .2s var(--header-ease, ease),
+              border-color .2s var(--header-ease, ease);
+}
+:where(.header-actions) > :where(.btn, .nav-link, button, a):hover {
+  background: var(--header-menu-hover);
+  border-color: var(--header-control-border, var(--header-border-strong));
 }
 
 /* ── Theme toggle ────────────────────────────────────────────── */
