@@ -24,6 +24,44 @@
   --header-accent: #e879f9;
   --header-menu-bg: #10142a;
   --header-menu-hover: rgba(255, 255, 255, .08);
+
+  /* Focus ring — near-white with a whisper of the brand hue so it never
+     reads as a stray browser default. 5.77:1 (bright end) to 17.98:1
+     (dark end) against the bar, 16.54:1 on the menu. Themes may override. */
+  --header-focus: oklch(0.97 0.02 320);
+  --header-focus-w: 2px;
+
+  /* Icon sizing. Two tokens: a filled glyph reads heavier than a stroked
+     one in the same box, so the solid home icon is set smaller to match
+     optically. */
+  --header-icon: 22px;        /* stroked glyphs (palette) */
+  --header-icon-solid: 20px;  /* filled glyphs (home) */
+
+  /* ease-out-quart: fast start, long settle, no overshoot. */
+  --header-ease: cubic-bezier(.22, 1, .36, 1);
+  --header-ease-in: cubic-bezier(.55, 0, 1, .45);
+}
+
+/* Colour judgements about the DEFAULT gradient specifically. Scoped to
+   html:not([data-theme]) because themes.css sets these per theme at the
+   same specificity as :root — a :root override here would silently
+   overwrite all five palettes. Every consumer below pairs them with a
+   var() fallback to the theme's own token. */
+html:not([data-theme]) {
+  /* --header-border-strong (.22) measures 1.91-1.95:1 on the bar, below
+     the 3:1 WCAG 1.4.11 needs for a control boundary. .42 gives 3.73-4.02:1. */
+  --header-control-border: rgba(255, 255, 255, .42);
+
+  /* --header-bg-end (#040714) is identical to the standard page
+     background, so a flat hairline measures 1.14:1 on the right half.
+     The bar's luminance swings 43x left-to-right, so the edge ramps too. */
+  --header-edge-from: rgba(255, 255, 255, .10);
+  --header-edge-to: rgba(255, 255, 255, .34);
+
+  /* .72 measures 4.14:1 at the start of the subtitle span — below AA.
+     Split from the icon colour, which only needs 3:1 as non-text. */
+  --header-text-dim: rgba(255, 255, 255, .82);
+  --header-icon-color: rgba(255, 255, 255, .78);
 }
 
 /* ── Bar ─────────────────────────────────────────────────────── */
@@ -39,6 +77,24 @@
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
   color: var(--header-text);
+  --header-h-cur: var(--header-h);
+}
+
+/* Bottom edge as a ramp, not a flat hairline (see --header-edge-*).
+   Degrades to the theme's flat --header-border where unsupported or
+   where a theme defines no ramp of its own. */
+html:not([data-theme]) .header-bar {
+  border-image: linear-gradient(
+    to right,
+    var(--header-edge-from, rgba(255, 255, 255, .10)),
+    var(--header-edge-to, rgba(255, 255, 255, .34))
+  ) 1;
+}
+/* Hub is a floating glass plate, not a band welded to the page — the
+   ramp would read as a seam. */
+html:not([data-theme]) .header-bar[data-header-mode="hub"] {
+  border-image: none;
+  border-bottom-color: var(--header-border);
 }
 
 /* Mode: hub — transparent cozy glass, no gradient */
@@ -51,10 +107,14 @@
 /* Mode: app — slim, auto-hides on scroll down (JS toggles .header-hidden) */
 .header-bar[data-header-mode="app"] {
   height: var(--header-h-app);
-  transition: transform .25s ease;
+  --header-h-cur: var(--header-h-app);
+  transition: transform .26s var(--header-ease, ease);
 }
+/* Leaving accelerates away; returning decelerates in. Same budget. */
 .header-bar[data-header-mode="app"].header-hidden {
   transform: translateY(-100%);
+  transition-duration: .2s;
+  transition-timing-function: var(--header-ease-in, ease);
 }
 
 /* ── Logo block ──────────────────────────────────────────────── */
@@ -71,23 +131,39 @@
   flex-shrink: 0;
   display: block;
   filter: brightness(0) invert(1);
-  transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+  transition: transform .28s var(--header-ease, ease);
 }
-.header-logo-img:hover { transform: scale(1.14) rotate(-9deg); }
+.header-logo-img:hover { transform: scale(1.06) rotate(-4deg); }
 
-.header-title-link { text-decoration: none; color: inherit; min-width: 0; }
+/* min-height also fixes a target-size failure: at <=700px the subtitle is
+   hidden and this link collapses to 22px, under the 24px WCAG 2.5.8
+   minimum. The parent centres it, so it grows symmetrically — no shift. */
+.header-title-link {
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--header-control-h);
+}
+/* rem, not em: a shared component must not rescale because a site set its
+   own body font-size. 1.2rem == 19.2px == today's rendered size. */
 .header-logo h1 {
-  font-size: 1.2em;
+  font-size: 1.2rem;
   font-weight: 600;
-  letter-spacing: .5px;
+  line-height: 1.2;
+  letter-spacing: .015em;
   color: var(--header-text);
   white-space: nowrap;
 }
 .header-subtitle {
-  font-size: .82em;
+  font-size: .8125rem;
+  line-height: 1.25;
   color: var(--header-text-dim);
   font-weight: 500;
-  margin-top: 3px;
+  margin-top: 2px;
+  letter-spacing: .005em;
   white-space: nowrap;
 }
 
@@ -135,10 +211,10 @@
   width: var(--header-control-h);
   height: var(--header-control-h);
   padding: 0;
-  border: 1px solid transparent;
-  border-radius: 50%;
+  border: 1px solid var(--header-control-border, var(--header-border-strong));
+  border-radius: 6px;
   background: transparent;
-  color: var(--header-text-dim);
+  color: var(--header-icon-color, var(--header-text-dim));
   cursor: pointer;
   transition: color .2s, border-color .2s, background .2s;
 }
@@ -148,7 +224,11 @@
   border-color: var(--header-border-strong);
   background: var(--header-menu-hover);
 }
-.header-theme-toggle svg { width: 20px; height: 20px; display: block; }
+.header-theme-toggle svg {
+  width: var(--header-icon, 22px);
+  height: var(--header-icon, 22px);
+  display: block;
+}
 [data-theme]:not([data-theme=""]) .header-theme-toggle { color: var(--header-accent); }
 
 /* ── Home icon ───────────────────────────────────────────────── */
@@ -156,17 +236,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: var(--header-control-h);
   height: var(--header-control-h);
   box-sizing: border-box;
-  padding: 5px;
+  padding: 0;
   border-radius: 6px;
-  color: var(--header-text-dim);
+  color: var(--header-icon-color, var(--header-text-dim));
   text-decoration: none;
   flex-shrink: 0;
-  transition: color .2s, background .2s;
+  transition: color .18s var(--header-ease, ease),
+              background .18s var(--header-ease, ease);
 }
 .header-home:hover { color: var(--header-text); background: var(--header-menu-hover); }
-.header-home svg { width: 30px; height: 30px; display: block; }
+.header-home svg {
+  width: var(--header-icon-solid, 20px);
+  height: var(--header-icon-solid, 20px);
+  display: block;
+}
 
 /* ── Overflow toggle (⋯) — injected by header.js ─────────────── */
 .header-overflow { position: relative; display: flex; }
@@ -175,11 +261,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
+  min-width: var(--header-control-h);
   height: var(--header-control-h);
   box-sizing: border-box;
   padding: 0 10px;
-  border: 1px solid var(--header-border-strong);
+  border: 1px solid var(--header-control-border, var(--header-border-strong));
   border-radius: 6px;
   background: transparent;
   color: var(--header-text);
@@ -192,12 +278,23 @@
 .header-overflow-toggle:hover,
 .header-overflow-toggle[aria-expanded="true"] { background: var(--header-menu-hover); }
 
+/* Shared press feedback — these three controls are kit-owned, so the kit
+   owns their states (sites style their own .btn). */
+.header-overflow-toggle:active,
+.header-theme-toggle:active,
+.header-home:active {
+  background: var(--header-menu-hover);
+  transform: translateY(.5px);
+}
+
 /* ── Dropdown menu (overflow + theme + Export▾ groups) ─────────
    Rules: parent gets position:relative; one open at a time; Esc /
    outside click closes; arrow keys navigate (all handled by header.js) */
 .header-menu {
   position: absolute;
-  top: calc(100% + 6px);
+  /* Anchored to the BAR's bottom edge, not the button's. A 40px control
+     centred in a 68px bar put the old panel 10.5px inside the bar. */
+  top: calc(100% + (var(--header-h-cur, 68px) - var(--header-control-h)) / 2 + 8px);
   right: 0;
   min-width: 180px;
   max-height: min(60vh, 320px);
@@ -207,12 +304,26 @@
   list-style: none;
   background: var(--header-menu-bg);
   border: 1px solid var(--header-border-strong);
-  border-radius: 10px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
+  border-radius: 12px;
+  /* Contact / mid / ambient + inner top highlight, so the panel lands
+     instead of floating. */
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, .45),
+    0 8px 16px -6px rgba(0, 0, 0, .5),
+    0 24px 48px -16px rgba(0, 0, 0, .65),
+    inset 0 1px 0 rgba(255, 255, 255, .06);
+  transform-origin: top right;
   display: none;
   z-index: 1;
 }
-.header-menu.open { display: block; }
+.header-menu.open {
+  display: block;
+  animation: neo-menu-in .14s var(--header-ease, ease) both;
+}
+@keyframes neo-menu-in {
+  from { opacity: 0; transform: translateY(-6px) scale(.98); }
+  to   { opacity: 1; transform: none; }
+}
 
 .header-menu .btn,
 .header-menu .nav-link,
@@ -220,12 +331,15 @@
 .header-menu a {
   display: flex;
   align-items: center;
+  /* text-align does nothing to a flex item; without this the site's own
+     .btn { justify-content: center } wins and every row centres itself. */
+  justify-content: flex-start;
   gap: 10px;
   width: 100%;
-  min-height: 0;
-  padding: 10px 12px;
+  min-height: 44px;
+  padding: 0 12px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   background: none;
   color: var(--header-text);
   font: inherit;
@@ -239,10 +353,38 @@
 .header-menu .btn:hover,
 .header-menu .nav-link:hover,
 .header-menu button:hover,
-.header-menu a:hover,
-.header-menu [role="menuitem"]:focus-visible {
+.header-menu a:hover {
   background: var(--header-menu-hover);
-  outline: none;
+}
+
+/* ── Focus visibility ─────────────────────────────────────────
+   Every focusable header control gets a real ring. outline costs no
+   layout and creates no stacking context, so app-mode transform is
+   unaffected. Longhand lists (no :is()) for universal support. */
+.header-logo a:focus-visible,
+.header-title-link:focus-visible,
+.header-actions > a:focus-visible,
+.header-actions > button:focus-visible,
+.header-actions > .btn:focus-visible,
+.header-actions > .nav-link:focus-visible,
+.header-overflow-toggle:focus-visible,
+.header-theme-toggle:focus-visible,
+.header-home:focus-visible {
+  outline: var(--header-focus-w) solid var(--header-focus);
+  outline-offset: 2px;
+}
+/* Drawn inside the item so it never collides with the menu's padding or
+   scroll edge. Covers menuitemradio/checkbox, which the old rule missed. */
+.header-menu .btn:focus-visible,
+.header-menu .nav-link:focus-visible,
+.header-menu button:focus-visible,
+.header-menu a:focus-visible,
+.header-menu [role="menuitem"]:focus-visible,
+.header-menu [role="menuitemradio"]:focus-visible,
+.header-menu [role="menuitemcheckbox"]:focus-visible {
+  outline: var(--header-focus-w) solid var(--header-focus);
+  outline-offset: -2px;
+  background: var(--header-menu-hover);
 }
 .header-menu .badge,
 .header-menu [data-badge] { margin-left: auto; }
@@ -287,16 +429,56 @@
 /* ── Mobile (≤700px): shrink, hide subtitle, JS moves non-kept
    action buttons into the ⋯ overflow menu ────────────────────── */
 @media (max-width: 700px) {
-  :root { --header-control-h: 36px; }
+  :root {
+    --header-control-h: 36px;
+    --header-icon: 20px;
+    --header-icon-solid: 18px;
+  }
   .header-bar { padding: 0 var(--space-4, 16px); gap: var(--space-2, 8px); }
   .header-subtitle { display: none; }
-  .header-logo h1 { font-size: 1em; }
+  .header-logo h1 { font-size: 1rem; }
   .header-logo-img { height: 28px; }
-  .header-home svg { width: 26px; height: 26px; }
+  .header-right { gap: 6px; }
+  /* A 180px panel pinned to the right of a 375px viewport wastes width. */
+  .header-menu {
+    min-width: min(260px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
+  }
 }
 
 /* ── Reduced motion ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .header-bar[data-header-mode="app"] { transition: none; }
+  .header-bar[data-header-mode="app"],
+  .header-bar[data-header-mode="app"].header-hidden { transition: none; }
   .header-logo-img { transition: none; }
+  .header-logo-img:hover { transform: none; }
+  .header-menu.open { animation: none; }
+  .header-overflow-toggle:active,
+  .header-theme-toggle:active,
+  .header-home:active { transform: none; }
+}
+
+/* ── Forced colors (Windows High Contrast) ────────────────────
+   The bar's hierarchy is carried entirely by translucent whites, which
+   all collapse to one system colour. Give the structural edges system
+   tokens so the header doesn't become one undifferentiated block. */
+@media (forced-colors: active) {
+  .header-bar {
+    border-image: none;
+    border-bottom: 1px solid CanvasText;
+  }
+  .header-overflow-toggle,
+  .header-theme-toggle { border-color: ButtonBorder; }
+  .header-menu { border: 1px solid CanvasText; }
+  .header-logo a:focus-visible,
+  .header-title-link:focus-visible,
+  .header-actions > a:focus-visible,
+  .header-actions > button:focus-visible,
+  .header-actions > .btn:focus-visible,
+  .header-actions > .nav-link:focus-visible,
+  .header-overflow-toggle:focus-visible,
+  .header-theme-toggle:focus-visible,
+  .header-home:focus-visible,
+  .header-menu button:focus-visible,
+  .header-menu a:focus-visible { outline-color: Highlight; }
 }

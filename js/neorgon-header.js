@@ -17,6 +17,8 @@
   var THEMES = [
     { id: 'default',   label: 'Default',   swatch: '#B015B0' },
     { id: 'christmas', label: 'Christmas', swatch: '#16a34a' },
+    { id: 'new-year',  label: 'New Year',  swatch: '#fcd34d' },
+    { id: 'halloween', label: 'Halloween', swatch: '#f97316' },
     { id: 'matrix',    label: 'Matrix',    swatch: '#00ff41' },
     { id: 'danger',    label: 'Danger',    swatch: '#dc2626' }
   ];
