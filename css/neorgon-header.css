@@ -80,6 +80,14 @@ html:not([data-theme]) {
 
      visitor choice (?theme= / cookie)  >  season (CDN)  >  skin  >  kit default
 
+   A site that should sit out every season keeps its skin with
+   `<html lang="en" data-season="off">` — see season.css. That declines
+   the fleet's decoration only; a visitor's ?theme= still wins.
+
+   Named skins below are the reusable ones. For a one-off palette no
+   other site would share, use `data-header-skin="custom"` and declare
+   the tokens in the site's own CSS — contract at the end of this block.
+
    Two cascade facts make that ordering work, and both are easy to
    get wrong:
 
@@ -217,6 +225,58 @@ html:not([data-theme]) .header-bar[data-header-skin="ember"] {
   --header-edge-from: rgba(251, 191, 36, .2);
   --header-edge-to: rgba(251, 191, 36, .32);
 }
+
+/* jade — clinical emerald. Tuned to headpain-site's #059669 / #10b981
+   accents on its #040714 page. For calm medical/health surfaces where
+   both the magenta default and ember's warning-warmth read wrong. */
+html:not([data-theme]) .header-bar[data-header-skin="jade"] {
+  --header-bg-start: #065f46;
+  --header-bg-mid: #043b2c;
+  --header-bg-end: #040714;
+  --header-glass: rgba(4, 59, 44, .5);
+  --header-accent: #6ee7b7;
+  --header-text: #ecfdf5;
+  --header-text-dim: rgba(236, 253, 245, .82);
+  --header-icon-color: rgba(167, 243, 208, .84);
+  --header-border: rgba(110, 231, 183, .2);
+  --header-border-strong: rgba(110, 231, 183, .36);
+  --header-control-border: rgba(167, 243, 208, .5);
+  --header-menu-bg: #08251c;
+  --header-menu-hover: rgba(110, 231, 183, .14);
+  --header-edge-from: rgba(110, 231, 183, .2);
+  --header-edge-to: rgba(110, 231, 183, .32);
+}
+
+/* ── custom — a site-authored skin ────────────────────────────────
+   For a one-off palette that no named skin fits and that no other
+   site would reuse. The kit deliberately ships NO tokens for this
+   value: the site supplies them, and the kit stays out of the way.
+
+     <header class="header-bar" data-header-skin="custom">
+
+   In the site's own css/style.css, copy this selector EXACTLY — the
+   scoping and the specificity are the whole contract:
+
+     html:not([data-theme]) .header-bar[data-header-skin="custom"] {
+       --header-bg-start: …;  --header-bg-mid: …;  --header-bg-end: …;
+       --header-accent: …;    --header-text: …;    --header-text-dim: …;
+       --header-icon-color: …; --header-border: …; --header-border-strong: …;
+       --header-control-border: …; --header-menu-bg: …; --header-menu-hover: …;
+       --header-edge-from: …; --header-edge-to: …;
+     }
+
+   Why that exact selector, and nothing shorter:
+     · `html:not([data-theme])` makes the skin collapse the instant a
+       visitor picks a theme. Drop it and the site ignores ?theme=.
+     · `[data-header-skin="custom"]` puts it at (0,3,1) — above the
+       kit default, below an armed season's (0,4,2) skin variant. A
+       bare `.header-bar { --header-bg-start: … }` is only (0,1,0)
+       and the kit's own defaults would beat it.
+   Set only the three gradient stops if that is all that clashes; the
+   bar re-composes --header-bg from them (see .header-bar below).
+   Only the three stops + accent are usually enough — but re-tune the
+   edge ramp too if the bar is much darker or lighter than the default
+   magenta, which those values are calibrated against. */
 
 /* ── Bar ─────────────────────────────────────────────────────── */
 .header-bar {
