@@ -11,22 +11,22 @@
     gtag('config', 'G-HTF349S8R5');
   </script>
   <meta name="color-scheme" content="dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.neorgon.org; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com https://cdn.neorgon.org; connect-src https://awesomesites.neorgon.com https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com https://www.google-analytics.com https://www.googletagmanager.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.neorgon.org; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com https://www.googletagmanager.com https://cdn.neorgon.org; connect-src https://awesomesites.neorgon.com https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com https://www.google-analytics.com https://www.googletagmanager.com https://esm.sh https://quaint-cobra-151.convex.cloud; frame-src https://www.youtube.com https://www.youtube-nocookie.com; upgrade-insecure-requests">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="preconnect" href="https://cdn.neorgon.org" crossorigin>
   <title>Neorgon | Made for Specific Problems</title>
-  <meta name="description" content="We made 40 tools and forgot to add a paywall. Open-source, no signup, no nonsense">
+  <meta name="description" content="We made 43 tools and forgot to add a paywall. Open-source, no signup, no nonsense">
   <meta property="og:title" content="Neorgon: Made for Specific Problems">
-  <meta property="og:description" content="We made 40 tools and forgot to add a paywall">
+  <meta property="og:description" content="We made 43 tools and forgot to add a paywall">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://neorgon.com/">
   <meta property="og:site_name" content="Neorgon">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Neorgon: Made for Specific Problems">
-  <meta name="twitter:description" content="We made 40 tools and forgot to add a paywall">
+  <meta name="twitter:description" content="We made 43 tools and forgot to add a paywall">
   <meta name="twitter:image" content="https://neorgon.com/og-preview.jpg">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://neorgon.com/">
@@ -44,7 +44,7 @@
     "@type": "WebSite",
     "name": "Neorgon",
     "url": "https://neorgon.com/",
-    "description": "We made 40 tools and forgot to add a paywall. Open-source, no signup, no nonsense",
+    "description": "We made 43 tools and forgot to add a paywall. Open-source, no signup, no nonsense",
     "author": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" }
   }
   </script>
@@ -130,7 +130,7 @@
       <span class="neon-word" id="heroTyping"></span><span class="typing-cursor" id="typingCursor"></span>
     </h1>
     <p class="hero-sub">
-      We made <span id="toolCount">40</span> tools and forgot to add a paywall.
+      We made <span id="toolCount">43</span> tools and forgot to add a paywall.
     </p>
     <div class="hero-search-wrap">
       <input class="hero-search" id="heroSearch" type="text" placeholder="Search tools, tags, or keywords…" aria-label="Search tools" autocomplete="off" spellcheck="false">
@@ -143,6 +143,23 @@
     </div>
   </section>
   <script defer src="js/hero.js"></script>
+
+  <!-- Recently shipped — populated by js/recent.js from each card's data-added.
+       Hidden until built so it never flashes an empty row. -->
+  <section class="sites-section recent-rail" id="recentRail" aria-labelledby="recent-rail-heading" hidden>
+    <div class="recent-rail-head">
+      <h2 class="group-label" id="recent-rail-heading">
+        <span class="group-dot"></span> Recently shipped
+      </h2>
+      <span class="recent-rail-count" id="recentRailCount"></span>
+    </div>
+    <div class="sites-grid recent-rail-grid" id="recentRailGrid"></div>
+  </section>
+
+  <!-- Category rail — sticky jump nav, built by js/catnav.js from the groups below -->
+  <nav class="cat-rail" id="catRail" aria-label="Tool categories" hidden>
+    <div class="cat-rail-inner" id="catRailInner"></div>
+  </nav>
 
   <!-- Sites -->
   <main class="sites-section" id="tools" aria-labelledby="catalog-heading">
@@ -157,12 +174,12 @@
     </div>
 
     <!-- ── Planning ────────────────────────────────────────────── -->
-    <div class="card-group" data-group="planning" style="--group-color: #4ade80">
+    <div class="card-group" id="group-planning" data-group="planning" style="--group-color: #4ade80">
       <h2 class="group-label"><span class="group-dot"></span> Planning</h2>
       <div class="sites-grid">
 
       <!-- Pathfinder (featured) -->
-      <a class="site-card" data-card-id="pathfinder"
+      <a class="site-card" data-card-id="pathfinder" data-added="2026-03-03"
          href="https://pathfinder.neorgon.com/"
          style="--card-glow: rgba(74,222,128,.3); --card-glow-border: rgba(74,222,128,.35); --card-accent: #4ade80;">
         <div class="card-content">
@@ -182,7 +199,7 @@
       </a>
 
       <!-- Skill Map -->
-      <a class="site-card" data-card-id="skillmap"
+      <a class="site-card" data-card-id="skillmap" data-added="2026-02-28"
          href="https://skillmap.neorgon.com/"
          style="--card-glow: rgba(167,139,250,.3); --card-glow-border: rgba(167,139,250,.35); --card-accent: #a78bfa;">
         <div class="card-content">
@@ -201,7 +218,7 @@
       </a>
 
       <!-- Doorman -->
-      <a class="site-card" data-card-id="doorman"
+      <a class="site-card" data-card-id="doorman" data-added="2026-07-28"
          href="https://doorman.neorgon.com/"
          style="--card-glow: rgba(194,144,74,.3); --card-glow-border: rgba(194,144,74,.35); --card-accent: #c2904a;">
         <div class="card-content">
@@ -221,7 +238,7 @@
       </a>
 
       <!-- Loadout -->
-      <a class="site-card" data-card-id="loadout"
+      <a class="site-card" data-card-id="loadout" data-added="2026-07-14"
          href="https://loadout.neorgon.com/"
          style="--card-glow: rgba(217,119,6,.3); --card-glow-border: rgba(217,119,6,.35); --card-accent: #d97706;">
         <div class="card-content">
@@ -244,12 +261,12 @@
     </div>
 
     <!-- ── DevOps ──────────────────────────────────────────────── -->
-    <div class="card-group" data-group="devops" style="--group-color: #fbbf24">
+    <div class="card-group" id="group-devops" data-group="devops" style="--group-color: #fbbf24">
       <h2 class="group-label"><span class="group-dot"></span> DevOps</h2>
       <div class="sites-grid">
 
       <!-- CardForge -->
-      <a class="site-card" data-card-id="cardforge"
+      <a class="site-card" data-card-id="cardforge" data-added="2026-08-02"
          href="https://cardforge.neorgon.com/"
          style="--card-glow: rgba(124,58,237,.3); --card-glow-border: rgba(124,58,237,.35); --card-accent: #7c3aed;">
         <div class="card-content">
@@ -269,7 +286,7 @@
       </a>
 
       <!-- Infra Drills -->
-      <a class="site-card" data-card-id="infradrills"
+      <a class="site-card" data-card-id="infradrills" data-added="2026-02-28"
          href="https://infradrills.neorgon.com/"
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #fbbf24;">
         <div class="card-content">
@@ -289,7 +306,7 @@
       </a>
 
       <!-- Snippets -->
-      <a class="site-card" data-card-id="snippets"
+      <a class="site-card" data-card-id="snippets" data-added="2026-03-07"
          href="https://snippets.neorgon.com/"
          style="--card-glow: rgba(250,204,21,.3); --card-glow-border: rgba(250,204,21,.35); --card-accent: #facc15;">
         <div class="card-content">
@@ -309,7 +326,7 @@
       </a>
 
       <!-- SafeGuard -->
-      <a class="site-card" data-card-id="safeguard"
+      <a class="site-card" data-card-id="safeguard" data-added="2026-03-07"
          href="https://safeguard.neorgon.com/"
          style="--card-glow: rgba(248,113,113,.3); --card-glow-border: rgba(248,113,113,.35); --card-accent: #f87171;">
         <div class="card-content">
@@ -329,7 +346,7 @@
       </a>
 
       <!-- Lockdown -->
-      <a class="site-card" data-card-id="lockdown"
+      <a class="site-card" data-card-id="lockdown" data-added="2026-03-16"
          href="https://lockdown.neorgon.com/"
          style="--card-glow: rgba(249,115,22,.3); --card-glow-border: rgba(249,115,22,.35); --card-accent: #f97316;">
         <div class="card-content">
@@ -348,7 +365,7 @@
       </a>
 
       <!-- Incident Runbook -->
-      <a class="site-card" data-card-id="runbook"
+      <a class="site-card" data-card-id="runbook" data-added="2026-08-03"
          href="https://runbook.neorgon.com/"
          style="--card-glow: rgba(236,72,153,.3); --card-glow-border: rgba(236,72,153,.35); --card-accent: #ec4899;">
         <div class="card-content">
@@ -371,12 +388,12 @@
     </div>
 
     <!-- ── Data ────────────────────────────────────────────────── -->
-    <div class="card-group" data-group="data" style="--group-color: #2dd4bf">
+    <div class="card-group" id="group-data" data-group="data" style="--group-color: #2dd4bf">
       <h2 class="group-label"><span class="group-dot"></span> Data</h2>
       <div class="sites-grid">
 
       <!-- JSON Studio -->
-      <div class="site-card multi-tool" data-card-id="jsonstudio"
+      <div class="site-card multi-tool" data-card-id="jsonstudio" data-added="2026-02-28"
            data-href="https://jsonstudio.neorgon.com/"
            role="button" tabindex="0"
            style="--card-glow: rgba(45,212,191,.3); --card-glow-border: rgba(45,212,191,.35); --card-accent: #2dd4bf;">
@@ -411,7 +428,7 @@
       </div>
 
       <!-- Reference Matrix -->
-      <div class="site-card multi-tool" data-card-id="references"
+      <div class="site-card multi-tool" data-card-id="references" data-added="2026-02-28"
            data-href="https://references.neorgon.com/"
            role="button" tabindex="0"
            style="--card-glow: rgba(244,114,182,.3); --card-glow-border: rgba(244,114,182,.35); --card-accent: #f472b6;">
@@ -442,7 +459,7 @@
       </div>
 
       <!-- Radar -->
-      <a class="site-card" data-card-id="sitrep"
+      <a class="site-card" data-card-id="sitrep" data-added="2026-07-29"
          href="https://radar.neorgon.com/"
          style="--card-glow: rgba(220,38,38,.3); --card-glow-border: rgba(220,38,38,.35); --card-accent: #dc2626;">
         <div class="card-content">
@@ -465,12 +482,12 @@
     </div>
 
     <!-- ── Productivity ────────────────────────────────────────── -->
-    <div class="card-group" data-group="productivity" style="--group-color: #a78bfa">
+    <div class="card-group" id="group-productivity" data-group="productivity" style="--group-color: #a78bfa">
       <h2 class="group-label"><span class="group-dot"></span> Productivity</h2>
       <div class="sites-grid">
 
       <!-- Presentation Sage -->
-      <a class="site-card" data-card-id="slides"
+      <a class="site-card" data-card-id="slides" data-added="2026-03-01"
          href="https://slides.neorgon.com/"
          style="--card-glow: rgba(251,146,60,.3); --card-glow-border: rgba(251,146,60,.35); --card-accent: #fb923c;">
         <div class="card-content">
@@ -490,7 +507,7 @@
       </a>
 
       <!-- Prompt Forge -->
-      <a class="site-card" data-card-id="promptforge"
+      <a class="site-card" data-card-id="promptforge" data-added="2026-06-15"
          href="https://promptforge.neorgon.com/"
          style="--card-glow: rgba(219,39,119,.3); --card-glow-border: rgba(219,39,119,.35); --card-accent: #db2777;">
         <div class="card-content">
@@ -510,7 +527,7 @@
       </a>
 
       <!-- OG Studio -->
-      <a class="site-card" data-card-id="ogstudio"
+      <a class="site-card" data-card-id="ogstudio" data-added="2026-03-04"
          href="https://ogstudio.neorgon.com/"
          style="--card-glow: rgba(163,230,53,.3); --card-glow-border: rgba(163,230,53,.35); --card-accent: #a3e635;">
         <div class="card-content">
@@ -530,7 +547,7 @@
       </a>
 
       <!-- Agent Lore -->
-      <div class="site-card multi-tool" data-card-id="agentlore"
+      <div class="site-card multi-tool" data-card-id="agentlore" data-added="2026-03-09"
            data-href="https://agentlore.neorgon.com/"
            role="button" tabindex="0"
            style="--card-glow: rgba(96,165,250,.3); --card-glow-border: rgba(96,165,250,.35); --card-accent: #60a5fa;">
@@ -565,7 +582,7 @@
       </div>
 
       <!-- Glass Box -->
-      <a class="site-card" data-card-id="glassbox"
+      <a class="site-card" data-card-id="glassbox" data-added="2026-08-05"
          href="https://glassbox.neorgon.com/"
          style="--card-glow: rgba(204,120,92,.3); --card-glow-border: rgba(204,120,92,.35); --card-accent: #cc785c;">
         <div class="card-content">
@@ -584,8 +601,28 @@
         </div>
       </a>
 
+      <!-- Stash -->
+      <a class="site-card" data-card-id="stash" data-added="2026-08-06"
+         href="https://stash.neorgon.com/"
+         style="--card-glow: rgba(192,38,211,.3); --card-glow-border: rgba(192,38,211,.35); --card-accent: #c026d3;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/stash.svg" class="card-site-icon" alt="Stash" width="28" height="28" loading="lazy"></div>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">stash.neorgon.com</div>
+          <h3 class="card-name">Stash</h3>
+          <div class="card-desc">Design assets worth reaching for later: icons, UI kits, pixel art, music and reading. Anyone can drop a find, and the JSON API hands an agent real icon sets instead of emoji.</div>
+          <div class="card-tags">
+            <span class="card-tag">Design</span>
+            <span class="card-tag">Assets</span>
+            <span class="card-tag">Submissions</span>
+          </div>
+        </div>
+      </a>
+
       <!-- Resume Forge -->
-      <a class="site-card" data-card-id="resume-forge"
+      <a class="site-card" data-card-id="resume-forge" data-added="2026-03-12"
          href="https://resume.neorgon.com/"
          style="--card-glow: rgba(139,92,246,.3); --card-glow-border: rgba(139,92,246,.35); --card-accent: #8b5cf6;">
         <div class="card-content">
@@ -605,7 +642,7 @@
       </a>
 
       <!-- Stack Rank -->
-      <a class="site-card" data-card-id="stackrank"
+      <a class="site-card" data-card-id="stackrank" data-added="2026-03-24"
          href="https://stackrank.neorgon.com/"
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #f59e0b;">
         <div class="card-content">
@@ -625,7 +662,7 @@
       </a>
 
       <!-- Awesome Sites -->
-      <a class="site-card" data-card-id="awesomesites"
+      <a class="site-card" data-card-id="awesomesites" data-added="2026-05-20"
          href="https://awesomesites.neorgon.com/"
          style="--card-glow: rgba(249,115,22,.3); --card-glow-border: rgba(249,115,22,.35); --card-accent: #f97316;">
         <div class="card-content">
@@ -648,12 +685,12 @@
     </div>
 
     <!-- ── UI Lab ──────────────────────────────────────────────── -->
-    <div class="card-group" data-group="ui-lab" style="--group-color: #d946ef">
+    <div class="card-group" id="group-ui-lab" data-group="ui-lab" style="--group-color: #d946ef">
       <h2 class="group-label"><span class="group-dot"></span> UI Lab</h2>
       <div class="sites-grid">
 
       <!-- UI Anatomy -->
-      <a class="site-card" data-card-id="anatomy"
+      <a class="site-card" data-card-id="anatomy" data-added="2026-03-10"
          href="https://uianatomy.neorgon.com/"
          style="--card-glow: rgba(125,211,252,.3); --card-glow-border: rgba(125,211,252,.35); --card-accent: #7dd3fc;">
         <div class="card-content">
@@ -673,7 +710,7 @@
       </a>
 
       <!-- Guild Hall -->
-      <a class="site-card" data-card-id="guildhall"
+      <a class="site-card" data-card-id="guildhall" data-added="2026-03-07"
          href="https://guildhall.neorgon.com/"
          style="--card-glow: rgba(251,146,60,.3); --card-glow-border: rgba(251,146,60,.35); --card-accent: #fb923c;">
         <div class="card-content">
@@ -693,7 +730,7 @@
       </a>
 
       <!-- Questline -->
-      <a class="site-card" data-card-id="questline"
+      <a class="site-card" data-card-id="questline" data-added="2026-06-04"
          href="https://questline.neorgon.com/"
          style="--card-glow: rgba(42,168,255,.3); --card-glow-border: rgba(42,168,255,.35); --card-accent: #2aa8ff;">
         <div class="card-content">
@@ -716,12 +753,12 @@
     </div>
 
     <!-- ── Fun ─────────────────────────────────────────────────── -->
-    <div class="card-group" data-group="fun" style="--group-color: #f472b6">
+    <div class="card-group" id="group-fun" data-group="fun" style="--group-color: #f472b6">
       <h2 class="group-label"><span class="group-dot"></span> Fun</h2>
       <div class="sites-grid">
 
       <!-- Decision Wheel -->
-      <div class="site-card multi-tool" data-card-id="decisionwheel"
+      <div class="site-card multi-tool" data-card-id="decisionwheel" data-added="2026-03-01"
            data-href="https://decisionwheel.neorgon.com/"
            role="button" tabindex="0"
            style="--card-glow: rgba(52,211,153,.3); --card-glow-border: rgba(52,211,153,.35); --card-accent: #34d399;">
@@ -751,7 +788,7 @@
       </div>
 
       <!-- Meme Vault -->
-      <a class="site-card" data-card-id="memes"
+      <a class="site-card" data-card-id="memes" data-added="2026-03-01"
          href="https://memes.neorgon.com/"
          style="--card-glow: rgba(244,63,94,.3); --card-glow-border: rgba(244,63,94,.35); --card-accent: #f43f5e;">
         <div class="card-content">
@@ -771,7 +808,7 @@
       </a>
 
       <!-- Client Says -->
-      <div class="site-card multi-tool" data-card-id="clientsays"
+      <div class="site-card multi-tool" data-card-id="clientsays" data-added="2026-02-28"
            data-href="https://clientsays.neorgon.com/"
            role="button" tabindex="0"
            style="--card-glow: rgba(236,72,153,.3); --card-glow-border: rgba(236,72,153,.35); --card-accent: #f472b6;">
@@ -802,7 +839,7 @@
       </div>
 
       <!-- Emoji Archive -->
-      <div class="site-card multi-tool" data-card-id="emojis"
+      <div class="site-card multi-tool" data-card-id="emojis" data-added="2026-03-01"
            data-href="https://emojis.neorgon.com/"
            role="button" tabindex="0"
            style="--card-glow: rgba(34,211,238,.3); --card-glow-border: rgba(34,211,238,.35); --card-accent: #22d3ee;">
@@ -832,7 +869,7 @@
       </div>
 
       <!-- Team Play -->
-      <a class="site-card" data-card-id="teamplay"
+      <a class="site-card" data-card-id="teamplay" data-added="2026-03-12"
          href="https://teamplay.neorgon.com/"
          style="--card-glow: rgba(13,148,136,.3); --card-glow-border: rgba(13,148,136,.35); --card-accent: #0d9488;">
         <div class="card-content">
@@ -852,7 +889,7 @@
       </a>
 
       <!-- GameBin -->
-      <a class="site-card" data-card-id="gamebin"
+      <a class="site-card" data-card-id="gamebin" data-added="2026-05-11"
          href="https://gamebin.neorgon.com/"
          style="--card-glow: rgba(0,99,229,.3); --card-glow-border: rgba(0,99,229,.35); --card-accent: #0063e5;">
         <div class="card-content">
@@ -872,7 +909,7 @@
       </a>
 
       <!-- Minimap -->
-      <a class="site-card" data-card-id="minimap"
+      <a class="site-card" data-card-id="minimap" data-added="2026-08-02"
          href="https://minimap.neorgon.com/"
          style="--card-glow: rgba(125,211,252,.3); --card-glow-border: rgba(125,211,252,.35); --card-accent: #7dd3fc;">
         <div class="card-content">
@@ -891,8 +928,28 @@
         </div>
       </a>
 
+      <!-- Pieza -->
+      <a class="site-card" data-card-id="pieza" data-added="2026-08-08"
+         href="https://pieza.neorgon.com/"
+         style="--card-glow: rgba(234,88,12,.3); --card-glow-border: rgba(234,88,12,.35); --card-accent: #ea580c;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/pieza.svg" class="card-site-icon" alt="Pieza" width="28" height="28" loading="lazy"></div>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">pieza.neorgon.com</div>
+          <h3 class="card-name">Pieza</h3>
+          <div class="card-desc">A bilingual print-and-play dice-and-cards game where cards are the guardrails. Forge cards, then run a Boss Hunt in the browser.</div>
+          <div class="card-tags">
+            <span class="card-tag">Fun</span>
+            <span class="card-tag">Games</span>
+            <span class="card-tag">Tabletop</span>
+          </div>
+        </div>
+      </a>
+
       <!-- YouTube Memes -->
-      <a class="site-card external-card" data-card-id="youtube"
+      <a class="site-card external-card" data-card-id="youtube" data-added="2026-05-11"
          href="https://www.youtube.com/@energon-hq/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(255,0,0,.25); --card-glow-border: rgba(255,0,0,.3); --card-accent: #ff4444;">
         <div class="card-content">
@@ -915,12 +972,12 @@
     </div>
 
     <!-- ── Social ──────────────────────────────────────────────── -->
-    <div class="card-group" data-group="social" style="--group-color: #38bdf8">
+    <div class="card-group" id="group-social" data-group="social" style="--group-color: #38bdf8">
       <h2 class="group-label"><span class="group-dot"></span> Social</h2>
       <div class="sites-grid">
 
       <!-- Vibe Check -->
-      <a class="site-card" data-card-id="vibecheck"
+      <a class="site-card" data-card-id="vibecheck" data-added="2026-02-21"
          href="https://interviews.neorgon.com/"
          style="--card-glow: rgba(56,189,248,.3); --card-glow-border: rgba(56,189,248,.35); --card-accent: #38bdf8;">
         <div class="card-content">
@@ -939,7 +996,7 @@
       </a>
 
       <!-- Hiring Pack -->
-      <a class="site-card" data-card-id="hiringpack"
+      <a class="site-card" data-card-id="hiringpack" data-added="2026-08-03"
          href="https://hiringpack.neorgon.com/"
          style="--card-glow: rgba(52,211,153,.3); --card-glow-border: rgba(52,211,153,.35); --card-accent: #34d399;">
         <div class="card-content">
@@ -959,7 +1016,7 @@
       </a>
 
       <!-- Character Sheet -->
-      <a class="site-card" data-card-id="charactersheet"
+      <a class="site-card" data-card-id="charactersheet" data-added="2026-03-06"
          href="https://charactersheet.neorgon.com/"
          style="--card-glow: rgba(232,121,249,.3); --card-glow-border: rgba(232,121,249,.35); --card-accent: #e879f9;">
         <div class="card-content">
@@ -979,7 +1036,7 @@
       </a>
 
       <!-- Parla -->
-      <a class="site-card" data-card-id="parla"
+      <a class="site-card" data-card-id="parla" data-added="2026-03-07"
          href="https://parla.neorgon.com/"
          style="--card-glow: rgba(52,211,153,.3); --card-glow-border: rgba(52,211,153,.35); --card-accent: #34d399;">
         <div class="card-content">
@@ -999,7 +1056,7 @@
       </a>
 
       <!-- Playbook -->
-      <a class="site-card" data-card-id="playbook"
+      <a class="site-card" data-card-id="playbook" data-added="2026-03-09"
          href="https://playbook.neorgon.com/"
          style="--card-glow: rgba(16,185,129,.3); --card-glow-border: rgba(16,185,129,.35); --card-accent: #10b981;">
         <div class="card-content">
@@ -1019,7 +1076,7 @@
       </a>
 
       <!-- TubeStack -->
-      <a class="site-card" data-card-id="tubestack"
+      <a class="site-card" data-card-id="tubestack" data-added="2026-03-18"
          href="https://tubestack.neorgon.com/"
          style="--card-glow: rgba(103,232,249,.3); --card-glow-border: rgba(103,232,249,.35); --card-accent: #67e8f9;">
         <div class="card-content">
@@ -1042,12 +1099,12 @@
     </div>
 
     <!-- ── Lifehacks ───────────────────────────────────────────── -->
-    <div class="card-group" data-group="lifehacks" style="--group-color: #f59e0b">
+    <div class="card-group" id="group-lifehacks" data-group="lifehacks" style="--group-color: #f59e0b">
       <h2 class="group-label"><span class="group-dot"></span> Lifehacks</h2>
       <div class="sites-grid">
 
       <!-- BuyHacks -->
-      <a class="site-card" data-card-id="buyhacks"
+      <a class="site-card" data-card-id="buyhacks" data-added="2026-03-06"
          href="https://buyhacks.neorgon.com/"
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #f59e0b;">
         <div class="card-content">
@@ -1071,12 +1128,12 @@
 
 
     <!-- ── Health ────────────────────────────────────────────────── -->
-    <div class="card-group" data-group="health" style="--group-color: #059669">
+    <div class="card-group" id="group-health" data-group="health" style="--group-color: #059669">
       <h2 class="group-label"><span class="group-dot"></span> Health</h2>
       <div class="sites-grid">
 
       <!-- HeadPain -->
-      <a class="site-card" data-card-id="headmap"
+      <a class="site-card" data-card-id="headmap" data-added="2026-07-29"
          href="https://headpain.neorgon.com/"
          style="--card-glow: rgba(5,150,105,.3); --card-glow-border: rgba(5,150,105,.35); --card-accent: #059669;">
         <div class="card-content">
@@ -1100,12 +1157,12 @@
 
 
     <!-- ── Growth ────────────────────────────────────────────────── -->
-    <div class="card-group" data-group="growth" style="--group-color: #fcd34d">
+    <div class="card-group" id="group-growth" data-group="growth" style="--group-color: #fcd34d">
       <h2 class="group-label"><span class="group-dot"></span> Growth</h2>
       <div class="sites-grid">
 
       <!-- Mettle -->
-      <a class="site-card" data-card-id="mettle"
+      <a class="site-card" data-card-id="mettle" data-added="2026-07-28"
          href="https://mettle.neorgon.com/"
          style="--card-glow: rgba(252,211,77,.3); --card-glow-border: rgba(252,211,77,.35); --card-accent: #fcd34d;">
         <div class="card-content">
@@ -1125,7 +1182,7 @@
       </a>
 
       <!-- Primer -->
-      <a class="site-card" data-card-id="primer"
+      <a class="site-card" data-card-id="primer" data-added="2026-07-28"
          href="https://primer.neorgon.com/"
          style="--card-glow: rgba(99,102,241,.3); --card-glow-border: rgba(99,102,241,.35); --card-accent: #6366f1;">
         <div class="card-content">
@@ -1155,12 +1212,12 @@
     </div>
 
     <!-- ── Platforms ─────────────────────────────────────────────── -->
-    <div class="card-group" data-group="platforms" style="--group-color: #64748b">
+    <div class="card-group" id="group-platforms" data-group="platforms" style="--group-color: #64748b">
       <h2 class="group-label"><span class="group-dot"></span> Platforms</h2>
       <div class="sites-grid">
 
       <!-- GitHub -->
-      <a class="site-card external-card" data-card-id="github"
+      <a class="site-card external-card" data-card-id="github" data-added="2026-02-21"
          href="https://github.com/energon-a-secas/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(139,148,158,.3); --card-glow-border: rgba(139,148,158,.35); --card-accent: #8b949e;">
         <div class="card-content">
@@ -1180,7 +1237,7 @@
       </a>
 
       <!-- GitLab -->
-      <a class="site-card external-card" data-card-id="gitlab"
+      <a class="site-card external-card" data-card-id="gitlab" data-added="2026-02-21"
          href="https://gitlab.com/energonhq/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(252,109,38,.25); --card-glow-border: rgba(252,109,38,.3); --card-accent: #fc6d26;">
         <div class="card-content">
@@ -1200,7 +1257,7 @@
       </a>
 
       <!-- Docker Hub -->
-      <a class="site-card external-card" data-card-id="dockerhub"
+      <a class="site-card external-card" data-card-id="dockerhub" data-added="2026-02-21"
          href="https://hub.docker.com/u/energonhq/" target="_blank" rel="noopener noreferrer"
          style="--card-glow: rgba(36,150,237,.25); --card-glow-border: rgba(36,150,237,.3); --card-accent: #2496ed;">
         <div class="card-content">
@@ -1240,7 +1297,7 @@
     <div class="sites-grid">
 
       <!-- Ghost card — Autopilot -->
-      <div class="site-card ghost-card" data-card-id="autopilot" role="button" tabindex="0" aria-disabled="true"
+      <div class="site-card ghost-card" data-card-id="autopilot" data-added="2026-03-04" role="button" tabindex="0" aria-disabled="true"
            style="--card-glow: rgba(251,191,36,.25); --card-glow-border: rgba(251,191,36,.3); --card-accent: #fbbf24;">
         <div class="ghost-locked">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35">
@@ -1264,7 +1321,7 @@
       </div>
 
       <!-- Ghost card — Rush Q Cards -->
-      <div class="site-card ghost-card" data-card-id="rushq" role="button" tabindex="0" aria-disabled="true"
+      <div class="site-card ghost-card" data-card-id="rushq" data-added="2026-03-16" role="button" tabindex="0" aria-disabled="true"
            style="--card-glow: rgba(251,191,36,.25); --card-glow-border: rgba(251,191,36,.3); --card-accent: #fbbf24;">
         <div class="ghost-locked">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35">
@@ -1288,7 +1345,7 @@
       </div>
 
       <!-- Ghost card — Energon HQ -->
-      <div class="site-card ghost-card" data-card-id="ehq" role="button" tabindex="0" aria-disabled="true"
+      <div class="site-card ghost-card" data-card-id="ehq" data-added="2026-02-21" role="button" tabindex="0" aria-disabled="true"
            style="--card-glow: rgba(99,102,241,.25); --card-glow-border: rgba(99,102,241,.3); --card-accent: #818cf8;">
         <div class="ghost-locked">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35">
@@ -1389,9 +1446,30 @@
   <div class="settings-divider"></div>
   <div class="settings-hint">
     <kbd>M</kbd> Music &nbsp;·&nbsp; <kbd>,</kbd> Settings<br>
+    <kbd>⌘K</kbd> Jump to a tool &nbsp;·&nbsp; <kbd>/</kbd> Search<br>
+    <kbd>↑</kbd><kbd>↓</kbd> Walk results &nbsp;·&nbsp; <kbd>↵</kbd> Open<br>
     <kbd>Esc</kbd> <kbd>Esc</kbd> Terminal<br>
     <kbd>↑↑↓↓←→←→BA</kbd> Warp drive<br>
-    Terminal: <kbd>matrix</kbd> <kbd>nerv</kbd> <kbd>warp</kbd> <kbd>help</kbd>
+    Terminal: <kbd>new</kbd> <kbd>random</kbd> <kbd>theme</kbd> <kbd>whois</kbd> <kbd>help</kbd>
+  </div>
+</div>
+
+<!-- Command palette (Cmd/Ctrl+K) -->
+<div class="pal-overlay" id="paletteOverlay" role="dialog" aria-modal="true" aria-label="Search tools" hidden>
+  <div class="pal-box">
+    <div class="pal-input-wrap">
+      <svg class="pal-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input class="pal-input" id="paletteInput" type="text" placeholder="Jump to a tool…"
+             aria-label="Search tools" autocomplete="off" spellcheck="false"
+             role="combobox" aria-expanded="true" aria-controls="paletteList" aria-autocomplete="list">
+    </div>
+    <ul class="pal-list" id="paletteList" role="listbox" aria-label="Tools"></ul>
+    <div class="pal-empty" id="paletteEmpty">Nothing matches. Try a shorter word.</div>
+    <div class="pal-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> open</span>
+      <span><kbd>esc</kbd> close</span>
+    </div>
   </div>
 </div>
 
@@ -1436,25 +1514,18 @@
 <script defer src="js/previews.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
 <script defer src="js/sortable.js"></script>
+<script defer src="js/recent.js"></script>
+<script defer src="js/catnav.js"></script>
+<script defer src="js/palette.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    var count = document.querySelectorAll('.site-card:not(.external-card):not(.ghost-card)').length;
+    /* Scoped to #tools: the Recently shipped rail holds clones of these cards,
+       and an unscoped selector would count every recent tool twice. */
+    var count = document.querySelectorAll('#tools .site-card:not(.external-card):not(.ghost-card)').length;
     var el = document.getElementById('toolCount');
     if (el && count > 0) el.textContent = count;
   });
 </script>
 
-  <footer class="neorgon-footer" aria-label="Neorgon navigation">
-    <div class="neorgon-footer-inner">
-      <a class="neorgon-footer-btn neorgon-footer-btn--home" href="https://neorgon.com/" aria-label="Back to Neorgon hub">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back to Neorgon
-      </a>
-      <a class="neorgon-footer-btn" href="https://github.com/energon-a-secas" target="_blank" rel="noopener noreferrer" aria-label="Star on GitHub">
-        <svg width="16" height="16" viewBox="0 0 98 96" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
-        Star on GitHub
-      </a>
-    </div>
-  </footer>
 </body>
 </html>

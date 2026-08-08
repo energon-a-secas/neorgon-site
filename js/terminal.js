@@ -113,24 +113,124 @@
     prompt.textContent = authedUser ? `${authedUser}@neorgon ❯ ` : '~ ❯ ';
   }
 
+  /* ── Catalog, read from the page ──────────────────────────────────────────
+     `tools` and `goto` used to carry hardcoded 14-entry lists. The hub now
+     ships 43 tools, so both had been wrong for months: `goto stash` reported
+     "unknown site" for a site that is right there on the page. Reading the DOM
+     means the terminal cannot drift from the catalog again.
+
+     Excludes .site-card--echo — the Recently shipped rail holds clones, and
+     counting them would report every recent tool twice. */
+  function catalog() {
+    /* Document-wide, not scoped to #tools: the three locked ghost cards live in
+       the hidden secret section, and scoping to #tools made `stats` report
+       "0 locked" while three ghosts sat on the page. */
+    return Array.from(document.querySelectorAll('.site-card[data-card-id]'))
+      .filter(el => !el.classList.contains('site-card--echo'))
+      .map(el => {
+        const txt = sel => ((el.querySelector(sel) || {}).textContent || '').trim();
+        const group = el.closest('.card-group');
+        const domain = txt('.card-domain');
+        let href = el.getAttribute('href');
+        if (!href) {
+          const sub = el.querySelector('.card-subtool-popup a[href]');
+          href = sub ? sub.getAttribute('href') : (domain ? 'https://' + domain : '');
+        }
+        return {
+          id: el.dataset.cardId,
+          name: txt('.card-name'),
+          desc: txt('.card-desc'),
+          domain: domain,
+          added: el.dataset.added || '',
+          group: group ? (group.querySelector('.group-label') || {}).textContent.trim() : '',
+          groupId: group ? group.id : '',
+          tags: Array.from(el.querySelectorAll('.card-tag')).map(t => t.textContent.trim()),
+          locked: el.classList.contains('ghost-card'),
+          external: el.classList.contains('external-card'),
+          href: href,
+          el: el
+        };
+      });
+  }
+
+  /* Live tools only — a locked ghost is not somewhere you can be sent, and an
+     external link is not one of ours. Restricted to #tools so this matches the
+     43 the hero claims; the ghosts sit outside it in the secret section. */
+  function liveTools() {
+    return catalog().filter(t =>
+      !t.locked && !t.external && t.el.closest('#tools'));
+  }
+
+  /* Resolve one argument to a tool: exact id, then name, then a unique prefix.
+     Ambiguity is reported rather than guessed — silently opening the wrong site
+     is worse than asking which one. */
+  function resolveTool(query) {
+    const q = (query || '').trim().toLowerCase();
+    if (!q) return { error: 'no name given' };
+    const all = catalog().filter(t => !t.locked);
+    const byId = all.find(t => t.id.toLowerCase() === q);
+    if (byId) return { tool: byId };
+    const byName = all.find(t => t.name.toLowerCase() === q);
+    if (byName) return { tool: byName };
+    const byDomain = all.find(t => t.domain.toLowerCase().split('.')[0] === q);
+    if (byDomain) return { tool: byDomain };
+
+    const partial = all.filter(t =>
+      t.id.toLowerCase().includes(q) ||
+      t.name.toLowerCase().includes(q) ||
+      t.domain.toLowerCase().includes(q)
+    );
+    if (partial.length === 1) return { tool: partial[0] };
+    if (partial.length > 1) return { ambiguous: partial };
+    return { error: `no tool matches "${q}"` };
+  }
+
+  function openTool(tool) {
+    addLine(`Opening ${tool.name} — ${tool.domain}`, 'sys');
+    window.open(tool.href, '_blank', 'noopener');
+  }
+
+  function relDays(added) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(added || '');
+    if (!m) return null;
+    return Math.floor((Date.now() - Date.UTC(+m[1], +m[2] - 1, +m[3])) / 86400000);
+  }
+
   /* ── Public commands (always available) ── */
   const publicCommands = {
     help() {
-      addLine('Commands:', 'sys');
-      addLine('  help         — show this message', 'sys');
-      addLine('  clear        — clear terminal', 'sys');
-      addLine('  warp         — engage warp drive', 'sys');
-      addLine('  tools        — list all tools', 'sys');
-      addLine('  goto <site>  — open a tool site', 'sys');
-      addLine('  whoami       — who are you?', 'sys');
-      addLine('  date         — current date', 'sys');
-      addLine('  login <u> <p>— authenticate', 'sys');
-      addLine('  reset-layout — restore default card order', 'sys');
-      addLine('  export-layout— copy layout JSON to clipboard', 'sys');
+      addLine('Find things:', 'sys');
+      addLine('  tools [cat]  — list tools, optionally one category', 'sys');
+      addLine('  categories   — list categories with counts', 'sys');
+      addLine('  new          — what shipped recently', 'sys');
+      addLine('  search <q>   — filter the catalog', 'sys');
+      addLine('  whois <tool> — details on one tool', 'sys');
+      addLine('  stats        — numbers about this site', 'sys');
+      addLine('', 'sys');
+      addLine('Go places:', 'sys');
+      addLine('  goto <tool>  — open a tool (id, name or prefix)', 'sys');
+      addLine('  open <cat>   — scroll to a category', 'sys');
+      addLine('  random       — open something at random', 'sys');
+      addLine('', 'sys');
+      addLine('Make it yours:', 'sys');
+      addLine('  theme [name] — set your theme (theme list to see them)', 'sys');
       addLine('  matrix       — toggle matrix rain (stays in terminal)', 'sys');
       addLine('  matrix background — toggle matrix & close terminal', 'sys');
       addLine('  nerv [level] — trigger NERV warning (blue/red/orange)', 'sys');
+      addLine('  warp         — engage warp drive', 'sys');
+      addLine('  reset-layout — restore default card order', 'sys');
+      addLine('  export-layout— copy layout JSON to clipboard', 'sys');
+      addLine('', 'sys');
+      addLine('Housekeeping:', 'sys');
+      addLine('  help         — show this message', 'sys');
+      addLine('  clear        — clear terminal', 'sys');
+      addLine('  whoami       — who are you?', 'sys');
+      addLine('  fortune      — unsolicited advice', 'sys');
+      addLine('  date         — current date', 'sys');
+      addLine('  login <u> <p>— authenticate', 'sys');
       addLine('  exit         — close terminal', 'sys');
+      addLine('', 'sys');
+      addLine('Tab completes commands and tool names. ↑ / ↓ walk history.', 'sys');
       addLine('', 'sys');
       addLine('Cheat codes (type anywhere):', 'sys');
       addLine('  ↑↑↓↓←→←→BA  — Konami Code (warp drive)', 'sys');
@@ -159,45 +259,197 @@
       closeTerm();
       setTimeout(() => window.engageWarp(), 200);
     },
-    tools() {
-      const tools = [
-        ['ehq.cl', 'Energon HQ'],
-        ['infradrills', 'Infra Drills'],
-        ['skillmap', 'Skill Map'],
-        ['clientsays', 'Client Says'],
-        ['decisionwheel', 'Decision Wheel'],
-        ['references', 'Reference Matrix'],
-        ['jsonstudio', 'JSON Studio'],
-        ['slides', 'Presentation Sage'],
-        ['pathfinder', 'Pathfinder'],
-        ['emojis', 'Emoji Archive'],
-        ['memes', 'Meme Vault'],
-        ['interviews', 'Vibe Check'],
-        ['ogstudio', 'OG Studio'],
-        ['charactersheet', 'Character Sheet'],
-      ];
-      tools.forEach(([key, name]) => addLine(`  ${key.padEnd(16)} ${name}`, 'sys'));
+    tools(args) {
+      const filter = (args || '').trim().toLowerCase();
+      let list = liveTools();
+      if (filter) {
+        list = list.filter(t => t.group.toLowerCase().includes(filter));
+        if (!list.length) {
+          addLine(`No category matches "${filter}". Try "categories".`, 'err');
+          return;
+        }
+      }
+      let lastGroup = null;
+      list.forEach(t => {
+        if (t.group !== lastGroup) {
+          addLine(`${lastGroup ? '\n' : ''}${t.group}`, 'sys');
+          lastGroup = t.group;
+        }
+        addLine(`  ${t.id.padEnd(16)} ${t.name}`, 'sys');
+      });
+      addLine('', 'sys');
+      addLine(`${list.length} ${list.length === 1 ? 'tool' : 'tools'}` +
+              `${filter ? ' in ' + filter : ''}. "goto <id>" to open one.`, 'sys');
+    },
+    categories() {
+      /* Counts every card in the group, external ones included, so this agrees
+         with the category rail's chip counts. Excluding externals made Platforms
+         vanish and the total read 10 where the rail shows 11. */
+      const seen = new Map();
+      catalog().filter(t => !t.locked && t.group).forEach(t =>
+        seen.set(t.group, (seen.get(t.group) || 0) + 1));
+      seen.forEach((n, group) => addLine(`  ${group.padEnd(16)} ${n}`, 'sys'));
+      addLine('', 'sys');
+      addLine('"open <category>" scrolls there \u00b7 "tools <category>" lists it', 'sys');
     },
     goto(args) {
-      const sites = {
-        'ehq': 'https://ehq.cl/', 'ehq.cl': 'https://ehq.cl/',
-        'infradrills': 'https://infradrills.neorgon.com/',
-        'skillmap': 'https://skillmap.neorgon.com/',
-        'clientsays': 'https://clientsays.neorgon.com/',
-        'decisionwheel': 'https://decisionwheel.neorgon.com/',
-        'references': 'https://references.neorgon.com/',
-        'jsonstudio': 'https://jsonstudio.neorgon.com/',
-        'slides': 'https://slides.neorgon.com/',
-        'pathfinder': 'https://pathfinder.neorgon.com/',
-        'emojis': 'https://emojis.neorgon.com/',
-        'memes': 'https://memes.neorgon.com/',
-        'interviews': 'https://interviews.neorgon.com/',
-        'ogstudio': 'https://ogstudio.neorgon.com/',
-        'charactersheet': 'https://charactersheet.neorgon.com/',
-      };
-      const key = (args || '').trim().toLowerCase();
-      if (sites[key]) { addLine(`Opening ${key}\u2026`, 'sys'); window.open(sites[key], '_blank'); }
-      else { addLine(`Unknown site: "${key}". Type "tools" for the list.`, 'err'); }
+      const r = resolveTool(args);
+      if (r.tool) { openTool(r.tool); return; }
+      if (r.ambiguous) {
+        addLine(`"${args.trim()}" matches ${r.ambiguous.length} tools:`, 'err');
+        r.ambiguous.forEach(t => addLine(`  ${t.id.padEnd(16)} ${t.name}`, 'sys'));
+        return;
+      }
+      addLine(`${r.error}. Type "tools" for the list.`, 'err');
+    },
+    /* Scrolls the page rather than opening anything \u2014 the counterpart to goto
+       for when you want to browse a section, not leave for a tool. */
+    open(args) {
+      const q = (args || '').trim().toLowerCase();
+      if (!q) { addLine('Usage: open <category>   (see "categories")', 'err'); return; }
+      const groups = Array.from(document.querySelectorAll('#tools > .card-group[id]'))
+        .filter(g => !g.hasAttribute('hidden'));
+      const match = groups.find(g => {
+        const label = ((g.querySelector('.group-label') || {}).textContent || '').trim().toLowerCase();
+        return label === q || label.includes(q) || g.id === 'group-' + q;
+      });
+      if (!match) { addLine(`No category matches "${q}". Try "categories".`, 'err'); return; }
+      const label = ((match.querySelector('.group-label') || {}).textContent || '').trim();
+      addLine(`Jumping to ${label}\u2026`, 'sys');
+      closeTerm();
+      /* catnav.js gives every group a `scroll-margin-top` covering the sticky
+         header + rail, so scrollIntoView lands correctly without repeating that
+         arithmetic here — one owner for the offset, not two that can drift. */
+      setTimeout(() => {
+        match.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }, 220);
+    },
+    /* Types the query into the hero search rather than reimplementing filtering,
+       so the constellation, pill physics and card FLIP all still run. */
+    search(args) {
+      const q = (args || '').trim();
+      if (!q) { addLine('Usage: search <query>', 'err'); return; }
+      const field = document.getElementById('heroSearch');
+      if (!field) { addLine('Search not available on this page.', 'err'); return; }
+      closeTerm();
+      setTimeout(() => {
+        field.value = q;
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+        field.focus();
+        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 220);
+    },
+    /* Reads the rail's own data so "new" and the rail can never disagree. */
+    new() {
+      const recent = window._neoRecent && window._neoRecent.length
+        ? window._neoRecent
+        : liveTools()
+            .filter(t => t.added)
+            .sort((a, b) => b.added.localeCompare(a.added))
+            .slice(0, 6);
+      if (!recent.length) { addLine('No launch dates on the page.', 'err'); return; }
+      addLine('Recently shipped:', 'sys');
+      recent.forEach(t => {
+        const d = relDays(t.added);
+        const when = d === null ? t.added
+          : d <= 0 ? 'today'
+          : d === 1 ? 'yesterday'
+          : d < 30 ? `${d}d ago`
+          : `${Math.floor(d / 30)}mo ago`;
+        addLine(`  ${t.id.padEnd(16)} ${when.padEnd(10)} ${t.name}`, 'sys');
+      });
+      addLine('', 'sys');
+      addLine('"goto <id>" to open one.', 'sys');
+    },
+    random() {
+      const list = liveTools();
+      if (!list.length) { addLine('Nothing to pick from.', 'err'); return; }
+      const pick = list[Math.floor(Math.random() * list.length)];
+      addLine('Rolling\u2026', 'sys');
+      addLine(`  ${pick.name} \u2014 ${pick.desc || pick.group}`, 'sys');
+      openTool(pick);
+    },
+    whois(args) {
+      const r = resolveTool(args);
+      if (r.ambiguous) {
+        addLine(`"${args.trim()}" matches ${r.ambiguous.length} tools:`, 'err');
+        r.ambiguous.forEach(t => addLine(`  ${t.id.padEnd(16)} ${t.name}`, 'sys'));
+        return;
+      }
+      if (!r.tool) { addLine(`${r.error}. Type "tools" for the list.`, 'err'); return; }
+      const t = r.tool;
+      const d = relDays(t.added);
+      addLine(t.name, 'sys');
+      if (t.desc) addLine(`  ${t.desc}`, 'sys');
+      addLine(`  id        ${t.id}`, 'sys');
+      addLine(`  category  ${t.group}`, 'sys');
+      addLine(`  domain    ${t.domain}`, 'sys');
+      if (t.added) addLine(`  shipped   ${t.added}${d !== null ? ` (${d}d ago)` : ''}`, 'sys');
+      if (t.tags.length) addLine(`  tags      ${t.tags.join(', ')}`, 'sys');
+      if (t.locked) addLine('  status    locked', 'sys');
+      addLine('', 'sys');
+      addLine(`  goto ${t.id}`, 'sys');
+    },
+    stats() {
+      const all = catalog();
+      const live = liveTools();
+      const dated = live.map(t => t.added).filter(Boolean).sort();
+      /* Same source as `categories` — counting groups from live tools only
+         dropped Platforms (all external) and reported 10 against the rail's 11. */
+      const groups = new Set(all.filter(t => !t.locked && t.group).map(t => t.group));
+      const fresh = live.filter(t => { const d = relDays(t.added); return d !== null && d <= 30; });
+      addLine('neorgon.com', 'sys');
+      addLine(`  tools        ${live.length} live \u00b7 ${all.filter(t => t.locked).length} locked \u00b7 ` +
+              `${all.filter(t => t.external).length} external`, 'sys');
+      addLine(`  categories   ${groups.size}`, 'sys');
+      if (dated.length) {
+        addLine(`  first ship   ${dated[0]}`, 'sys');
+        addLine(`  last ship    ${dated[dated.length - 1]}`, 'sys');
+      }
+      addLine(`  new (30d)    ${fresh.length}`, 'sys');
+      addLine(`  theme        ${(window.NeoHeader && window.NeoHeader.getTheme()) || 'default'}`, 'sys');
+    },
+    /* Visitor-scoped only: writes the neo_theme cookie through the header kit,
+       which is the visitor's own preference. Changing the *fleet* default is a
+       CDN operation and deliberately not exposed here \u2014 that belongs in an ops
+       console, not a page anyone can open. */
+    theme(args) {
+      const arg = (args || '').trim().toLowerCase();
+      const kit = window.NeoHeader;
+      if (!kit || !kit.setTheme) { addLine('Header kit not loaded.', 'err'); return; }
+      const ids = kit.themes || [];
+      if (!arg || arg === 'list') {
+        addLine(`Current: ${kit.getTheme ? kit.getTheme() : 'default'}`, 'sys');
+        (kit.list || ids.map(id => ({ id: id, label: id }))).forEach(t => {
+          addLine(`  ${t.id.padEnd(12)} ${t.label || ''}`, 'sys');
+        });
+        addLine('', 'sys');
+        addLine('Usage: theme <name>   \u2014 applies to you, on every neorgon.com site', 'sys');
+        return;
+      }
+      if (ids.indexOf(arg) === -1) {
+        addLine(`Unknown theme: "${arg}". Type "theme list".`, 'err');
+        return;
+      }
+      kit.setTheme(arg);
+      addLine(`Theme set to ${arg}. Follows you across neorgon.com.`, 'sys');
+    },
+    fortune() {
+      /* Deliberately about this workshop rather than generic fortunes \u2014 the
+         terminal is the one place the site gets to have an opinion. */
+      const lines = [
+        'A tool you built for yourself is the only user research that never lies.',
+        'The site with 43 tools started as one page with one button.',
+        'Naming is the hard part. Everything else is typing.',
+        'A dead link is a broken promise. Check your DNS.',
+        'Ship it small. Ship it hidden. Ship it anyway.',
+        'The best feature is the one you delete.',
+        'Every hardcoded list becomes a lie eventually.',
+        'You will rewrite this in six months and it will be better.',
+        'Zero build steps, zero dependencies, zero 3am pages.',
+        'If the terminal is the best part, the terminal is the product.'
+      ];
+      addLine(lines[Math.floor(Math.random() * lines.length)], 'sys');
     },
     whoami() {
       if (authedUser) {
@@ -417,9 +669,70 @@
     }
   }
 
+  /* ── Tab completion ──────────────────────────────────────────────────────
+     `goto` over 43 tools is only pleasant if you do not have to remember the
+     ids. Completes the command in the first word, and tool ids after any
+     command that takes one. On multiple matches it fills the longest common
+     prefix and prints the candidates, like a shell. */
+  const TOOL_ARG_COMMANDS = ['goto', 'whois', 'ghost'];
+  const CATEGORY_ARG_COMMANDS = ['open', 'tools'];
+
+  function commonPrefix(list) {
+    if (!list.length) return '';
+    return list.reduce((acc, s) => {
+      let i = 0;
+      while (i < acc.length && i < s.length && acc[i] === s[i]) i++;
+      return acc.slice(0, i);
+    });
+  }
+
+  function completions(word, pool) {
+    return pool.filter(c => c.indexOf(word) === 0);
+  }
+
+  function complete() {
+    const value = input.value;
+    /* A trailing space means "complete the next word", not the one just typed. */
+    const words = value.split(/\s+/);
+    const atNewWord = /\s$/.test(value);
+    const wordIdx = atNewWord ? words.length - 1 : words.length - 1;
+    const word = (atNewWord ? '' : words[wordIdx] || '').toLowerCase();
+
+    let pool;
+    if (wordIdx === 0) {
+      pool = Object.keys(publicCommands).concat(authedUser ? Object.keys(authCommands) : []);
+    } else {
+      const cmd = words[0].toLowerCase();
+      if (TOOL_ARG_COMMANDS.indexOf(cmd) !== -1) {
+        pool = catalog().map(t => t.id);
+      } else if (CATEGORY_ARG_COMMANDS.indexOf(cmd) !== -1) {
+        pool = Array.from(new Set(liveTools().map(t => t.group.toLowerCase())));
+      } else if (cmd === 'theme') {
+        pool = (window.NeoHeader && window.NeoHeader.themes) || [];
+      } else {
+        return;
+      }
+    }
+
+    const matches = completions(word, pool.sort());
+    if (!matches.length) return;
+
+    const head = words.slice(0, wordIdx);
+    const filled = matches.length === 1 ? matches[0] : commonPrefix(matches);
+    if (filled.length > word.length || matches.length === 1) {
+      input.value = head.concat(filled).join(' ') + (matches.length === 1 ? ' ' : '');
+    }
+    if (matches.length > 1) {
+      addLine(matches.join('   '), 'sys');
+    }
+  }
+
   /* ── Input handling ── */
   input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      complete();
+    } else if (e.key === 'Enter') {
       exec(input.value);
       input.value = '';
     } else if (e.key === 'ArrowUp') {

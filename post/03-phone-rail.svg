@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" width="1200" height="620" font-family="'Avenir Next','Segoe UI',Roboto,sans-serif">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#1a1040" stop-opacity=".85"/>
+      <stop offset="55%" stop-color="#0a0a24" stop-opacity=".45"/>
+      <stop offset="100%" stop-color="#040714" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="620" fill="#040714"/>
+  <rect width="1200" height="620" fill="url(#glow)"/>
+  
+  
+  <text x="64" y="88" fill="#B015B0" font-size="20" font-weight="700" letter-spacing="3.4">MOBILE</text>
+  <text x="64" y="136" fill="#f9f9f9" font-size="42" font-weight="700" letter-spacing="-.4">6 cards, one column, two screens of scroll</text>
+  <text x="64" y="172" fill="rgba(255,255,255,.46)" font-size="21">On a 390×844 phone the rail buried the thing it introduces.</text>
+  <rect x="631.74759914134" y="196" width="4" height="290" rx="2" fill="#f9f9f9"/>
+  <text x="647.74759914134" y="188" fill="rgba(255,255,255,.46)" font-size="18" font-weight="700">ONE SCREEN (844px)</text>
+  
+    <text x="274" y="254" text-anchor="end" fill="#f9f9f9" font-size="24" font-weight="600">Before</text>
+    <rect x="300" y="212" width="660.4" height="64" rx="9" fill="#f9f9f9" fill-opacity=".28"/>
+    <text x="318" y="253" fill="#f9f9f9" font-size="19" fill-opacity=".8">catalog starts at y=2228</text>
+    <text x="984.377358490566" y="244" fill="#f9f9f9" font-size="25" font-weight="700">1670px</text>
+    <text x="984.377358490566" y="270" fill="rgba(255,255,255,.46)" font-size="18">1.98 screens</text>
+  
+    <text x="274" y="394" text-anchor="end" fill="#f9f9f9" font-size="24" font-weight="600">After</text>
+    <rect x="300" y="352" width="160.5" height="64" rx="9" fill="#B015B0" fill-opacity=".9"/>
+    <text x="300" y="446" fill="#f9f9f9" font-size="19" fill-opacity=".62">catalog starts at y=964</text>
+    <text x="984.377358490566" y="384" fill="#f9f9f9" font-size="25" font-weight="700">406px</text>
+    <text x="984.377358490566" y="410" fill="rgba(255,255,255,.46)" font-size="18">0.48 screens</text>
+  <text x="64" y="524" fill="rgba(255,255,255,.34)" font-size="17">Same 6 cards. Below 600px the grid becomes a snap-scrolling row: first card full, second peeking.</text>
+  <text x="64" y="554" fill="rgba(255,255,255,.34)" font-size="17">The catalog moved up 1264px — from below the fold to inside the first screen and a bit.</text>
+  <text x="64" y="584" fill="rgba(255,255,255,.34)" font-size="17">Measured with getBoundingClientRect().height / innerHeight on a live page.</text>
+</svg>

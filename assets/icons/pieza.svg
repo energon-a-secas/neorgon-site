@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <!-- back card, tilted -->
+  <rect x="14" y="12" width="28" height="38" rx="4" transform="rotate(-12 28 31)" stroke="#E326E4" stroke-width="3" opacity="0.4"/>
+  <!-- front card -->
+  <rect x="24" y="16" width="28" height="38" rx="4" stroke="#E326E4" stroke-width="3"/>
+  <!-- die pips on the front card (a 5-face) -->
+  <circle cx="32" cy="24" r="2.4" fill="#E326E4"/>
+  <circle cx="44" cy="24" r="2.4" fill="#E326E4"/>
+  <circle cx="38" cy="35" r="2.4" fill="#E326E4"/>
+  <circle cx="32" cy="46" r="2.4" fill="#E326E4"/>
+  <circle cx="44" cy="46" r="2.4" fill="#E326E4"/>
+</svg>

@@ -51,20 +51,25 @@
   const index = buildIndex();
 
   /* ── Curated categories ─────────────────────────────────────── */
+  /* Pills mirror the DOM `.card-group` sections one-for-one — same labels, same
+     membership. They used to drift: a "Learning" pill matched no section (Agent
+     Lore sits in Productivity, SafeGuard in DevOps) and a "Game" pill pointed
+     only at a locked ghost card, so clicking it filtered the catalog to nothing.
+     Keywords from those retired pills were folded into the groups that actually
+     hold the cards, so no search term was lost. Keep `ids` in sync with the
+     group they name. */
   const CATEGORIES = [
     { label: 'Planning',      color: '#4ade80', ids: ['pathfinder','skillmap','doorman','loadout'], keywords: 'planning visual canvas export learning roadmap pathfinder skill map strategy doorman build vs buy duplicate vendor deliverable cost estimate scope tokens engineers reverse engineer doorman fallacy loadout team meetings workload overload balance week manager distribution drag drop calendar bottle capacity' },
-    { label: 'DevOps',        color: '#fbbf24', ids: ['cardforge','infradrills','snippets','lockdown','runbook'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell terminal commands bash powershell windows wsl macos git infra drills snippets lockdown security scanner endpoints headers incident runbook alert response on-call checklist cardforge card designer editor json export rush q game builder' },
+    { label: 'DevOps',        color: '#fbbf24', ids: ['cardforge','infradrills','snippets','safeguard','lockdown','runbook'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell terminal commands bash powershell windows wsl macos git infra drills snippets lockdown security scanner endpoints headers incident runbook alert response on-call checklist cardforge card designer editor json export rush q game builder safeguard hardening guides accounts devices privacy' },
     { label: 'Data',          color: '#2dd4bf', ids: ['jsonstudio','references','sitrep'], keywords: 'data editor privacy api search json reference matrix scrambler viewer visualizer radar sitrep santiago chile earthquakes seismic weather forecast metro transit war room situation board dashboard usgs' },
-    { label: 'Productivity',  color: '#a78bfa', ids: ['slides','ogstudio','resume-forge','stackrank','awesomesites','promptforge','glassbox'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio resume forge gaming pdf psn steam stack rank priority lists drag drop collaboration awesome sites curated bookmarks external api whiteboard prompt forge ai prompts context pathfinder agent lore glass box claude architect certification exam agent loop subagents coordinator mcp anti-patterns planning mode config claude.md under the hood simulation' },
-    { label: 'Learning',      color: '#67e8f9', ids: ['agentlore','safeguard'], keywords: 'learning tutorials ai agent claude cursor mcp commands skills path security hardening safeguard guides' },
+    { label: 'Productivity',  color: '#a78bfa', ids: ['slides','promptforge','ogstudio','agentlore','glassbox','stash','resume-forge','stackrank','awesomesites'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio resume forge gaming pdf psn steam stack rank priority lists drag drop collaboration awesome sites curated bookmarks external api whiteboard prompt forge ai prompts context pathfinder agent lore glass box claude architect certification exam agent loop subagents coordinator mcp anti-patterns planning mode config claude.md under the hood simulation stash design assets inspiration icons ui kits pixel art music sprites itch.io submissions votes wishlist json api learning tutorials ai agent cursor commands skills path' },
     { label: 'UI Lab',        color: '#d946ef', ids: ['anatomy','guildhall','questline'], keywords: 'ui lab mockups wireframe components interface design anatomy learn names guild hall quests monster hunter gamified teams badges ranks questline operating model console nier command palette chapters playbooks atlas onboarding keyboard nav experiments prototypes' },
-    { label: 'Fun',           color: '#f472b6', ids: ['decisionwheel','memes','clientsays','emojis','gamebin','minimap','youtube'], keywords: 'minimap arpg parody dungeon boss grind level fun randomizer community upload wheel spin memes timezone translator jargon client says decoded emoji archive search gamebin game bin steam lists curate profile youtube video overflow' },
+    { label: 'Fun',           color: '#f472b6', ids: ['decisionwheel','memes','clientsays','emojis','teamplay','gamebin','minimap','pieza','youtube'], keywords: 'minimap arpg parody dungeon boss grind level fun randomizer community upload wheel spin memes timezone translator jargon client says decoded emoji archive search gamebin game bin steam lists curate profile youtube video overflow pieza dice cards tabletop print play boss hunt dnd bilingual card game teamplay team building retros activities icebreakers games strategy' },
     { label: 'Social',        color: '#38bdf8', ids: ['vibecheck','hiringpack','charactersheet','parla','playbook','tubestack'], keywords: 'social interviews scoring vibe check behavioral personality export character sheet know parla slang latin american regional language playbook career advice tech job hunting bilingual english spanish tubestack youtube channels discovery engineers match community hiring pack resume bullets follow-up' },
     { label: 'Lifehacks',     color: '#f59e0b', ids: ['buyhacks'], keywords: 'lifehacks community reviews buyhacks buy hacks products shopping' },
     { label: 'Health',        color: '#059669', ids: ['headmap'], keywords: 'health head pain migraine headache sinus tension eye strain allergy flu tmj map 3d visualization share' },
-    { label: 'Growth',        color: '#fcd34d', ids: ['mettle', 'primer'], keywords: 'growth mettle reasoning maturity self assessment introspection virtues courage wisdom tolerance eloquence imagination rank probe character moral compass private primer machine learning ml llm ai data science insights training embeddings rag pytorch scikit-learn ollama tutorial learn beginner hands-on pet projects fortune 500' },
+    { label: 'Growth',        color: '#fcd34d', ids: ['mettle','primer'], keywords: 'growth mettle reasoning maturity self assessment introspection virtues courage wisdom tolerance eloquence imagination rank probe character moral compass private primer machine learning ml llm ai data science insights training embeddings rag pytorch scikit-learn ollama tutorial learn beginner hands-on pet projects fortune 500' },
     { label: 'Platforms',     color: '#64748b', ids: ['github','gitlab','dockerhub'], keywords: 'platforms github gitlab docker hub containers images repos code open source private ci cd pipelines' },
-    { label: 'Game',          color: '#e879f9', ids: ['rushq'], keywords: 'game strategy rush q cards corporate' },
   ];
 
   /* ── Floating pills (physics) ───────────────────────────────── */
@@ -511,11 +516,23 @@
 
     syncCatalogMerge(matchedIds);
 
+    /* "N of M tools" has to agree with the 43 the hero claims, so the
+       denominator excludes the same things that count does: locked ghosts, the
+       4 external destinations (github/gitlab/docker/youtube are not ours), and
+       the Recently shipped rail's clones. Counting all 50 cards with an id
+       produced "of 47", contradicting the hero one scroll above. */
+    function countable(item) {
+      return !ghost.includes(item.id) &&
+             !item.el.classList.contains('external-card') &&
+             !item.el.classList.contains('site-card--echo') &&
+             !!item.el.closest('#tools');
+    }
+
     var visible = currentIndex.filter(function (i) {
-      return matchedIds.has(i.id) && !ghost.includes(i.id);
+      return matchedIds.has(i.id) && countable(i);
     }).length;
 
-    var total = currentIndex.filter(function (i) { return !ghost.includes(i.id); }).length;
+    var total = currentIndex.filter(countable).length;
 
     pills.forEach(function (p) {
       if (!p.matched) {
@@ -536,7 +553,90 @@
     runFilterMotion(flipPairs, riseEls);
   }
 
-  input.addEventListener('input', doFilter);
+  /* ── Keyboard walking ────────────────────────────────────────────
+     Typing a query used to be a dead end: the catalog filtered, and reaching
+     the one card left still meant taking hands off the keyboard. Arrow keys now
+     walk the matches and Enter opens the highlighted one — Enter with nothing
+     highlighted takes the top match, which is the common case of "type three
+     letters, hit Enter".
+
+     Results are read from the DOM at keypress time rather than cached, because
+     the merged grid is re-ordered by doFilter and a stale list would highlight
+     a card that has since moved. */
+  var kbdIndex = -1;
+
+  function kbdResults() {
+    if (!document.body.classList.contains('search-active') || !mergedGrid) return [];
+    return Array.from(mergedGrid.querySelectorAll('.site-card[data-card-id]'))
+      .filter(function (c) {
+        return !c.classList.contains('search-hidden') &&
+               !c.classList.contains('ghost-card');
+      });
+  }
+
+  function kbdPaint(list) {
+    (list || kbdResults()).forEach(function (c, i) {
+      c.classList.toggle('kbd-active', i === kbdIndex);
+    });
+  }
+
+  function kbdClear() {
+    kbdIndex = -1;
+    document.querySelectorAll('.site-card.kbd-active').forEach(function (c) {
+      c.classList.remove('kbd-active');
+    });
+  }
+
+  function kbdMove(delta) {
+    var list = kbdResults();
+    if (!list.length) return;
+    kbdIndex = kbdIndex < 0
+      ? (delta > 0 ? 0 : list.length - 1)
+      : (kbdIndex + delta + list.length) % list.length;
+    kbdPaint(list);
+    var el = list[kbdIndex];
+    var rect = el.getBoundingClientRect();
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    /* Only scroll when the highlight would otherwise be off-screen — walking
+       through a row that is already visible should not jerk the page. */
+    if (rect.top < 90 || rect.bottom > vh - 24) {
+      el.scrollIntoView({
+        block: 'center',
+        behavior: prefersReducedMotion() ? 'auto' : 'smooth'
+      });
+    }
+    if (window._neoSoundPing) window._neoSoundPing(660, 0.012);
+  }
+
+  function kbdOpen() {
+    var list = kbdResults();
+    if (!list.length) return;
+    var el = list[kbdIndex < 0 ? 0 : kbdIndex];
+    var href = el.getAttribute('href');
+    if (href) {
+      if (el.classList.contains('external-card') || el.target === '_blank') {
+        window.open(href, '_blank', 'noopener');
+      } else {
+        window.location.href = href;
+      }
+    } else {
+      /* Multi-tool cards are <div>s whose sub-tool popup is wired by cards.js;
+         a click is the only way in, and cards.js owns that behaviour. */
+      el.click();
+      el.scrollIntoView({ block: 'center' });
+    }
+  }
+
+  input.addEventListener('input', function () {
+    kbdClear();
+    doFilter();
+  });
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); kbdMove(1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); kbdMove(-1); }
+    else if (e.key === 'Enter') { e.preventDefault(); kbdOpen(); }
+  });
 
   /* Scroll hero search into view only when it is largely off-screen */
   var searchWrap = input.closest('.hero-search-wrap');
@@ -554,6 +654,7 @@
     e.preventDefault();
     e.stopPropagation();
     input.value = '';
+    kbdClear();
     // Small delay to ensure DOM state is clean
     setTimeout(function() {
       doFilter();
@@ -573,7 +674,11 @@
     }
     if (e.key === 'Escape' && document.activeElement === input) {
       e.preventDefault();
-      if (input.value) {
+      if (kbdIndex >= 0) {
+        /* First Esc drops the highlight, not the query — losing a typed query
+           to a keystroke meant for "deselect" is the annoying outcome. */
+        kbdClear();
+      } else if (input.value) {
         input.value = '';
         doFilter();
       } else {

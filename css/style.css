@@ -2139,3 +2139,431 @@ body.search-active .sites-grid {
   color: rgba(255, 255, 255, 0.4);
   line-height: 1.5;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Recently shipped · Category rail · Command palette
+   Added by the hub navigation pass. See js/recent.js, js/catnav.js, js/palette.js
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Recently shipped rail ─────────────────────────────────────────────── */
+.recent-rail {
+  padding-bottom: 0;
+  margin-bottom: var(--layout-stack-gap);
+}
+.recent-rail[hidden] { display: none; }
+
+.recent-rail-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.recent-rail-head .group-label {
+  margin-bottom: 0;
+  /* Warm amber reads as "fresh" without colliding with any group colour. */
+  --group-color: #fbbf24;
+  color: var(--group-color);
+}
+.recent-rail-count {
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 3px 9px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, #fbbf24 24%, transparent);
+  background: color-mix(in srgb, #fbbf24 8%, transparent);
+  white-space: nowrap;
+}
+
+/* A hairline above the catalog so the rail reads as its own shelf. */
+.recent-rail::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin-top: var(--layout-stack-gap);
+  background: linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, #fbbf24 22%, transparent) 20%,
+    rgba(255,255,255,.07) 50%,
+    transparent);
+}
+
+/* The rail is a single scrollable row on wide screens, so it stays one glance
+   rather than becoming a second full grid competing with the catalog. */
+.recent-rail-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 1100px) {
+  .recent-rail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* On a phone, one column of six 248px cards is 1670px — two full screens of
+   "recently shipped" before the catalog even starts, which buries the thing the
+   rail is supposed to be introducing. Below 600px it becomes a swipeable row:
+   the first card is fully visible, the second peeks to advertise the swipe, and
+   the whole shelf costs one screen instead of two. */
+@media (max-width: 600px) {
+  .recent-rail-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* Cancel the section padding for the scroll container only, so cards can
+       run to the screen edge while still starting flush with the heading. */
+    margin-inline: calc(-1 * var(--layout-gutter));
+    padding-inline: var(--layout-gutter);
+    padding-bottom: 6px;
+    scrollbar-width: none;
+    /* Snapping aligns against the scroll *padding*, not the box padding, so
+       without this the first card snaps flush to the screen edge and sits 18px
+       out of line with the heading above it. */
+    scroll-padding-inline: var(--layout-gutter);
+  }
+  .recent-rail-grid::-webkit-scrollbar { display: none; }
+  .recent-rail-grid > * {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+  }
+}
+
+/* Echo cards: visually lighter than the canonical card in its category, so the
+   rail reads as a pointer rather than a duplicate catalog. */
+.site-card--echo {
+  animation: echoRise .5s var(--ease-out) both;
+  animation-delay: var(--echo-delay, 0ms);
+}
+@keyframes echoRise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-card--echo { animation: none; }
+}
+
+/* Shipped stamp replaces the tag row inside echo cards. */
+.card-shipped {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 4px;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--card-accent, #818cf8);
+}
+.card-shipped-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+  flex-shrink: 0;
+  animation: shippedPulse 2.6s ease-in-out infinite;
+}
+@keyframes shippedPulse {
+  0%, 100% { opacity: .45; transform: scale(.85); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-shipped-dot { animation: none; opacity: .9; }
+}
+
+/* ── NEW badge (on the canonical card, self-expiring via js/recent.js) ──── */
+.card-new-badge {
+  margin-left: auto;
+  margin-right: 8px;
+  align-self: center;
+  font-size: .6rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 8px;
+  color: #10131f;
+  background: linear-gradient(135deg, #fde68a, #fbbf24);
+  box-shadow: 0 0 12px rgba(251,191,36,.4);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Category rail ──────────────────────────────────────────────────────── */
+.cat-rail {
+  position: sticky;
+  /* Set from the live header height by js/catnav.js — the header is 68px of
+     transparent glass at desktop but shorter once its controls collapse, and a
+     hardcoded value here left 12px of the rail sliding underneath it. The
+     fallback only matters for the frame before that script runs. */
+  top: var(--cat-rail-top, 62px);
+  z-index: 40;
+  margin: 0 auto var(--layout-stack-gap);
+  padding: 8px var(--layout-gutter);
+  max-width: var(--catalog-max-width);
+  width: 100%;
+  transition: opacity .25s ease, transform .25s ease;
+}
+.cat-rail[hidden] { display: none; }
+
+.cat-rail-inner {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  padding: 7px 9px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(0, 9, 18, .78);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-float);
+  scroll-behavior: smooth;
+}
+.cat-rail-inner::-webkit-scrollbar { display: none; }
+
+/* Filtering flattens the catalog into one merged grid, so the section chips
+   would point at hidden groups — fade the rail out rather than leave it lying. */
+.cat-rail--suppressed {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 6px 11px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .03em;
+  text-decoration: none;
+  color: var(--text-secondary);
+  background: transparent;
+  transition: color .2s, background .2s, border-color .2s;
+  white-space: nowrap;
+}
+.cat-chip:hover {
+  color: var(--chip-color, var(--text-primary));
+  background: color-mix(in srgb, var(--chip-color, #818cf8) 10%, transparent);
+  border-color: color-mix(in srgb, var(--chip-color, #818cf8) 26%, transparent);
+}
+.cat-chip.active {
+  color: var(--chip-color, var(--text-primary));
+  background: color-mix(in srgb, var(--chip-color, #818cf8) 14%, transparent);
+  border-color: color-mix(in srgb, var(--chip-color, #818cf8) 40%, transparent);
+}
+.cat-chip:focus-visible {
+  outline: 2px solid var(--chip-color, #818cf8);
+  outline-offset: 2px;
+}
+.cat-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--chip-color, currentColor);
+  opacity: .55;
+  flex-shrink: 0;
+  transition: opacity .2s, box-shadow .2s;
+}
+.cat-chip.active .cat-chip-dot,
+.cat-chip:hover .cat-chip-dot {
+  opacity: 1;
+  box-shadow: 0 0 8px var(--chip-color, currentColor);
+}
+.cat-chip-count {
+  font-size: .64rem;
+  font-weight: 700;
+  opacity: .5;
+  font-variant-numeric: tabular-nums;
+}
+.cat-chip.active .cat-chip-count { opacity: .85; }
+
+@media (max-width: 700px) {
+  /* `top` stays with --cat-rail-top; only the padding is narrower here. */
+  .cat-rail { padding: 6px 12px; }
+  .cat-chip { padding: 6px 9px; }
+  /* Counts are the first thing to go when horizontal room runs out. */
+  .cat-chip-count { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-rail, .cat-chip, .cat-chip-dot { transition: none; }
+  .cat-rail-inner { scroll-behavior: auto; }
+}
+
+/* ── Command palette ────────────────────────────────────────────────────── */
+.pal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(60px, 12vh, 140px) 16px 16px;
+  background: rgba(0, 4, 12, .72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease;
+}
+.pal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.pal-overlay[hidden] { display: none; }
+
+.pal-box {
+  width: 100%;
+  max-width: 580px;
+  border-radius: 16px;
+  border: 1px solid var(--border-glow);
+  background: rgba(2, 10, 22, .96);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+  transform: translateY(-10px) scale(.98);
+  transition: transform .22s var(--ease-out);
+}
+.pal-overlay.open .pal-box { transform: none; }
+
+.pal-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.pal-icon {
+  width: 17px;
+  height: 17px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.pal-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 1rem;
+}
+.pal-input::placeholder { color: var(--text-muted); }
+
+.pal-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.pal-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.pal-item.active {
+  background: rgba(129, 140, 248, .13);
+  border-color: rgba(129, 140, 248, .3);
+}
+.pal-item-main {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  min-width: 0;
+}
+.pal-item-name {
+  font-size: .92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.pal-item-group {
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pal-item-domain {
+  font-size: .72rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+}
+.pal-mark {
+  background: none;
+  color: #c084fc;
+  font-weight: 800;
+}
+
+.pal-empty {
+  display: none;
+  padding: 22px 16px;
+  text-align: center;
+  font-size: .85rem;
+  color: var(--text-muted);
+}
+.pal-empty.show { display: block; }
+
+.pal-foot {
+  display: flex;
+  gap: 14px;
+  padding: 9px 14px;
+  border-top: 1px solid var(--border);
+  font-size: .66rem;
+  color: var(--text-muted);
+  background: rgba(255,255,255,.02);
+}
+.pal-foot kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .62rem;
+  padding: 1px 5px;
+  margin-right: 3px;
+  border-radius: 4px;
+  border: 1px solid var(--border-glow);
+  background: rgba(255,255,255,.05);
+}
+
+/* Locking the page behind the palette stops the catalog scrolling underneath. */
+body.palette-open { overflow: hidden; }
+
+@media (max-width: 600px) {
+  .pal-item-group { display: none; }
+  .pal-foot { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pal-overlay, .pal-box { transition: none; }
+}
+
+/* ── Search: keyboard-walked active card ───────────────────────────────── */
+.site-card.kbd-active {
+  border-color: var(--card-glow-border, rgba(255,255,255,.35));
+  box-shadow:
+    var(--shadow-card-hover),
+    0 0 0 2px color-mix(in srgb, var(--card-accent, #818cf8) 55%, transparent),
+    0 0 32px var(--card-glow, rgba(120,0,255,.3));
+}
+.site-card.kbd-active::before { opacity: 1; }

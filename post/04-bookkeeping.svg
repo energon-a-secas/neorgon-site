@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 728" width="1200" height="728" font-family="'Avenir Next','Segoe UI',Roboto,sans-serif">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#1a1040" stop-opacity=".85"/>
+      <stop offset="55%" stop-color="#0a0a24" stop-opacity=".45"/>
+      <stop offset="100%" stop-color="#040714" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="728" fill="#040714"/>
+  <rect width="1200" height="728" fill="url(#glow)"/>
+  
+  
+  <text x="64" y="88" fill="#B015B0" font-size="20" font-weight="700" letter-spacing="3.4">BOOKKEEPING</text>
+  <text x="64" y="136" fill="#f9f9f9" font-size="42" font-weight="700" letter-spacing="-.4">What the page said about itself</text>
+  <text x="64" y="172" fill="rgba(255,255,255,.46)" font-size="21">None of these were the feature. All of them were visible.</text>
+  <text x="720" y="182" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="18" letter-spacing="2.6">BEFORE</text>
+  <text x="1010" y="182" text-anchor="middle" fill="#B015B0" font-size="18" letter-spacing="2.6">AFTER</text>
+  
+    <text x="74" y="224" fill="rgba(255,255,255,.62)" font-size="23">Tools the page claimed</text>
+    <text x="720" y="228" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="34" font-weight="700">40</text>
+    <line x1="674" y1="216" x2="766" y2="216" stroke="rgba(255,255,255,.46)" stroke-width="0"/>
+    <path d="M 794 215 H 928" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+    <path d="M 922 209 l 8 6 l -8 6 z" fill="rgba(255,255,255,.16)"/>
+    <text x="1010" y="228" text-anchor="middle" fill="#B015B0" font-size="34" font-weight="700">43</text>
+    <path d="M 74 254 H 1126" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+    <text x="74" y="302" fill="rgba(255,255,255,.62)" font-size="23">New badges rendered</text>
+    <text x="720" y="306" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="34" font-weight="700">19</text>
+    <line x1="674" y1="294" x2="766" y2="294" stroke="rgba(255,255,255,.46)" stroke-width="0"/>
+    <path d="M 794 293 H 928" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+    <path d="M 922 287 l 8 6 l -8 6 z" fill="rgba(255,255,255,.16)"/>
+    <text x="1010" y="306" text-anchor="middle" fill="#B015B0" font-size="34" font-weight="700">13</text>
+    <path d="M 74 332 H 1126" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+    <text x="74" y="380" fill="rgba(255,255,255,.62)" font-size="23">Pills pointing at a real section</text>
+    <text x="720" y="384" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="34" font-weight="700">11/13</text>
+    <line x1="674" y1="372" x2="766" y2="372" stroke="rgba(255,255,255,.46)" stroke-width="0"/>
+    <path d="M 794 371 H 928" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+    <path d="M 922 365 l 8 6 l -8 6 z" fill="rgba(255,255,255,.16)"/>
+    <text x="1010" y="384" text-anchor="middle" fill="#B015B0" font-size="34" font-weight="700">11/11</text>
+    <path d="M 74 410 H 1126" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+    <text x="74" y="458" fill="rgba(255,255,255,.62)" font-size="23">Cards no pill could reach</text>
+    <text x="720" y="462" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="34" font-weight="700">4</text>
+    <line x1="674" y1="450" x2="766" y2="450" stroke="rgba(255,255,255,.46)" stroke-width="0"/>
+    <path d="M 794 449 H 928" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+    <path d="M 922 443 l 8 6 l -8 6 z" fill="rgba(255,255,255,.16)"/>
+    <text x="1010" y="462" text-anchor="middle" fill="#B015B0" font-size="34" font-weight="700">0</text>
+    <path d="M 74 488 H 1126" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+    <text x="74" y="536" fill="rgba(255,255,255,.62)" font-size="23">Footers on the page</text>
+    <text x="720" y="540" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="34" font-weight="700">2</text>
+    <line x1="674" y1="528" x2="766" y2="528" stroke="rgba(255,255,255,.46)" stroke-width="0"/>
+    <path d="M 794 527 H 928" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+    <path d="M 922 521 l 8 6 l -8 6 z" fill="rgba(255,255,255,.16)"/>
+    <text x="1010" y="540" text-anchor="middle" fill="#B015B0" font-size="34" font-weight="700">1</text>
+    <path d="M 74 566 H 1126" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+    <text x="74" y="614" fill="rgba(255,255,255,.62)" font-size="23">Console errors on load</text>
+    <text x="720" y="618" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="34" font-weight="700">8</text>
+    <line x1="674" y1="606" x2="766" y2="606" stroke="rgba(255,255,255,.46)" stroke-width="0"/>
+    <path d="M 794 605 H 928" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+    <path d="M 922 599 l 8 6 l -8 6 z" fill="rgba(255,255,255,.16)"/>
+    <text x="1010" y="618" text-anchor="middle" fill="#B015B0" font-size="34" font-weight="700">3</text>
+    <path d="M 74 644 H 1126" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+  <text x="64" y="680" fill="rgba(255,255,255,.34)" font-size="17">Every figure counted in a live page, not estimated. Source rows in .forge/brief.md.</text>
+</svg>

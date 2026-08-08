@@ -10,6 +10,13 @@
   --header-h: 68px;
   --header-h-app: 56px;
   --header-control-h: 40px; /* every header control (buttons, ⋯, palette, home) shares this height */
+  /* Logo height. A token, not a literal, so a site can make the mark carry more
+     weight without forking the kit. Default 36px = the historical value, so
+     nothing changes for a site that never sets it. The bar is 68px with no
+     vertical padding, so ~52px is the practical ceiling before the mark starts
+     to look wedged against the edges. */
+  --header-logo-h: 36px;
+  --header-logo-h-mobile: 28px;
 
   /* Palette — themes override these (see themes.css) */
   --header-bg-start: #B015B0;
@@ -348,7 +355,7 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   min-width: 0;
 }
 .header-logo-img {
-  height: 36px;
+  height: var(--header-logo-h, 36px);
   width: auto;
   flex-shrink: 0;
   display: block;
@@ -686,7 +693,7 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   .header-bar { padding: 0 var(--space-4, 16px); gap: var(--space-2, 8px); }
   .header-subtitle { display: none; }
   .header-logo h1 { font-size: 1rem; }
-  .header-logo-img { height: 28px; }
+  .header-logo-img { height: var(--header-logo-h-mobile, 28px); }
   .header-right { gap: 6px; }
   /* A 180px panel pinned to the right of a 375px viewport wastes width. */
   .header-menu {
