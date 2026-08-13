@@ -2,7 +2,7 @@
 
 :root {
   --bg: #000912;
-  --font: 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font: 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   --text-primary: #f0f4ff;
   --text-secondary: #9eb0d4;
   --text-muted: rgba(172, 188, 218, 0.78);
@@ -823,6 +823,62 @@ body.search-active #tools > .card-group.catalog-native-suppressed {
   width: 10px;
   height: 10px;
   opacity: .6;
+}
+
+/* ── Soon card ──────────────────────────────────────────────────────────
+   A tool that is built but has nowhere to send you yet — the subdomain is
+   reserved and serves nothing. Rendered as a <div>, never an <a>, so the card
+   *cannot* put a visitor on a 404: the badge says "not yet" and the markup
+   makes that true rather than merely advertising it.
+
+   Dimmed to .78, not the ghost card's .07. A ghost is a puzzle nobody is meant
+   to read; this one is a roadmap entry and has to stay legible. Below about .7
+   the description loses its contrast against the card, which is why the dim
+   stops there and the dashed border and badge carry the rest of the signal. */
+.soon-card {
+  opacity: .78;
+  cursor: default;
+  border-style: dashed;
+  border-color: rgba(255,255,255,.14);
+}
+/* Hover restores full legibility but withholds the lift and glow a link gets —
+   the card answers "what is this" and stops, because there is nowhere to go. */
+.soon-card:hover,
+.soon-card:focus-within {
+  opacity: 1;
+  border-color: rgba(255,255,255,.14);
+  box-shadow: var(--shadow-card);
+}
+.soon-card:hover::before,
+.soon-card:hover::after { opacity: 0; }
+.soon-card:hover .card-icon-wrap { transform: none; box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 2px 6px rgba(0,0,0,.28); }
+/* Desaturated until it ships, so a row of live tools still reads first. */
+.soon-card .card-site-icon { filter: grayscale(.6) drop-shadow(0 0 3px rgba(227, 38, 228, .35)); }
+.soon-card:hover .card-site-icon { filter: drop-shadow(0 0 3px rgba(227, 38, 228, .7)); }
+
+.soon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: .6rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--card-accent, #818cf8);
+  background: color-mix(in srgb, var(--card-accent, #818cf8) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--card-accent, #818cf8) 32%, transparent);
+}
+.soon-badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .85;
 }
 
 /* ── Arrival toast ──────────────────────────────────────────────────── */
@@ -2146,13 +2202,16 @@ body.search-active .sites-grid {
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Recently shipped rail ─────────────────────────────────────────────── */
-.recent-rail {
+.recent-rail,
+.fav-shelf {
   padding-bottom: 0;
   margin-bottom: var(--layout-stack-gap);
 }
-.recent-rail[hidden] { display: none; }
+.recent-rail[hidden],
+.fav-shelf[hidden] { display: none; }
 
-.recent-rail-head {
+.recent-rail-head,
+.fav-shelf-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -2160,13 +2219,15 @@ body.search-active .sites-grid {
   margin-bottom: 10px;
   flex-wrap: wrap;
 }
-.recent-rail-head .group-label {
+.recent-rail-head .group-label,
+.fav-shelf-head .group-label {
   margin-bottom: 0;
-  /* Warm amber reads as "fresh" without colliding with any group colour. */
-  --group-color: #fbbf24;
+  /* Each shelf sets --shelf-tone; the rail's warm amber is the fallback. */
+  --group-color: var(--shelf-tone, #fbbf24);
   color: var(--group-color);
 }
-.recent-rail-count {
+.recent-rail-count,
+.fav-shelf-count {
   font-size: .68rem;
   font-weight: 600;
   letter-spacing: .08em;
@@ -2174,31 +2235,34 @@ body.search-active .sites-grid {
   color: var(--text-muted);
   padding: 3px 9px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, #fbbf24 24%, transparent);
-  background: color-mix(in srgb, #fbbf24 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--shelf-tone, #fbbf24) 24%, transparent);
+  background: color-mix(in srgb, var(--shelf-tone, #fbbf24) 8%, transparent);
   white-space: nowrap;
 }
 
 /* A hairline above the catalog so the rail reads as its own shelf. */
-.recent-rail::after {
+.recent-rail::after,
+.fav-shelf::after {
   content: '';
   display: block;
   height: 1px;
   margin-top: var(--layout-stack-gap);
   background: linear-gradient(90deg,
     transparent,
-    color-mix(in srgb, #fbbf24 22%, transparent) 20%,
+    color-mix(in srgb, var(--shelf-tone, #fbbf24) 22%, transparent) 20%,
     rgba(255,255,255,.07) 50%,
     transparent);
 }
 
 /* The rail is a single scrollable row on wide screens, so it stays one glance
    rather than becoming a second full grid competing with the catalog. */
-.recent-rail-grid {
+.recent-rail-grid,
+.fav-shelf-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 @media (max-width: 1100px) {
-  .recent-rail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .recent-rail-grid,
+  .fav-shelf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 /* On a phone, one column of six 248px cards is 1670px — two full screens of
    "recently shipped" before the catalog even starts, which buries the thing the
@@ -2206,7 +2270,8 @@ body.search-active .sites-grid {
    the first card is fully visible, the second peeks to advertise the swipe, and
    the whole shelf costs one screen instead of two. */
 @media (max-width: 600px) {
-  .recent-rail-grid {
+  .recent-rail-grid,
+  .fav-shelf-grid {
     display: flex;
     grid-template-columns: none;
     overflow-x: auto;
@@ -2222,11 +2287,196 @@ body.search-active .sites-grid {
        out of line with the heading above it. */
     scroll-padding-inline: var(--layout-gutter);
   }
-  .recent-rail-grid::-webkit-scrollbar { display: none; }
-  .recent-rail-grid > * {
+  .recent-rail-grid::-webkit-scrollbar,
+  .fav-shelf-grid::-webkit-scrollbar { display: none; }
+  .recent-rail-grid > *,
+  .fav-shelf-grid > * {
     flex: 0 0 78%;
     scroll-snap-align: start;
   }
+}
+
+/* ── Favorites shelf ───────────────────────────────────────────────────────
+   Shares the rail's layout (see the grid rules above) and differs only in
+   tone, so the two shelves read as siblings rather than as two designs. */
+.fav-shelf {
+  /* Soft violet: not the rail's amber, and not any group's colour. */
+  --shelf-tone: #c4b5fd;
+}
+.fav-shelf-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fav-clear {
+  font: inherit;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.fav-clear:hover,
+.fav-clear:focus-visible {
+  color: var(--text);
+  border-color: rgba(255,255,255,.28);
+}
+/* Armed for the second click. Red only at this point: the button is harmless
+   until it is asking, and colouring it red before then is a false alarm. */
+.fav-clear.is-armed {
+  color: #fca5a5;
+  border-color: rgba(248,113,113,.42);
+  background: rgba(248,113,113,.1);
+}
+
+/* ── Card control strip ────────────────────────────────────────────────────
+   One pill, bottom-right, opposite the arrow. The arrow at the top means "go
+   there"; this means "keep this", and the two gestures never share a corner.
+
+   It replaced a bare 28px star that you had to aim at. Hovering anywhere on
+   the card now brings up a surface with real targets on it, and on a saved
+   card the star stays out so the state reads without hovering at all. The
+   secondary controls collapse to zero width at rest and grow on hover, so the
+   pill is only ever as wide as it has something to say. */
+.card-tools {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: color-mix(in srgb, #04070f 76%, transparent);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  opacity: 0;
+  transition: opacity .18s, border-color .2s, box-shadow .25s;
+}
+.site-card:hover .card-tools,
+.site-card:focus-within .card-tools {
+  opacity: 1;
+  border-color: rgba(255,255,255,.12);
+  box-shadow: 0 6px 18px rgba(0,0,0,.42);
+}
+/* A saved card keeps its strip visible at rest — that is the state readout. */
+.site-card.is-fav .card-tools { opacity: 1; }
+
+.card-tool {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color .18s, background .18s, transform .18s var(--ease-out);
+}
+.card-tool svg { width: 15px; height: 15px; }
+.card-tool:hover { background: rgba(255,255,255,.08); transform: translateY(-1px); }
+.card-tool:focus-visible {
+  outline: 2px solid var(--fav-gold, #fcd34d);
+  outline-offset: 1px;
+}
+
+/* Secondary controls: nothing at rest, full size once the card is engaged.
+   Margin animates with width so a collapsed control leaves no dead gap. */
+.card-tool.pin-toggle,
+.card-tool.drag-handle {
+  width: 0;
+  margin-left: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: width .2s var(--ease-out), margin .2s var(--ease-out), opacity .16s, color .18s, background .18s;
+}
+.site-card.is-fav:hover .pin-toggle,
+.site-card.is-fav:focus-within .pin-toggle,
+.site-card.is-pinned .pin-toggle,
+.fav-shelf .site-card:hover .drag-handle,
+.fav-shelf .site-card:focus-within .drag-handle {
+  width: 28px;
+  margin-left: 2px;
+  opacity: 1;
+}
+.drag-handle { cursor: grab; }
+.drag-handle:active { cursor: grabbing; }
+
+/* ── Saved and pinned ──────────────────────────────────────────────────────
+   The state lives on the card's own border, not only in an icon: a warm rim
+   plus the top hairline held on. That reads across a grid at a glance, which a
+   15px star in a corner does not. */
+.site-card {
+  --fav-gold: #fcd34d;
+}
+.card-tool.is-on { color: var(--fav-gold); }
+.card-tool.fav-toggle.is-on svg { fill: currentColor; }
+.card-tool.pin-toggle.is-on .pin-head { fill: currentColor; }
+
+.site-card.is-fav {
+  border-color: color-mix(in srgb, var(--fav-gold) 34%, transparent);
+}
+.site-card.is-fav:hover {
+  border-color: color-mix(in srgb, var(--fav-gold) 52%, transparent);
+}
+/* ::after is the card's existing top hairline, hover-only by default. A saved
+   card just holds it on, in gold, rather than inventing a second element. */
+.site-card.is-fav::after {
+  opacity: .85;
+  background: linear-gradient(90deg, transparent, var(--fav-gold), transparent);
+}
+
+/* Pinned is louder than saved, because it claims the front of the shelf: a
+   brighter rim and a warm wash off the top-left corner. The wash rides
+   background-image, so the card keeps its own background-color. */
+.site-card.is-pinned {
+  border-color: color-mix(in srgb, var(--fav-gold) 55%, transparent);
+  background-image:
+    linear-gradient(135deg, color-mix(in srgb, var(--fav-gold) 15%, transparent), transparent 20%),
+    linear-gradient(165deg, rgba(255,255,255,.045), rgba(255,255,255,0) 42%);
+}
+.site-card.is-pinned::after { opacity: 1; }
+
+/* Reserve the corner so a long tag row never runs under the resting strip. */
+.site-card.has-fav .card-tags { padding-right: 34px; }
+
+/* Dragging inside the shelf. Sortable's classes are shared with the catalog's
+   own reorder (js/sortable.js), so these only add what the shelf needs. */
+.fav-shelf-grid .sortable-ghost { opacity: .32; }
+.fav-shelf-grid .sortable-chosen { cursor: grabbing; }
+/* The card that follows the cursor on the fallback drag path. Lifted and
+   tilted so it reads as picked up rather than as a second copy of the row. */
+.sortable-fallback {
+  opacity: .95 !important;
+  transform: rotate(1.5deg) scale(1.02);
+  box-shadow: 0 22px 44px rgba(0,0,0,.55);
+  cursor: grabbing;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-tools,
+  .card-tool,
+  .card-tool.pin-toggle,
+  .card-tool.drag-handle { transition: none; }
+  .card-tool:hover { transform: none; }
+}
+/* Touch has no hover, so a strip that waits for one would never appear. Show
+   it, quietly, wherever there is no pointer. */
+@media (hover: none) {
+  .card-tools { opacity: .82; }
+  /* Pin still only exists on a saved card — touch reveals the strip, it does
+     not hand out a control the tool has not earned yet. */
+  .site-card.is-fav .card-tool.pin-toggle,
+  .fav-shelf .card-tool.drag-handle { width: 28px; margin-left: 2px; opacity: 1; }
 }
 
 /* Echo cards: visually lighter than the canonical card in its category, so the
@@ -2501,6 +2751,20 @@ body.search-active .sites-grid {
   padding: 2px 6px;
   border-radius: 6px;
   border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+/* Kept when .pal-item-group is dropped on narrow screens: the category is
+   context, but "this one isn't live yet" changes what Enter does. */
+.pal-item-soon {
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #fbbf24;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(251,191,36,.32);
+  background: rgba(251,191,36,.1);
   flex-shrink: 0;
 }
 .pal-item-domain {

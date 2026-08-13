@@ -1,0 +1,370 @@
+/* ══════════════════════════════════════════════════════════════
+   Neorgon Footer Kit — footer.css
+   Canonical source: packages/neorgon-ui/footer/
+   Vendored per site as css/neorgon-footer.css — do not edit copies.
+   Live CDN: https://cdn.neorgon.org/v1.0.0/footer/footer.css
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Geometry — minimal mode is sized to match the one-line .info-footer
+     it replaces (~70px total). Raise --footer-pad-block per site only if
+     that site genuinely wants a heavier footer. */
+  --footer-pad-block: 24px;
+  --footer-pad-block-app: 14px;
+  --footer-pad-block-content: 40px;
+  --footer-max-w: 1100px;
+  --footer-control-h: 32px;
+
+  /* Palette — inherits the header theme tokens so ?theme=matrix and the
+     fleet-wide season.css re-skin the footer too. Fallbacks keep the kit
+     usable on a page that never loads the header kit. */
+  --footer-bg: transparent;
+  --footer-border: var(--header-border, rgba(255, 255, 255, .07));
+  --footer-border-strong: var(--header-border-strong, rgba(255, 255, 255, .22));
+  --footer-text: var(--text-muted, rgba(255, 255, 255, .55));
+  --footer-text-strong: var(--text-secondary, #cacaca);
+  --footer-accent: var(--header-accent, #e879f9);
+  --footer-surface: var(--surface-1, rgba(255, 255, 255, .03));
+  --footer-hover: var(--header-menu-hover, rgba(255, 255, 255, .08));
+
+  --footer-z-top: 150; /* back-to-top: above content, below header (200) and modals (400) */
+}
+
+/* ── Always-at-the-bottom ─────────────────────────────────────
+   Primary: any <body> that owns a .neo-footer becomes a column so
+   the footer's margin-top:auto pins it to the viewport floor on
+   short pages and flows naturally on long ones. Scoped with :has()
+   so sites without the kit are untouched.
+   Fallback (no :has()): the sticky top:100vh trick. It is the
+   fallback rather than the default because several sites set
+   `overflow-x: hidden` on body, which makes body a scroll container
+   and silently breaks sticky. */
+body:has(> .neo-footer) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+body:has(> .neo-footer) > .neo-footer { margin-top: auto; }
+
+@supports not (selector(:has(*))) {
+  body { min-height: 100vh; min-height: 100dvh; }
+  .neo-footer { position: sticky; top: 100vh; }
+}
+
+/* Wrapped layouts: when the footer lives inside a wrapper instead of
+   directly under <body>, footer.js tags the chain and the same
+   column-with-auto-margin applies one level down. */
+body.neo-footer-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.neo-footer-host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.neo-footer-host > .neo-footer { margin-top: auto; }
+
+/* Escape hatch: a site whose layout owns its own bottom (full-screen
+   canvas, virtualised scroller) opts out without losing kit styling. */
+.neo-footer[data-stick="off"] { margin-top: 0; position: static; }
+
+/* ── Footer shell ─────────────────────────────────────────────── */
+.neo-footer {
+  width: 100%;
+  flex-shrink: 0;
+  padding: var(--footer-pad-block) var(--space-6, 24px);
+  padding-bottom: calc(var(--footer-pad-block) + env(safe-area-inset-bottom, 0px));
+  background: var(--footer-bg);
+  border-top: 1px solid var(--footer-border);
+  color: var(--footer-text);
+  font-size: .78rem;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.neo-footer-inner {
+  max-width: var(--footer-max-w);
+  margin: 0 auto;
+}
+
+/* Site-authored copy (privacy note, data provenance, disclaimer) */
+.neo-footer-note { margin: 0; }
+.neo-footer-note + .neo-footer-note { margin-top: 6px; }
+
+/* Links — .neo-footer a is styled broadly so retrofitted markup that
+   still uses .footer-link inherits the right treatment for free. */
+.neo-footer a {
+  color: var(--footer-text);
+  text-decoration: none;
+  border-radius: 4px;
+  transition: color var(--dur, 200ms) ease;
+}
+.neo-footer a:hover,
+.neo-footer a:focus-visible { color: var(--footer-text-strong); text-decoration: underline; }
+.neo-footer a:focus-visible { outline: 2px solid var(--footer-accent); outline-offset: 3px; }
+
+/* ── Meta bar (built by footer.js) ────────────────────────────── */
+.neo-footer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 12px;
+  max-width: var(--footer-max-w);
+  margin: 0 auto;
+}
+.neo-footer-inner + .neo-footer-bar { margin-top: 14px; }
+
+/* Right-hand cluster in content mode (© stays left) */
+.neo-footer-bar-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+
+.neo-footer-sep { opacity: .4; user-select: none; }
+
+/* Version / updated stamps — mono + tabular so they never jitter */
+.neo-footer-stamp {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: .95em;
+  opacity: .8;
+}
+
+/* ── Mode: minimal (default) — the one-liner most tool sites use ──
+   The note and the meta bar share ONE centred line whenever they fit,
+   and wrap to a second only when the copy is genuinely long. Stacking
+   them unconditionally made this mode ~60% taller than the
+   `.info-footer` one-liner it is meant to replace. */
+.neo-footer[data-footer-mode="minimal"],
+.neo-footer:not([data-footer-mode]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px 12px;
+}
+.neo-footer[data-footer-mode="minimal"] > .neo-footer-inner,
+.neo-footer[data-footer-mode="minimal"] > .neo-footer-bar,
+.neo-footer:not([data-footer-mode]) > .neo-footer-inner,
+.neo-footer:not([data-footer-mode]) > .neo-footer-bar {
+  margin: 0;
+  font-size: 1em;
+}
+
+/* ── Mode: app — slim, low-contrast, stays out of the way ───────── */
+.neo-footer[data-footer-mode="app"] {
+  padding-top: var(--footer-pad-block-app);
+  padding-bottom: calc(var(--footer-pad-block-app) + env(safe-area-inset-bottom, 0px));
+  font-size: .72rem;
+  background: var(--footer-surface);
+}
+.neo-footer[data-footer-mode="app"] .neo-footer-inner,
+.neo-footer[data-footer-mode="app"] .neo-footer-bar {
+  max-width: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 12px;
+}
+@media (min-width: 701px) {
+  .neo-footer[data-footer-mode="app"] .neo-footer-inner { justify-content: flex-start; }
+  .neo-footer[data-footer-mode="app"] .neo-footer-bar { justify-content: flex-end; margin-top: 0; }
+  .neo-footer[data-footer-mode="app"] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .neo-footer[data-footer-mode="app"] .neo-footer-inner { flex: 1 1 auto; }
+}
+
+/* ── Mode: content — brand block + link columns + bottom bar ──────
+   Deliberately the tall one: it carries navigation, not just a note. */
+.neo-footer[data-footer-mode="content"] { text-align: left; padding-top: var(--footer-pad-block-content); }
+.neo-footer[data-footer-mode="content"] .neo-footer-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
+  gap: 32px;
+}
+.neo-footer-brand { display: flex; flex-direction: column; gap: 10px; }
+.neo-footer-logo {
+  height: 28px;
+  width: auto;
+  align-self: flex-start;
+  filter: brightness(0) invert(1);
+  opacity: .75;
+}
+.neo-footer-tagline { margin: 0; max-width: 34ch; }
+
+.neo-footer-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 24px;
+}
+.neo-footer-col { display: flex; flex-direction: column; gap: 8px; }
+.neo-footer-col h2,
+.neo-footer-col h3 {
+  margin: 0 0 2px;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--footer-text-strong);
+}
+.neo-footer-col a { line-height: 1.5; }
+
+.neo-footer[data-footer-mode="content"] .neo-footer-bar {
+  justify-content: space-between;
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--footer-border);
+}
+
+/* ── Theme switcher (opt-in: <meta name="neo-theme-switcher" content="footer">) */
+.neo-footer-theme { position: relative; display: inline-flex; }
+.neo-footer-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--footer-control-h);
+  padding: 0 10px;
+  border: 1px solid var(--footer-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--footer-text);
+  font: inherit;
+  cursor: pointer;
+  transition: color var(--dur, 200ms), border-color var(--dur, 200ms), background var(--dur, 200ms);
+}
+.neo-footer-theme-toggle:hover,
+.neo-footer-theme-toggle[aria-expanded="true"] {
+  color: var(--footer-text-strong);
+  border-color: var(--footer-border-strong);
+  background: var(--footer-hover);
+}
+.neo-footer-theme-toggle svg { width: 15px; height: 15px; display: block; }
+
+.neo-footer-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  min-width: 170px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--header-menu-bg, #10142a);
+  border: 1px solid var(--footer-border-strong);
+  border-radius: 10px;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, .5);
+  display: none;
+  text-align: left;
+  z-index: 2;
+}
+.neo-footer-menu.open { display: block; }
+.neo-footer-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 11px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--header-text, #f9f9f9);
+  font: inherit;
+  font-size: .8rem;
+  text-align: left;
+  cursor: pointer;
+}
+.neo-footer-menu button:hover,
+.neo-footer-menu button:focus-visible { background: var(--footer-hover); outline: none; }
+.neo-footer-menu .theme-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, .25);
+}
+.neo-footer-menu [aria-checked="true"]::after {
+  content: "✓";
+  margin-left: auto;
+  color: var(--footer-accent);
+}
+
+/* ── Back to top (built by footer.js; data-footer-top="off" disables) ── */
+.neo-top {
+  position: fixed;
+  right: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: var(--footer-z-top);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--footer-border-strong);
+  border-radius: 50%;
+  background: var(--header-menu-bg, #10142a);
+  color: var(--footer-text-strong);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity var(--dur, 200ms) ease, transform var(--dur, 200ms) ease, visibility var(--dur, 200ms);
+}
+.neo-top.is-visible { opacity: .9; visibility: visible; transform: none; }
+.neo-top:hover { opacity: 1; background: var(--footer-hover); color: var(--header-text, #f9f9f9); }
+.neo-top:focus-visible { outline: 2px solid var(--footer-accent); outline-offset: 3px; opacity: 1; visibility: visible; transform: none; }
+.neo-top svg { width: 18px; height: 18px; display: block; }
+
+/* ── Mobile ───────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .neo-footer { padding-left: var(--space-4, 16px); padding-right: var(--space-4, 16px); }
+  .neo-footer[data-footer-mode="content"] {
+    text-align: center;
+    padding-top: 32px;
+  }
+  .neo-footer[data-footer-mode="content"] .neo-footer-inner { grid-template-columns: 1fr; gap: 26px; }
+  .neo-footer-brand { align-items: center; }
+  .neo-footer-logo { align-self: center; }
+  .neo-footer-tagline { max-width: none; }
+  .neo-footer-col { align-items: center; }
+  .neo-footer[data-footer-mode="content"] .neo-footer-bar { justify-content: center; }
+  .neo-top { right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: 38px; height: 38px; }
+}
+
+/* ── Reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .neo-footer a,
+  .neo-footer-theme-toggle,
+  .neo-top { transition: none; }
+  .neo-top { transform: none; }
+}
+
+/* ── Print — the footer is the only place a printed page can show
+   provenance, so expand link URLs and drop the floating control. ── */
+@media print {
+  .neo-top, .neo-footer-theme { display: none !important; }
+  .neo-footer {
+    color: #000;
+    border-top: 1px solid #999;
+    background: none;
+    page-break-inside: avoid;
+  }
+  .neo-footer a { color: #000; text-decoration: underline; }
+  .neo-footer a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: .9em;
+    word-break: break-all;
+  }
+}

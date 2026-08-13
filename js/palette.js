@@ -47,6 +47,12 @@
           group: groupLabel,
           added: card.dataset.added || '',
           external: card.classList.contains('external-card'),
+          /* Findable, but not somewhere the palette can send you — Enter on a
+             Soon tool scrolls to its card instead of opening a reserved domain
+             that serves nothing. A blank query sorts it last on its own, since
+             the recency tie-break reads `added` and a Soon card has none. */
+          soon: card.dataset.status === 'soon',
+          el: card,
           href: href,
           haystack: (name + ' ' + desc + ' ' + domain + ' ' + tags.join(' ') + ' ' + groupLabel).toLowerCase()
         };
@@ -136,6 +142,13 @@
         main.appendChild(grp);
       }
 
+      if (it.soon) {
+        var soon = document.createElement('span');
+        soon.className = 'pal-item-soon';
+        soon.textContent = 'Soon';
+        main.appendChild(soon);
+      }
+
       var dom = document.createElement('span');
       dom.className = 'pal-item-domain';
       dom.textContent = it.domain;
@@ -175,6 +188,12 @@
     var it = results[i];
     if (!it) return;
     close();
+    /* Nothing is served at a Soon tool's domain, so "take me there" becomes
+       "show me where it will be" — the card, in its category, with its badge. */
+    if (it.soon) {
+      if (it.el) it.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
     if (it.external) window.open(it.href, '_blank', 'noopener');
     else window.location.href = it.href;
   }

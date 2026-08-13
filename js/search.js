@@ -62,13 +62,13 @@
     { label: 'Planning',      color: '#4ade80', ids: ['pathfinder','skillmap','doorman','loadout'], keywords: 'planning visual canvas export learning roadmap pathfinder skill map strategy doorman build vs buy duplicate vendor deliverable cost estimate scope tokens engineers reverse engineer doorman fallacy loadout team meetings workload overload balance week manager distribution drag drop calendar bottle capacity' },
     { label: 'DevOps',        color: '#fbbf24', ids: ['cardforge','infradrills','snippets','safeguard','lockdown','runbook'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell terminal commands bash powershell windows wsl macos git infra drills snippets lockdown security scanner endpoints headers incident runbook alert response on-call checklist cardforge card designer editor json export rush q game builder safeguard hardening guides accounts devices privacy' },
     { label: 'Data',          color: '#2dd4bf', ids: ['jsonstudio','references','sitrep'], keywords: 'data editor privacy api search json reference matrix scrambler viewer visualizer radar sitrep santiago chile earthquakes seismic weather forecast metro transit war room situation board dashboard usgs' },
-    { label: 'Productivity',  color: '#a78bfa', ids: ['slides','promptforge','ogstudio','agentlore','glassbox','stash','resume-forge','stackrank','awesomesites'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio resume forge gaming pdf psn steam stack rank priority lists drag drop collaboration awesome sites curated bookmarks external api whiteboard prompt forge ai prompts context pathfinder agent lore glass box claude architect certification exam agent loop subagents coordinator mcp anti-patterns planning mode config claude.md under the hood simulation stash design assets inspiration icons ui kits pixel art music sprites itch.io submissions votes wishlist json api learning tutorials ai agent cursor commands skills path' },
-    { label: 'UI Lab',        color: '#d946ef', ids: ['anatomy','guildhall','questline'], keywords: 'ui lab mockups wireframe components interface design anatomy learn names guild hall quests monster hunter gamified teams badges ranks questline operating model console nier command palette chapters playbooks atlas onboarding keyboard nav experiments prototypes' },
+    { label: 'Productivity',  color: '#a78bfa', ids: ['slides','promptforge','ogstudio','agentlore','glassbox','stash','resume-forge','stackrank','awesomesites','rigcheck','tickbox'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio resume forge gaming pdf psn steam stack rank priority lists drag drop collaboration awesome sites curated bookmarks external api whiteboard prompt forge ai prompts context pathfinder agent lore glass box claude architect certification exam agent loop subagents coordinator mcp anti-patterns planning mode config claude.md under the hood simulation stash design assets inspiration icons ui kits pixel art music sprites itch.io submissions votes wishlist json api learning tutorials ai agent cursor commands skills path rigcheck camera settings review contradict sony a6700 video shooting picture profile tickbox todo to-do tasks checklist puter offline sync account' },
+    { label: 'UI Lab',        color: '#d946ef', ids: ['anatomy','guildhall','questline','rewind'], keywords: 'ui lab mockups wireframe components interface design anatomy learn names guild hall quests monster hunter gamified teams badges ranks questline operating model console nier command palette chapters playbooks atlas onboarding keyboard nav experiments prototypes rewind design history snapshots archive time machine wayback past versions before after era compare capture screenshot filmstrip' },
     { label: 'Fun',           color: '#f472b6', ids: ['decisionwheel','memes','clientsays','emojis','teamplay','gamebin','minimap','pieza','youtube'], keywords: 'minimap arpg parody dungeon boss grind level fun randomizer community upload wheel spin memes timezone translator jargon client says decoded emoji archive search gamebin game bin steam lists curate profile youtube video overflow pieza dice cards tabletop print play boss hunt dnd bilingual card game teamplay team building retros activities icebreakers games strategy' },
     { label: 'Social',        color: '#38bdf8', ids: ['vibecheck','hiringpack','charactersheet','parla','playbook','tubestack'], keywords: 'social interviews scoring vibe check behavioral personality export character sheet know parla slang latin american regional language playbook career advice tech job hunting bilingual english spanish tubestack youtube channels discovery engineers match community hiring pack resume bullets follow-up' },
     { label: 'Lifehacks',     color: '#f59e0b', ids: ['buyhacks'], keywords: 'lifehacks community reviews buyhacks buy hacks products shopping' },
     { label: 'Health',        color: '#059669', ids: ['headmap'], keywords: 'health head pain migraine headache sinus tension eye strain allergy flu tmj map 3d visualization share' },
-    { label: 'Growth',        color: '#fcd34d', ids: ['mettle','primer'], keywords: 'growth mettle reasoning maturity self assessment introspection virtues courage wisdom tolerance eloquence imagination rank probe character moral compass private primer machine learning ml llm ai data science insights training embeddings rag pytorch scikit-learn ollama tutorial learn beginner hands-on pet projects fortune 500' },
+    { label: 'Growth',        color: '#fcd34d', ids: ['mettle','primer','proctor'], keywords: 'growth mettle reasoning maturity self assessment introspection virtues courage wisdom tolerance eloquence imagination rank probe character moral compass private primer machine learning ml llm ai data science insights training embeddings rag pytorch scikit-learn ollama tutorial learn beginner hands-on pet projects fortune 500 proctor exam test quiz simulator json yaml questions answers study certification' },
     { label: 'Platforms',     color: '#64748b', ids: ['github','gitlab','dockerhub'], keywords: 'platforms github gitlab docker hub containers images repos code open source private ci cd pipelines' },
   ];
 
@@ -516,15 +516,16 @@
 
     syncCatalogMerge(matchedIds);
 
-    /* "N of M tools" has to agree with the 43 the hero claims, so the
+    /* "N of M tools" has to agree with the count the hero claims, so the
        denominator excludes the same things that count does: locked ghosts, the
-       4 external destinations (github/gitlab/docker/youtube are not ours), and
-       the Recently shipped rail's clones. Counting all 50 cards with an id
-       produced "of 47", contradicting the hero one scroll above. */
+       4 external destinations (github/gitlab/docker/youtube are not ours), the
+       Recently shipped rail's clones, and Soon cards. Counting all 50 cards
+       with an id produced "of 47", contradicting the hero one scroll above. */
     function countable(item) {
       return !ghost.includes(item.id) &&
              !item.el.classList.contains('external-card') &&
              !item.el.classList.contains('site-card--echo') &&
+             item.el.dataset.status !== 'soon' &&
              !!item.el.closest('#tools');
     }
 
@@ -534,18 +535,30 @@
 
     var total = currentIndex.filter(countable).length;
 
+    /* Soon cards are searchable but uncountable, which would otherwise let a
+       query match a card on screen and still report zero. Counted separately
+       so the line describes what is actually visible without inflating M. */
+    var soonVisible = currentIndex.filter(function (i) {
+      return matchedIds.has(i.id) &&
+             i.el.dataset.status === 'soon' &&
+             !!i.el.closest('#tools');
+    }).length;
+
     pills.forEach(function (p) {
       if (!p.matched) {
         p.matched = p.cat.ids.some(function (id) { return matchedIds.has(id); });
       }
     });
 
-    if (visible === 0) {
+    if (visible === 0 && soonVisible === 0) {
       noResults.classList.add('show');
       countEl.textContent = '';
     } else {
       noResults.classList.remove('show');
-      countEl.textContent = visible + ' of ' + total + ' tools';
+      var parts = [];
+      if (visible > 0) parts.push(visible + ' of ' + total + ' tools');
+      if (soonVisible > 0) parts.push(soonVisible + ' coming soon');
+      countEl.textContent = parts.join(' · ');
     }
 
     updateGroupVisibility();
@@ -620,8 +633,10 @@
         window.location.href = href;
       }
     } else {
-      /* Multi-tool cards are <div>s whose sub-tool popup is wired by cards.js;
-         a click is the only way in, and cards.js owns that behaviour. */
+      /* Two kinds of card carry no href. Multi-tool cards are <div>s whose
+         sub-tool popup is wired by cards.js, and a click is the only way in.
+         Soon cards are <div>s precisely so they cannot navigate anywhere; the
+         click finds no handler and the scroll is the whole response. */
       el.click();
       el.scrollIntoView({ block: 'center' });
     }

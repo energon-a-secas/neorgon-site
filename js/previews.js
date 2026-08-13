@@ -2,6 +2,7 @@
   const HOVER_DELAY = 1200;
   const PREVIEW_PATH = 'assets/previews/';
   const PREVIEW_MAP = {
+    questline: 'questline.gif',
     pathfinder: 'pathfinder.gif',
     infradrills: 'infradrills.gif',
     skillmap: 'skillmap.gif',

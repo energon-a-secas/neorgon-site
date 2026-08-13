@@ -11,7 +11,7 @@
     gtag('config', 'G-HTF349S8R5');
   </script>
   <meta name="color-scheme" content="dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.neorgon.org; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com https://www.googletagmanager.com https://cdn.neorgon.org; connect-src https://awesomesites.neorgon.com https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com https://www.google-analytics.com https://www.googletagmanager.com https://esm.sh https://quaint-cobra-151.convex.cloud; frame-src https://www.youtube.com https://www.youtube-nocookie.com; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.neorgon.org; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://www.google-analytics.com https://www.googletagmanager.com https://cdn.neorgon.org; connect-src https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com https://www.google-analytics.com https://www.googletagmanager.com https://esm.sh https://quaint-cobra-151.convex.cloud; frame-src https://www.youtube.com https://www.youtube-nocookie.com; upgrade-insecure-requests">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -56,6 +56,8 @@
   <link rel="stylesheet" href="css/neorgon-themes.css">
   <link rel="stylesheet" href="https://cdn.neorgon.org/v1.0.0/header/season.css">
   <script defer src="js/neorgon-header.js"></script>
+  <link rel="stylesheet" href="css/neorgon-footer.css">
+  <script defer src="js/neorgon-footer.js"></script>
 </head>
 <body>
 
@@ -143,6 +145,23 @@
     </div>
   </section>
   <script defer src="js/hero.js"></script>
+
+  <!-- Favorites — the visitor's own shelf, built by js/favorites.js from
+       localStorage. Hidden until something is saved, so a first visit is
+       byte-for-byte the page it always was. Sits above Recently shipped
+       because "the tools I came back for" beats "the tools we just made". -->
+  <section class="sites-section fav-shelf" id="favShelf" aria-labelledby="fav-shelf-heading" hidden>
+    <div class="fav-shelf-head">
+      <h2 class="group-label" id="fav-shelf-heading">
+        <span class="group-dot"></span> Your favorites
+      </h2>
+      <div class="fav-shelf-meta">
+        <span class="fav-shelf-count" id="favShelfCount"></span>
+        <button type="button" class="fav-clear" id="favClear">Clear</button>
+      </div>
+    </div>
+    <div class="sites-grid fav-shelf-grid" id="favShelfGrid"></div>
+  </section>
 
   <!-- Recently shipped — populated by js/recent.js from each card's data-added.
        Hidden until built so it never flashes an empty row. -->
@@ -268,7 +287,7 @@
       <!-- CardForge -->
       <a class="site-card" data-card-id="cardforge" data-added="2026-08-02"
          href="https://cardforge.neorgon.com/"
-         style="--card-glow: rgba(124,58,237,.3); --card-glow-border: rgba(124,58,237,.35); --card-accent: #7c3aed;">
+         style="--card-glow: rgba(14,165,233,.3); --card-glow-border: rgba(14,165,233,.35); --card-accent: #0ea5e9;">
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/cardforge.svg" class="card-site-icon" alt="CardForge" width="28" height="28" loading="lazy"></div>
@@ -672,7 +691,7 @@
           </div>
           <div class="card-domain">awesomesites.neorgon.com</div>
           <h3 class="card-name">Awesome Sites</h3>
-          <div class="card-desc">Curated external tabs with labeled lists. JSON API feeds featured picks on the hub.</div>
+          <div class="card-desc">Curated external tabs with labeled lists, plus a JSON API of the whole catalog.</div>
           <div class="card-tags">
             <span class="card-tag">Curated</span>
             <span class="card-tag">Bookmarks</span>
@@ -680,6 +699,44 @@
           </div>
         </div>
       </a>
+
+      <!-- Rigcheck (soon — rigcheck.neorgon.com is reserved, nothing served yet) -->
+      <div class="site-card soon-card" data-card-id="rigcheck" data-status="soon"
+           style="--card-glow: rgba(14,165,233,.3); --card-glow-border: rgba(14,165,233,.35); --card-accent: #0ea5e9;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/rigcheck.svg" class="card-site-icon" alt="Rigcheck" width="28" height="28" loading="lazy"></div>
+            <span class="soon-badge">Soon</span>
+          </div>
+          <div class="card-domain">rigcheck.neorgon.com</div>
+          <h3 class="card-name">Rigcheck</h3>
+          <div class="card-desc">Review your camera settings and find the ones that contradict each other, do nothing, or get corrected twice in post.</div>
+          <div class="card-tags">
+            <span class="card-tag">Review</span>
+            <span class="card-tag">Camera</span>
+            <span class="card-tag">Video</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TickBox (soon — tickbox.neorgon.com is reserved, nothing served yet) -->
+      <div class="site-card soon-card" data-card-id="tickbox" data-status="soon"
+           style="--card-glow: rgba(34,197,94,.3); --card-glow-border: rgba(34,197,94,.35); --card-accent: #22c55e;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/tickbox.svg" class="card-site-icon" alt="TickBox" width="28" height="28" loading="lazy"></div>
+            <span class="soon-badge">Soon</span>
+          </div>
+          <div class="card-domain">tickbox.neorgon.com</div>
+          <h3 class="card-name">TickBox</h3>
+          <div class="card-desc">A to-do list kept in your own Puter account. Offline until you sign in, then the same list on every browser.</div>
+          <div class="card-tags">
+            <span class="card-tag">To-do</span>
+            <span class="card-tag">Offline-first</span>
+            <span class="card-tag">Sync</span>
+          </div>
+        </div>
+      </div>
 
       </div>
     </div>
@@ -748,6 +805,25 @@
           </div>
         </div>
       </a>
+
+      <!-- Rewind -->
+      <div class="site-card soon-card" data-card-id="rewind" data-status="soon"
+           style="--card-glow: rgba(147,51,234,.3); --card-glow-border: rgba(147,51,234,.35); --card-accent: #9333ea;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/rewind.svg" class="card-site-icon" alt="Rewind" width="28" height="28" loading="lazy"></div>
+            <span class="soon-badge">Soon</span>
+          </div>
+          <div class="card-domain">rewind.neorgon.com</div>
+          <h3 class="card-name">Rewind</h3>
+          <div class="card-desc">Scrub through every site's past designs as living pages. Snapshots from git history and live captures, with side-by-side era compare.</div>
+          <div class="card-tags">
+            <span class="card-tag">History</span>
+            <span class="card-tag">Snapshots</span>
+            <span class="card-tag">Compare</span>
+          </div>
+        </div>
+      </div>
 
       </div>
     </div>
@@ -929,13 +1005,12 @@
       </a>
 
       <!-- Pieza -->
-      <a class="site-card" data-card-id="pieza" data-added="2026-08-08"
-         href="https://pieza.neorgon.com/"
-         style="--card-glow: rgba(234,88,12,.3); --card-glow-border: rgba(234,88,12,.35); --card-accent: #ea580c;">
+      <div class="site-card soon-card" data-card-id="pieza" data-status="soon"
+           style="--card-glow: rgba(234,88,12,.3); --card-glow-border: rgba(234,88,12,.35); --card-accent: #ea580c;">
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><img src="assets/icons/pieza.svg" class="card-site-icon" alt="Pieza" width="28" height="28" loading="lazy"></div>
-            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <span class="soon-badge">Soon</span>
           </div>
           <div class="card-domain">pieza.neorgon.com</div>
           <h3 class="card-name">Pieza</h3>
@@ -946,7 +1021,7 @@
             <span class="card-tag">Tabletop</span>
           </div>
         </div>
-      </a>
+      </div>
 
       <!-- YouTube Memes -->
       <a class="site-card external-card" data-card-id="youtube" data-added="2026-05-11"
@@ -1201,15 +1276,29 @@
         </div>
       </a>
 
+      <!-- Proctor -->
+      <a class="site-card" data-card-id="proctor" data-added="2026-08-10"
+         href="https://proctor.neorgon.com/"
+         style="--card-glow: rgba(8,145,178,.3); --card-glow-border: rgba(8,145,178,.35); --card-accent: #0891b2;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><img src="assets/icons/proctor.svg" class="card-site-icon" alt="Proctor" width="28" height="28" loading="lazy"></div>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">proctor.neorgon.com</div>
+          <h3 class="card-name">Proctor</h3>
+          <div class="card-desc">Run any exam from a JSON or YAML file. Study with instant corrections or sit a timed simulation, and let an LLM write the test for you.</div>
+          <div class="card-tags">
+            <span class="card-tag">Exams</span>
+            <span class="card-tag">JSON/YAML</span>
+            <span class="card-tag">LLM-ready</span>
+          </div>
+        </div>
+      </a>
+
       </div>
     </div>
 
-
-    <!-- ── Awesome Sites (API feed) ──────────────────────────────── -->
-    <div id="awesomeSitesHubGroup" class="card-group" data-group="awesome-sites" style="--group-color: #f97316" hidden>
-      <h2 class="group-label"><span class="group-dot"></span> Awesome Sites</h2>
-      <div class="sites-grid" id="awesomeSitesHubGrid"></div>
-    </div>
 
     <!-- ── Platforms ─────────────────────────────────────────────── -->
     <div class="card-group" id="group-platforms" data-group="platforms" style="--group-color: #64748b">
@@ -1371,15 +1460,12 @@
     </div>
   </div>
 
-  <footer class="site-footer">
+  <footer class="neo-footer" data-footer-mode="minimal">
     Neorgon · Tools for Engineers ·
-    <a class="footer-link" href="/about.html">About</a>
-    &nbsp;·&nbsp;
-    <a class="footer-link" href="/blog/">Blog</a>
-    &nbsp;·&nbsp;
-    <a class="footer-link" href="https://ehq.cl/" target="_blank" rel="noopener noreferrer">ehq.cl</a>
-    &nbsp;·&nbsp;
-    <a class="footer-link" href="https://github.com/energon-a-secas" target="_blank" rel="noopener noreferrer">GitHub</a>
+    <a href="/about.html">About</a> ·
+    <a href="/blog/">Blog</a> ·
+    <a href="https://ehq.cl/" target="_blank" rel="noopener noreferrer">ehq.cl</a> ·
+    <a href="https://github.com/energon-a-secas" target="_blank" rel="noopener noreferrer">GitHub</a>
   </footer>
 
 <!-- Konami input HUD -->
@@ -1503,7 +1589,6 @@
 <script defer src="js/sound.js"></script>
 <script defer src="js/cursor.js"></script>
 <script defer src="js/entrance.js"></script>
-<script defer src="js/awesome-sites-hub.js"></script>
 <div id="ytMusicPlayer" style="position:fixed;left:-9999px;width:1px;height:1px;pointer-events:none;" aria-hidden="true"></div>
 <script defer src="js/music.js"></script>
 <script defer src="js/matrix.js"></script>
@@ -1515,13 +1600,19 @@
 <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
 <script defer src="js/sortable.js"></script>
 <script defer src="js/recent.js"></script>
+<!-- After recent.js: favorites.js uses the clone helper recent.js exports. -->
+<script defer src="js/favorites.js"></script>
 <script defer src="js/catnav.js"></script>
 <script defer src="js/palette.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     /* Scoped to #tools: the Recently shipped rail holds clones of these cards,
-       and an unscoped selector would count every recent tool twice. */
-    var count = document.querySelectorAll('#tools .site-card:not(.external-card):not(.ghost-card)').length;
+       and an unscoped selector would count every recent tool twice.
+       Soon cards are excluded — "we made N tools" has to mean N things you can
+       actually open, or the number is a claim the page itself disproves. */
+    var count = document.querySelectorAll(
+      '#tools .site-card:not(.external-card):not(.ghost-card):not([data-status="soon"])'
+    ).length;
     var el = document.getElementById('toolCount');
     if (el && count > 0) el.textContent = count;
   });

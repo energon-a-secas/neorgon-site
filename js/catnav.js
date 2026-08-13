@@ -15,9 +15,8 @@
   var groups = Array.from(
     document.querySelectorAll('#tools > .card-group:not(#catalogSearchMerged)')
   ).filter(function (g) {
-    /* The awesome-sites group is populated by an API call and starts empty and
-       `hidden`; including it would render a chip pointing at nothing. */
-    return !g.hasAttribute('hidden');
+    /* A chip pointing at an empty section is worse than no chip. */
+    return g.querySelectorAll('.site-card[data-card-id]').length > 0;
   });
 
   if (groups.length < 2) return;

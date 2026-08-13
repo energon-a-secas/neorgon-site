@@ -90,6 +90,38 @@ separate, boring, reliable surface.
 
 - `2026-08-08 11:11` Repeated SIGKILL of the Playwright MCP Chrome left its profile unopenable (locked UKM db, login-database errors, immediate close). Deleting the whole mcp-chrome-<id> directory is the fix; killing processes alone is not.
 
+- `2026-08-11 17:54` Approach: three independent edits to the catalog. (1) Delete the API-fed Awesome Sites group + js/awesome-sites-hub.js + its CSP connect-src grant — the hub's contract becomes 'every card is a destination we own'. The Awesome Sites *card* stays: awesomesites.neorgon.com is ours, and Platforms stays for the same reason. (2) Add a data-status="soon" card state for the registry's three 'ready' sites (pieza, rigcheck, tickbox — all three 404 today), rendered as a non-link so a Soon card cannot send anyone to a dead domain. (3) Cap the entrance stagger and stop the rail inheriting it.
+
+- `2026-08-11 17:54` Root cause of the slow rail: js/entrance.js sets an INLINE animation-delay of index*110ms on every catalog card (~5.4s at the 49th). js/recent.js then cloneNode()s those cards for the Recently-shipped rail, and cloneNode copies the inline style — so the echo's inherited animation-delay overrides the CSS 'animation-delay: var(--echo-delay)' at style.css:2236. The shelf whose whole job is 'look what just shipped' was the last thing on the page to appear.
+
+- `2026-08-11 17:54` Rejected: an IntersectionObserver scroll-reveal for the catalog. It reads better on a long page, but the CSS default is 'opacity:0 + animation forwards', which is what keeps the catalog visible when JS fails; driving reveal from an observer means a card is a blank slot if the observer never fires. Capping the stagger fixes the reported symptom with no new failure mode.
+
+- `2026-08-11 17:54` Rejected: hiding unpublished sites from the hub entirely. It solves the dead link but loses the thing asked for — a slot to put new work in before it ships. A dimmed Soon card is a roadmap; an absent card is nothing.
+
+- `2026-08-11 17:55` stream **awesome-feed** done — Group markup, js/awesome-sites-hub.js, the script tag and the awesomesites CSP connect-src grant are gone. The Awesome Sites card stays in Productivity. catnav.js's hidden-group filter was dead once the feed left — replaced with an empty-group filter, which is the invariant the original comment was actually protecting.
+
+- `2026-08-11 18:05` stream **soon-state** done — data-status=soon is one attribute that the card markup, hero count, search count, rail, palette and terminal all read. Cards render as <div> so they cannot navigate to a reserved domain. Verified: hero 46→43, palette shows a Soon chip and Enter scrolls instead of navigating (URL unchanged), search reports '5 of 43 tools · 1 coming soon' on a mixed query and no longer says 'no results' when the only match is a Soon card.
+
+- `2026-08-11 18:06` stream **entrance** done — Measured on the running page: 50 cards, worst-case entrance delay 5390ms → 440ms. Rail echoes now carry no inline animation-delay (cleared in recent.js) and compute 0/60/120/180/240/300ms from --echo-delay as the CSS intended. Also fixed a latent reduced-motion bug in the same file: the old branch set opacity:1 but left cardEnter running at delay 0, so reduced-motion users got the animation anyway.
+
+- `2026-08-11 18:12` stream **docs** done — PROJECTS.md gains the hub's ownership rule + the Soon-card contract, a rigcheck-site row and a Rigcheck accent; HUB_REGISTRY.md gains a Soon-cards section with the markup and the flip-to-live steps; neorgon-site/CLAUDE.md documents data-status and warns entrance.js off a global counter. Caught two accent collisions while writing the docs: PROJECTS.md already reserved #22c55e for TickBox (I had used #16a34a) and #7c3aed belongs to CardForge (I had given it to Rigcheck) — both corrected in index.html, Rigcheck is now #0ea5e9.
+
+- `2026-08-11 18:12` Verified on the running page (localhost:8800): hero 46→43; no Soon card has an href, a New badge, or a rail slot; search reads '5 of 43 tools · 1 coming soon' on a mixed query; palette Enter on a Soon row leaves the URL unchanged; worst catalog entrance delay 5390ms→440ms; rail echoes carry no inherited inline delay and compute 0–300ms. `make smoke` 18/18.
+
+- `2026-08-11 19:04` Approach: a Favorites shelf above the catalog, never inside it. The catalog is ours (eleven categories in an order we chose); favorites are theirs. Reordering or filtering the catalog per visitor would make the hub's shape depend on who is looking, so this adds a shelf and leaves the categories byte-for-byte unchanged. Storage is localStorage ('neorgon-favorites', array of card ids in save order), no account, nothing leaves the page.
+
+- `2026-08-11 19:04` The shelf renders clones through window._neoMakeEcho, extracted from recent.js in this session. Two shelves now clone catalog cards and every rule about a safe clone (retag data-card-id to data-echo-id, drop entrance.js's inline delay, convert a multi-tool card to a link) is a rule both must follow. A second copy of those rules would be a second chance to get one wrong. Consequence: favoriting a tool moves no number on the page, because data-echo-id is already what search, the count, sortable, the palette and the terminal all skip.
+
+- `2026-08-11 19:04` Rejected: wrapping each card in a .card-slot so the star could be a real <button> sibling of the <a>. search.js reparents .site-card elements into the merged grid and keys a WeakMap on card.parentElement, and sortable.js drags .sites-grid children — the wrapper would have needed surgery on both, and search is the most-used feature on the page. Chose a <span role=button tabindex=0> inside the card with the click intercepted and stopPropagation()d, which is the interception cards.js already does for multi-tool cards. Named trade-off: a screen reader announces a button inside a link.
+
+- `2026-08-11 19:04` toggle() returns true saved / false removed / null when the id names nothing in the catalog. Started with a two-outcome boolean plus a #tools guard in terminal.js; that guard was unreachable (resolveTool already drops locked ghost cards) and the boolean would have let the terminal print 'Removed X' for a tool it never held. Three outcomes deleted the dead code and made the wrong report impossible.
+
+- `2026-08-11 20:09` Refinement pass: the single 28px star became a .card-tools pill (star + pin + drag handle) with secondary controls collapsing to zero width at rest, and 'saved' moved from an icon to a border state — a warm rim plus the card's existing ::after top hairline held on, with a brighter rim and corner wash for pinned. The old star was a precision target; a strip with a surface behind it means hovering anywhere on the card lands on something usable.
+
+- `2026-08-11 20:09` Drag needed forceFallback: true, which the catalog's own sortable.js does not set. Shelf cards are <a> elements and SortableJS's default path is native HTML5 drag-and-drop, which on an anchor is the browser's own 'drag this link' gesture competing for the same motion. It is also unreachable from synthetic pointer events, so the default path could not be verified at all — with the fallback the whole drag was exercised end to end (Sortable.active true mid-drag, .sortable-fallback on the page, order and localStorage both updated).
+
+- `2026-08-11 20:09` Pinned/unpinned is a band, not a sort key you can fight: onMove refuses a cross-band drag while it is happening, so the card stops at the boundary instead of snapping back after the drop. ArrowLeft/ArrowRight on the drag handle do the same move from the keyboard, because a reorder that only exists for mice is not a reorder.
+
 ## Measured
 
 All figures below were read out of a live page via `browser_evaluate` against
@@ -144,3 +176,21 @@ from the terminal, which the user explicitly reassigned to an ops console — th
 terminal only sets the visitor's own `neo_theme` cookie.
 
 _Closed 2026-08-08 11:12._
+
+---
+
+## Run — 2026-08-11 17:54
+
+**Problem.** Hub mixes other people's sites in with ours, links a card to a domain that 404s, and reveals the Recently-shipped rail ~4.6s after page load
+
+_Closed 2026-08-11 18:12._
+
+---
+
+## Run — 2026-08-11 19:04
+
+**Problem.** Hub has no way for a visitor to keep the tools they came back for
+
+_Closed 2026-08-11 19:04._
+
+_Closed 2026-08-11 20:09._

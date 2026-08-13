@@ -26,7 +26,8 @@ Single-page hub at `neorgon.com` listing all Neorgon tools. The page is a single
 | `intervention.js` | "Death Note L" CRT broadcast takeover — third background mode |
 | `settings.js` | Settings panel: toggles for sound/glow/previews, background picker. Persists to `localStorage` under key `neorgon-prefs` |
 | `search.js` | Hero search bar with floating category pills (physics simulation on canvas), card filtering, and constellation drawing connecting matched cards. Also arrow-key walking + Enter-to-open over the results. `CATEGORIES` must stay 1:1 with the `.card-group` sections in `index.html` — a pill whose `ids` name no group silently filters to zero results |
-| `recent.js` | "Recently shipped" rail above the catalog. Reads `data-added="YYYY-MM-DD"` off each card, renders the newest 6 as clones, and stamps a self-expiring `New` badge (30 days) on the canonical card. Exposes `window._neoRecent` for the terminal's `new` |
+| `recent.js` | "Recently shipped" rail above the catalog. Reads `data-added="YYYY-MM-DD"` off each card, renders the newest 6 as clones, and stamps a self-expiring `New` badge (30 days) on the canonical card. Exposes `window._neoRecent` for the terminal's `new`, and **`window._neoMakeEcho(card)`** — the one definition of a safe clone (retag `data-card-id` → `data-echo-id`, clear entrance.js's inline delay, convert a multi-tool card to a link). Any shelf that clones catalog cards must use it |
+| `favorites.js` | "Your favorites" shelf above the rail, from `localStorage` key `neorgon-favorites` (`[{ id, pinned }]`; a bare id array is the v1 shape and still loads). Injects the control strip into every catalog card and every echo, prunes saved ids whose card no longer exists (and persists the prune), and renders the shelf with `_neoMakeEcho`. Pin holds the front; drag and ArrowLeft/ArrowRight reorder within a band. Exposes `window._neoFavorites` for the terminal's `fav` / `favs` / `pin`. **Never touches the catalog** — the categories below are byte-for-byte what a first-time visitor sees |
 | `catnav.js` | Sticky category rail with live counts and scroll-spy. Owns the sticky-chrome offset for the whole page: sets `--cat-rail-top` and every group's `scroll-margin-top` from one measurement, which `terminal.js` `open <cat>` relies on |
 | `palette.js` | ⌘K / Ctrl+K command palette over every tool (fuzzy match, recency tie-break) |
 | `cards.js` | Multi-tool card popup (for cards with sub-tools) and ghost card unlock logic |
@@ -35,7 +36,7 @@ Single-page hub at `neorgon.com` listing all Neorgon tools. The page is a single
 | `music.js` | Web Audio API ambient music synced to background mode (stars/matrix/intervention) |
 | `sound.js` | UI sound effects — exposes `window._neoSound` with `.dragStart()`, `.dropCard()`, `.unlock()`, and `window._neoSoundPing(freq, vol)`, `window._neoSoundDiscover()` |
 | `cursor.js` | Custom cursor glow element |
-| `entrance.js` | Page entrance animation |
+| `entrance.js` | Card entrance stagger. Delays are **per group and capped** (8 × 55ms), not a global `index × 110ms` timeline — the old form grew with the catalog (5.4s at 50 cards) and leaked into the rail, because recent.js clones these cards and `cloneNode` copies the inline `animation-delay`. recent.js now clears that on every echo; do not reintroduce a global counter here |
 | `hero.js` | Hero section typewriter / tagline animation |
 | `terminal.js` | Hidden terminal (keyboard shortcut) with Convex auth for admin commands. Navigation/discovery commands (`tools`, `goto`, `open`, `whois`, `new`, `stats`, `random`, `search`) build their catalog from the DOM, so a new card needs no terminal edit. `theme` sets the *visitor's* cookie via `NeoHeader.setTheme` only — changing the fleet-wide CDN default belongs in an ops console, not a page anyone can open |
 | `codes.js` | Easter eggs: Konami code (warp drive), other sequences |
@@ -48,6 +49,8 @@ Single-page hub at `neorgon.com` listing all Neorgon tools. The page is a single
 - `window._neoSound` — sound effect object from sound.js
 - `window._neoSoundPing(freq, vol)` — from sound.js
 - `window._neoSoundDiscover()` — from sound.js
+- `window._neoMakeEcho(card)` — from recent.js, the safe-clone helper both shelves use
+- `window._neoFavorites` — from favorites.js: `{ list(), has(id), isPinned(id), toggle(id), pin(id), clear() }`. `toggle` and `pin` return `true` on / `false` off / **`null` when the id names nothing in the catalog** — three outcomes, because `false` for both "removed" and "not a tool" is how a caller reports a removal that never happened. `pin` on an unsaved tool saves it in the same gesture
 - `window._neoMusicSwitch(mode)` — from music.js, called by settings.js when background changes
 - `window._neoBgSync(mode)` — from settings.js, called by terminal.js to sync picker state
 - `window.matrixOn/Off/Kill`, `window.interventionOn/Off/Kill` — canvas control from matrix.js / intervention.js
@@ -65,12 +68,60 @@ The Convex HTTP client is lazy-loaded via `esm.sh` only when the terminal is ope
 Each tool card in HTML has:
 - `data-card-id` — unique slug matching `PREVIEW_MAP` in previews.js and `CATEGORIES` in search.js
 - `data-added="YYYY-MM-DD"` — the day it shipped. Drives the Recently shipped rail and the self-expiring `New` badge (recent.js); no separate list to maintain
+- `data-status="soon"` — the tool's subdomain is reserved but serves nothing yet. The card is a `<div class="site-card soon-card">` with a `.soon-badge` where the arrow goes, **no `href`** (so it cannot navigate to a 404) and **no `data-added`** (nothing shipped). One attribute, read by every module that counts or navigates: the hero count and the search denominator skip it, the rail and the `New` badge skip it, palette.js shows a Soon chip and scrolls to the card instead of opening it, terminal.js keeps it out of `liveTools()` and has `goto` report the state. Search still finds it, and the search line reads `N of M tools · 1 coming soon`. To ship it: `<div>` → `<a href>`, badge → `.card-arrow`, drop `data-status`, add `data-added`
 - `.card-name`, `.card-desc`, `.card-domain`, `.card-tag` — searchable text fields
 - `--card-glow` / `--card-accent` CSS custom properties — per-card neon colour
 
 `data-card-id` is the join key across search.js, previews.js, cards.js and sortable.js. The rail's clones therefore carry **`data-echo-id`** instead — same value, different attribute — which is what keeps a cloned card out of the search index, the drag-reorder, and the "N of M tools" count. Anything that walks cards should either scope itself to `#tools` or filter out `.site-card--echo`.
 
 Multi-tool cards (`.site-card.multi-tool`) show a `.card-subtool-popup` on click. Ghost cards (`.ghost-card`) are locked until clicked, then play an unlock sound.
+
+### Shelves above the catalog
+
+Two sections sit between the hero and `#tools`, both hidden until they have
+something to show, both built from **clones** via `_neoMakeEcho`:
+
+| Shelf | Source | Owner |
+|---|---|---|
+| Your favorites | `localStorage` → `neorgon-favorites` | the visitor |
+| Recently shipped | each card's `data-added` | us |
+
+Clones carry `data-echo-id`, never `data-card-id`, which is what keeps them out
+of the search index, the "N of M tools" count, the drag-reorder, the command
+palette and the terminal's catalog. **Favoriting a tool must not move a number
+on the page** — if it does, something started counting `.site-card` without
+either scoping to `#tools` or filtering `.site-card--echo`.
+
+**The control strip** (`.card-tools`) sits bottom-right, opposite the arrow —
+the arrow means "go there", the strip means "keep this", and the two never
+share a corner. It holds the star, the pin (only on a saved card) and, in the
+favorites shelf, a drag handle. Secondary controls collapse to zero width at
+rest and grow on hover, so the pill is only as wide as it has something to say.
+A saved card keeps its strip visible at rest — that is the state readout.
+
+Each control is a `<span role="button" tabindex="0">`, not a `<button>`,
+because a card is an `<a>` and nesting a button in a link is invalid. Clicks
+are intercepted and `stopPropagation()`d so activating one never follows the
+link, the same interception `cards.js` uses for multi-tool cards. Known
+trade-off: a screen reader announces buttons inside a link. The alternative was
+wrapping all 50 cards in a slot element, which breaks the card reparenting in
+`search.js` and the drag targets in `sortable.js`.
+
+**Saved / pinned are border states, not just icons** — a warm rim plus the
+card's existing `::after` top hairline held on, and for pinned a brighter rim
+and a corner wash. That reads across a grid at a glance; a 15px star does not.
+
+**Ordering.** Favorites store as `[{ id, pinned }]` (a bare array of ids is the
+v1 shape and still loads). Pinned sort to the front; drag and the arrow keys
+both reorder *within* a band, never across it — `onMove` refuses the crossing
+live, so a card stops at the edge instead of snapping back after the drop.
+
+`Sortable.create` on the shelf sets **`forceFallback: true`**, unlike
+`sortable.js` on the catalog. These cards are anchors, and native HTML5
+drag-and-drop on an anchor is the browser's own "drag this link" gesture
+competing for the same motion. The fallback path never starts a native drag.
+It is also the only path a synthetic pointer sequence can exercise, so the
+drag is testable.
 
 ### User preferences
 
@@ -88,6 +139,8 @@ Stored in `localStorage` key `neorgon-prefs`:
 4. Register the new icon file in `assets/icons/`.
 
 The rail, category chips, palette and terminal all read the DOM, so they pick the card up with no further edits. The hero tool count is computed too — don't hardcode it.
+
+If the subdomain is reserved but nothing is served there yet, add it as a **Soon card** instead (`data-status="soon"`, see the card data model above) and skip steps 3. A card that links to a domain we have not published sends visitors to a 404; a Soon card says so on its face and cannot.
 
 ### Required scripts for all HTML pages
 

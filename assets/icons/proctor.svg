@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#E326E4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <!-- clipboard -->
+  <rect x="14" y="10" width="36" height="46" rx="4"/>
+  <path d="M26 10a6 6 0 0 1 12 0h4a2 2 0 0 1 2 2v4H20v-4a2 2 0 0 1 2-2h4z" fill="#E326E4" stroke="none" opacity=".85"/>
+  <!-- checked line -->
+  <path d="M22 30l4 4 7-7"/>
+  <line x1="38" y1="31" x2="44" y2="31"/>
+  <!-- crossed line -->
+  <path d="M23 44l6 6M29 44l-6 6"/>
+  <line x1="38" y1="47" x2="44" y2="47"/>
+</svg>

@@ -14,6 +14,54 @@
   var RAIL_SIZE = 6;      /* how many cards the rail shows */
   var NEW_DAYS = 30;      /* a tool stops being "new" after this many days */
 
+  /* ── Safe clone, shared with js/favorites.js ────────────────────────────
+     Two shelves now clone catalog cards, and every rule about what makes a
+     clone safe is a rule both have to follow: retag the id so the catalog
+     modules skip it, drop the inline delay entrance.js wrote, and turn a
+     multi-tool card into something that still goes somewhere. Exported
+     rather than duplicated, because a second copy of these rules is a
+     second chance to get one of them wrong.
+
+     Structure only. What the clone *says* — badges, stamps, stagger — is
+     the calling shelf's business, and the two shelves disagree about it. */
+  function makeEcho(card) {
+    var echo = card.cloneNode(true);
+
+    /* cloneNode copies inline styles, and js/entrance.js writes an
+       `animation-delay` onto every catalog card. Inherited, that inline value
+       beats `.site-card--echo { animation-delay: var(--echo-delay) }` in CSS —
+       which is how the rail ended up revealing *after* the whole catalog it
+       sits above. A shelf owns its own timing; drop whatever came with the
+       clone before anything else reads it. */
+    echo.style.animationDelay = '';
+
+    /* Hand the clone a different key so the catalog modules skip it. */
+    echo.removeAttribute('data-card-id');
+    echo.setAttribute('data-echo-id', card.dataset.cardId);
+    echo.classList.add('site-card--echo');
+
+    /* A multi-tool card opens a popup wired by cards.js against
+       data-card-id. Without that hook the clone would be a dead <div>, so
+       point the echo at the tool's domain and let it behave like a link. */
+    if (echo.classList.contains('multi-tool')) {
+      var popup = echo.querySelector('.card-subtool-popup');
+      if (popup) popup.remove();
+      var first = card.querySelector('.card-subtool-popup a[href]');
+      var domain = (card.querySelector('.card-domain') || {}).textContent || '';
+      var href = first ? first.getAttribute('href') : 'https://' + domain.trim();
+      var link = document.createElement('a');
+      link.className = echo.className;
+      link.setAttribute('href', href);
+      link.setAttribute('data-echo-id', card.dataset.cardId);
+      link.style.cssText = echo.style.cssText;
+      link.innerHTML = echo.innerHTML;
+      link.classList.remove('multi-tool');
+      echo = link;
+    }
+    return echo;
+  }
+  window._neoMakeEcho = makeEcho;
+
   var rail = document.getElementById('recentRail');
   var grid = document.getElementById('recentRailGrid');
   if (!rail || !grid) return;
@@ -31,13 +79,18 @@
     return (Date.now() - ts) / 86400000;
   }
 
-  /* Real tools only: external destinations and locked ghost cards are not
-     "shipped tools" and would push genuine releases out of the rail. */
+  /* Real tools only: external destinations, locked ghost cards and unshipped
+     Soon cards are not "shipped tools" and would push genuine releases out of
+     the rail. A Soon card should have no `data-added` in the first place — the
+     check is here because getting that wrong would put an unreleased tool at
+     the top of a shelf headed "Recently shipped", which is the one place the
+     page cannot afford to be wrong. */
   var candidates = Array.from(
     document.querySelectorAll('#tools .site-card[data-card-id][data-added]')
   ).filter(function (card) {
     return !card.classList.contains('external-card') &&
-           !card.classList.contains('ghost-card');
+           !card.classList.contains('ghost-card') &&
+           card.dataset.status !== 'soon';
   }).map(function (card) {
     return { el: card, ts: parseDate(card.dataset.added) };
   }).filter(function (c) {
@@ -91,38 +144,13 @@
   var shown = candidates.slice(0, RAIL_SIZE);
 
   shown.forEach(function (c, i) {
-    var echo = c.el.cloneNode(true);
-
-    /* Hand the clone a different key so the catalog modules skip it. */
-    echo.removeAttribute('data-card-id');
-    echo.setAttribute('data-echo-id', c.el.dataset.cardId);
-    echo.classList.add('site-card--echo');
+    var echo = makeEcho(c.el);
 
     /* Badges are stamped before cloning, so the echo inherits one — but every
        card in a shelf headed "Recently shipped" is new by definition, and the
        stamp below already says when. Drop it rather than labelling the obvious. */
     var inherited = echo.querySelector('.card-new-badge');
     if (inherited) inherited.remove();
-
-    /* A multi-tool card opens a popup wired by cards.js against
-       data-card-id. Without that hook the clone would be a dead <div>, so
-       point the echo at the tool's domain and let it behave like a link. */
-    if (echo.classList.contains('multi-tool')) {
-      var popup = echo.querySelector('.card-subtool-popup');
-      if (popup) popup.remove();
-      var first = c.el.querySelector('.card-subtool-popup a[href]');
-      var domain = (c.el.querySelector('.card-domain') || {}).textContent || '';
-      var href = first ? first.getAttribute('href')
-                       : 'https://' + domain.trim();
-      var link = document.createElement('a');
-      link.className = echo.className;
-      link.setAttribute('href', href);
-      link.setAttribute('data-echo-id', c.el.dataset.cardId);
-      link.style.cssText = echo.style.cssText;
-      link.innerHTML = echo.innerHTML;
-      link.classList.remove('multi-tool');
-      echo = link;
-    }
 
     /* Stagger the entrance so the rail assembles left to right. */
     echo.style.setProperty('--echo-delay', (i * 60) + 'ms');

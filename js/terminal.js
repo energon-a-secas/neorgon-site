@@ -147,18 +147,20 @@
           tags: Array.from(el.querySelectorAll('.card-tag')).map(t => t.textContent.trim()),
           locked: el.classList.contains('ghost-card'),
           external: el.classList.contains('external-card'),
+          soon: el.dataset.status === 'soon',
           href: href,
           el: el
         };
       });
   }
 
-  /* Live tools only — a locked ghost is not somewhere you can be sent, and an
-     external link is not one of ours. Restricted to #tools so this matches the
-     43 the hero claims; the ghosts sit outside it in the secret section. */
+  /* Live tools only — a locked ghost is not somewhere you can be sent, an
+     external link is not one of ours, and a Soon tool has a reserved domain
+     that serves nothing. Restricted to #tools so this matches the count the
+     hero claims; the ghosts sit outside it in the secret section. */
   function liveTools() {
     return catalog().filter(t =>
-      !t.locked && !t.external && t.el.closest('#tools'));
+      !t.locked && !t.external && !t.soon && t.el.closest('#tools'));
   }
 
   /* Resolve one argument to a tool: exact id, then name, then a unique prefix.
@@ -186,6 +188,14 @@
   }
 
   function openTool(tool) {
+    /* `goto` resolves Soon tools on purpose — they are on the page and worth
+       asking about — but opening one would land on a reserved domain that
+       serves nothing, so it reports the state instead of proving it. */
+    if (tool.soon) {
+      addLine(`${tool.name} is not live yet — ${tool.domain} is reserved.`, 'err');
+      addLine(`"whois ${tool.id}" for what it will be.`, 'sys');
+      return;
+    }
     addLine(`Opening ${tool.name} — ${tool.domain}`, 'sys');
     window.open(tool.href, '_blank', 'noopener');
   }
@@ -213,6 +223,9 @@
       addLine('  random       — open something at random', 'sys');
       addLine('', 'sys');
       addLine('Make it yours:', 'sys');
+      addLine('  favs         — your saved tools', 'sys');
+      addLine('  fav <tool>   — save or unsave one', 'sys');
+      addLine('  pin <tool>   — hold one at the front of the shelf', 'sys');
       addLine('  theme [name] — set your theme (theme list to see them)', 'sys');
       addLine('  matrix       — toggle matrix rain (stays in terminal)', 'sys');
       addLine('  matrix background — toggle matrix & close terminal', 'sys');
@@ -361,6 +374,64 @@
       addLine('', 'sys');
       addLine('"goto <id>" to open one.', 'sys');
     },
+    /* Favorites live in js/favorites.js and localStorage. The terminal reads
+       that module rather than the DOM, because the shelf on the page is built
+       from the stored list and asking the page would be asking a copy. */
+    favs() {
+      const F = window._neoFavorites;
+      if (!F) { addLine('Favorites are not available on this page.', 'err'); return; }
+      const saved = F.list();
+      if (!saved.length) {
+        addLine('Nothing saved yet.', 'sys');
+        addLine('"fav <tool>" to save one, or click the star on any card.', 'sys');
+        return;
+      }
+      const byId = {};
+      catalog().forEach(t => { byId[t.id] = t; });
+      const pins = saved.filter(id => F.isPinned(id)).length;
+      addLine(`${saved.length} saved${pins ? `, ${pins} pinned` : ''}:`, 'sys');
+      saved.forEach(id => {
+        const t = byId[id];
+        const mark = F.isPinned(id) ? '📌' : '  ';
+        addLine(`  ${mark} ${id.padEnd(16)} ${t ? t.name : '(gone)'}`, 'sys');
+      });
+      addLine('', 'sys');
+      addLine('"fav <id>" to remove · "pin <id>" to hold the front', 'sys');
+    },
+    fav(args) {
+      const F = window._neoFavorites;
+      if (!F) { addLine('Favorites are not available on this page.', 'err'); return; }
+      if (!(args || '').trim()) { addLine('Usage: fav <tool>   (see "favs")', 'err'); return; }
+      const r = resolveTool(args);
+      if (r.ambiguous) {
+        addLine(`"${args.trim()}" matches ${r.ambiguous.length} tools:`, 'err');
+        r.ambiguous.forEach(t => addLine(`  ${t.id.padEnd(16)} ${t.name}`, 'sys'));
+        return;
+      }
+      if (!r.tool) { addLine(`${r.error}. Type "tools" for the list.`, 'err'); return; }
+      /* null means the id names nothing the shelf can hold, so report that
+         rather than claiming a removal. */
+      const now = F.toggle(r.tool.id);
+      if (now === null) { addLine(`${r.tool.name} is not in the catalog.`, 'err'); return; }
+      addLine(now ? `Saved ${r.tool.name}.` : `Removed ${r.tool.name}.`, 'sys');
+    },
+    pin(args) {
+      const F = window._neoFavorites;
+      if (!F) { addLine('Favorites are not available on this page.', 'err'); return; }
+      if (!(args || '').trim()) { addLine('Usage: pin <tool>   (see "favs")', 'err'); return; }
+      const r = resolveTool(args);
+      if (r.ambiguous) {
+        addLine(`"${args.trim()}" matches ${r.ambiguous.length} tools:`, 'err');
+        r.ambiguous.forEach(t => addLine(`  ${t.id.padEnd(16)} ${t.name}`, 'sys'));
+        return;
+      }
+      if (!r.tool) { addLine(`${r.error}. Type "tools" for the list.`, 'err'); return; }
+      const wasSaved = F.has(r.tool.id);
+      const now = F.pin(r.tool.id);
+      if (now === null) { addLine(`${r.tool.name} is not in the catalog.`, 'err'); return; }
+      if (now && !wasSaved) addLine(`Saved and pinned ${r.tool.name}.`, 'sys');
+      else addLine(now ? `Pinned ${r.tool.name}.` : `Unpinned ${r.tool.name}.`, 'sys');
+    },
     random() {
       const list = liveTools();
       if (!list.length) { addLine('Nothing to pick from.', 'err'); return; }
@@ -387,8 +458,9 @@
       if (t.added) addLine(`  shipped   ${t.added}${d !== null ? ` (${d}d ago)` : ''}`, 'sys');
       if (t.tags.length) addLine(`  tags      ${t.tags.join(', ')}`, 'sys');
       if (t.locked) addLine('  status    locked', 'sys');
+      if (t.soon) addLine('  status    not shipped — domain reserved', 'sys');
       addLine('', 'sys');
-      addLine(`  goto ${t.id}`, 'sys');
+      if (!t.soon) addLine(`  goto ${t.id}`, 'sys');
     },
     stats() {
       const all = catalog();
@@ -674,7 +746,7 @@
      ids. Completes the command in the first word, and tool ids after any
      command that takes one. On multiple matches it fills the longest common
      prefix and prints the candidates, like a shell. */
-  const TOOL_ARG_COMMANDS = ['goto', 'whois', 'ghost'];
+  const TOOL_ARG_COMMANDS = ['goto', 'whois', 'ghost', 'fav', 'pin'];
   const CATEGORY_ARG_COMMANDS = ['open', 'tools'];
 
   function commonPrefix(list) {

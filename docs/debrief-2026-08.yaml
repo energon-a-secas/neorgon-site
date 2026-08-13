@@ -1,279 +1,188 @@
 presentation:
-  title: "The hub that couldn't count"
-  subtitle: "Recency, navigation, and six defects nobody had measured"
-  author: "Luciano Adonis"
-  date: "2026-08"
+  title: "A card that cannot lie"
+  author: "LucianoAdonis"
+  date: "2026-08-11"
 
   slides:
     - type: title
-      heading: "The hub that couldn't count"
-      subtitle: "neorgon.com — 50 tools, 11 categories, no way to find any of them"
+      heading: "A card that cannot lie"
+      subtitle: "Three things neorgon.com was wrong about, and why styling the fix was not enough"
+      note: >
+        Audience: eng. Scope is one session on projects/neorgon-site.
+        The working tree also holds unrelated pre-existing edits (blog/*.html,
+        about.html, the vendored footer kit) that are not part of this change set.
 
     - type: bullets
-      heading: "Ship a new tool and nothing on the page says so"
+      heading: "Three complaints, filed separately"
       bullets:
-        - "New tool drops into its category, in no particular order"
-        - "Looks identical to one from February"
-        - "Returning visitor scrolls 11 sections hunting a new name"
-        - "The page had no concept of time at all"
+        - "A section of the hub listed other people's sites"
+        - "A card pointed at a domain that serves nothing"
+        - "The Recently shipped shelf appeared last"
       note: >
-        This was the original ask, and the only one on the list. The rest of
-        the deck is what turned up while fixing it.
+        These arrived as three unrelated annoyances. The interesting part is that
+        they turned out to be the same defect wearing three costumes. Do not give
+        away the punchline here; the cause slide does it.
 
-    - type: stats
-      background: ocean
-      heading: "What was actually there when we looked"
-      stats:
-        - value: "13"
-          label: "Tools shipped in 30 days, none marked"
-        - value: "0"
-          label: "Navigation for 11 sections"
-        - value: "4"
-          label: "Cards no category pill could reach"
-        - value: "8"
-          label: "Console errors on load"
+    - type: quote
+      text: "Every one of those claims was maintained somewhere other than the thing making the claim."
+      source: "The cause, in one sentence"
+      note: >
+        'These are ours' was maintained by me remembering not to add external cards.
+        'This card goes somewhere' was maintained by me remembering to publish first.
+        'Look at this shelf first' was maintained by a CSS rule with no authority.
 
     - type: divider
-      heading: "What we found"
-      subtitle: "Every defect had a number attached"
+      heading: "The cause"
+      subtitle: "The prettiest failure first"
 
-    - type: bullets
-      heading: "The page contradicted itself about its own size"
-      bullets:
-        - "Hero HTML said 40 tools; script computed 43"
-        - "The number visibly flipped on load"
-        - "Title, meta, OG and JSON-LD all said 40"
-        - "19 New badges rendered for 13 new tools"
+    - type: image
+      heading: "Every card, and the moment it appeared"
+      src: "../post/png/10-entrance-timeline.png"
+      alt: "Timeline of 50 card entrance delays, before and after, with the six-card shelf highlighted"
+      caption: "50 cards, one tick each. The shelf is the pink row."
       note: >
-        The badge count was a cloning bug — the recency shelf clones cards,
-        and badges were stamped before the clone, so 6 echoes inherited one.
-
-    - type: bullets
-      heading: "Category pills pointed at sections that did not exist"
-      bullets:
-        - "'Learning' matched no DOM group at all"
-        - "'Game' filtered the catalog to zero results"
-        - "teamplay, stash, safeguard, pieza in no pill list"
-        - "Worse than a label mismatch — a dead-end click"
-
-    - type: bullets
-      heading: "One number, computed three times, wrong three ways"
-      bullets:
-        - "Rail sticky top hardcoded 62px under a 68px header"
-        - "12px of the rail lived under the header"
-        - "Scroll-spy reading line drifted 8px from the jump target"
-        - "Jumping to Health highlighted Lifehacks"
-      note: >
-        The 8px is the one worth dwelling on: the section you just landed on
-        counted as not-yet-reached, so the highlight went to the one above it.
-
-    - type: bullets
-      heading: "Chrome overwrote every JS scroll correction"
-      bullets:
-        - "#group-health landed at top: 0, under 130px of chrome"
-        - "Corrections at 120ms, 400ms, 900ms and on load all lost"
-        - "16 samples over 1.5s: pinned at 0, not drifting"
-        - "Chrome re-jumps on every layout shift during load"
+        Before, the last shelf card landed at 5.06s. The shelf sits above the catalog,
+        so anyone who scrolled in the first two seconds saw a heading with nothing under it.
+        Delays are computed from entrance.js and recent.js by the diagram generator, and
+        were separately confirmed in the browser.
 
     - type: code
-      heading: "The fix was to delete the arithmetic"
+      heading: "cloneNode copies inline styles"
       language: js
       code: |
-        // scroll-margin-top is the only offset the *browser's*
-        // fragment jump honours. Declared once, every
-        // re-application already lands correctly.
-        function anchorOffset() {
-          var header = document.querySelector('.header-bar');
-          return rail.offsetHeight
-               + (header ? header.offsetHeight : 0) + 16;
-        }
+        // entrance.js — writes an INLINE delay on every catalog card
+        card.style.animationDelay = (i * 110) + 'ms';   // 47th card => 5060ms
+
+        // recent.js — builds the shelf by cloning those cards
+        var echo = c.el.cloneNode(true);                // …delay comes along
+
+        // style.css — the shelf's own timing, which never got a turn
+        .site-card--echo { animation-delay: var(--echo-delay); }
       note: >
-        One owner for the offset. It feeds scroll-margin-top, --cat-rail-top
-        and readingLine(), and terminal.js `open <cat>` reads it too instead
-        of keeping a second copy.
+        Proctor was the newest tool on the site and the 47th card down the catalog.
+        It carried animation-delay 5060ms into the top slot of the shelf. Inline beats
+        the stylesheet, so the newest tool was the last pixel on the page.
+        Neither half was wrong on its own. The bug lives in the word "clone".
 
     - type: divider
       heading: "What changed"
-      subtitle: "Five themes, one afternoon"
 
     - type: split
-      heading: "Recency: the data model came first"
+      heading: "Every card points at something we own"
       left:
-        heading: "The attribute"
+        heading: "Before"
         bullets:
-          - "data-added=\"YYYY-MM-DD\" on all 50 cards"
-          - "Date sits next to what it describes"
-          - "No list to keep in sync"
+          - "A group fed by an external API"
+          - "Curated links to other people's sites"
+          - "A CSP grant to fetch them"
       right:
-        heading: "What reads it"
+        heading: "After"
         bullets:
-          - "Shelf of the newest 6, above the categories"
-          - "New badge, self-expiring at 30 days"
-          - "Terminal's `new` command"
-
-    - type: columns
-      heading: "Two simpler options, and why they lost"
-      left:
-        heading: "Read dates from the site registry"
-        text: >
-          It is the monorepo's source of truth and already lists every site.
-          But it has no launch-date field to read, the hub would gain a runtime
-          fetch plus a CSP entry for static data, and the shelf would silently
-          empty out whenever that fetch failed.
-      right:
-        heading: "A hand-curated array of recent IDs"
-        text: >
-          The simplest thing that works, and rejected because nothing expires.
-          The New badge would sit on a four-month-old tool until someone
-          remembered to rotate the list. Dates expire on their own.
-
-    - type: bullets
-      heading: "Navigation: three surfaces, all reading the DOM"
-      bullets:
-        - "Sticky category rail, live counts, scroll-spy"
-        - "Cmd+K palette over every tool, recency tie-break"
-        - "Enter-to-open and arrow walking in hero search"
-        - "All 11 pills realigned 1:1 with real sections"
-
-    - type: bullets
-      heading: "Mobile: the shelf buried what it introduces"
-      bullets:
-        - "6 cards in one column was 1670px — two screens"
-        - "Catalog started at y=2228 on a 390px phone"
-        - "Now a snap-scrolling row: 406px, catalog at y=964"
-        - "Snap aligns to scroll-padding-inline, not padding-inline"
-
-    - type: bullets
-      heading: "Terminal: DOM-driven, 12 new commands"
-      bullets:
-        - "Hardcoded tool list replaced by a DOM read"
-        - "New card is reachable with no terminal edit"
-        - "tools, goto, open, search, new, whois, stats, theme"
-        - "Tab completion, longest-common-prefix"
+          - "Group, script and CSP grant removed"
+          - "GitHub and YouTube cards stay"
+          - "Those are our accounts"
       note: >
-        `theme` sets the visitor's own neo_theme cookie only. Fleet-wide CDN
-        header control was deliberately left out — see the open items slide.
+        The rule is now written into PROJECTS.md. An external card is fine when the
+        destination is ours. The Awesome Sites card survives because that site is ours;
+        its feed does not, because its contents are not.
+
+    - type: code
+      heading: "A Soon card is not a link styled to look inert"
+      language: html
+      code: |
+        <div class="site-card soon-card"
+             data-card-id="pieza" data-status="soon">
+          ...
+          <span class="soon-badge">Soon</span>
+        </div>
+      note: >
+        Rejected: pointer-events none (stops the mouse, not the keyboard), aria-disabled
+        (a label, not a behaviour), and a greyed anchor (still a real URL for middle-click,
+        copy-link and crawlers). A div has no href to leak. The badge tells a person;
+        the element type makes it true whether or not they read the badge.
+
+    - type: bullets
+      heading: "One attribute, six readers"
+      bullets:
+        - "Hero count and search denominator skip it"
+        - "Shelf and New badge skip it"
+        - "Palette shows a chip, scrolls instead of opening"
+        - "Terminal keeps it out of liveTools()"
+        - "Search still finds it"
+      note: >
+        data-status="soon" is the single switch. Search reports
+        "5 of 43 tools · 1 coming soon" rather than reporting zero for a card
+        that is visibly on screen. Applied to the three sites the registry
+        marks 'ready': pieza, rigcheck, tickbox.
+
+    - type: stats
+      background: ocean
+      heading: "Measured"
+      stats:
+        - value: "5.39s → 0.44s"
+          label: "Worst card entrance delay"
+        - value: "5.06s → 0.30s"
+          label: "When the new shelf finishes"
+        - value: "46 → 43"
+          label: "Tools the page claims"
+        - value: "3"
+          label: "Dead destinations removed"
+      note: >
+        Entrance figures computed from the constants and confirmed in the browser.
+        The count moved because three unshipped tools stopped being counted.
+        make smoke passed 18/18.
+
+    - type: bullets
+      heading: "What it cost"
+      bullets:
+        - "Cards below the fold no longer animate on scroll"
+        - "Soon cards need a second edit to go live"
+        - "Two accent colours had to be re-picked"
+      note: >
+        The scroll reveal was a real loss. An IntersectionObserver would restore it,
+        but the CSS default (opacity 0 plus a forwards animation) is what keeps the
+        catalog visible when JS fails, and driving reveal from an observer means a
+        blank slot if it never fires. Capping fixes the reported symptom with no new
+        failure mode. The colour collisions were mine: PROJECTS.md already reserved
+        #22c55e for TickBox and #7c3aed for CardForge.
 
     - type: qa
-      heading: "Questions so far?"
-      subtext: "Next: the measurements, then what is still broken"
+      heading: "Questions on the change?"
+      note: >
+        Natural checkpoint: everything after this is what I found and did not fix.
+        Likely question: why not restore the scroll reveal with an observer.
+        Answer is on the cost slide.
 
     - type: divider
-      heading: "Proof"
-      subtitle: "Read out of a live browser, not estimated"
+      heading: "Still open"
+      subtitle: "Found while counting, not fixed"
 
-    - type: stats
-      background: ocean
-      heading: "Before and after, counted"
-      stats:
-        - value: "2 → 1"
-          label: "Footers rendered"
-        - value: "19 → 13"
-          label: "New badges vs 13 new tools"
-        - value: "4 → 0"
-          label: "Cards unreachable by pill"
-        - value: "8 → 3"
-          label: "Console errors on load"
-
-    - type: stats
-      background: ocean
-      heading: "Navigation, measured on a live page"
-      stats:
-        - value: "0 → 146px"
-          label: "Deep-link heading position"
-        - value: "22/22"
-          label: "Chips landing correctly at 1440 and 390px"
-        - value: "6/6"
-          label: "Scroll-spy sample positions correct"
-        - value: "12 → 0px"
-          label: "Rail hidden under the header"
-
-    - type: bullets
-      heading: "How each figure was taken"
-      bullets:
-        - "browser_evaluate against a live local server"
-        - "Chips: click each, assert rect top and .active"
-        - "Spy: scrollY 1200 to 99999, incl. page bottom"
-        - "Counts: DOM queries, not reading the source"
+    - type: image
+      heading: "A badge on a third of the catalog"
+      src: "../post/png/12-badge-inflation.png"
+      alt: "43 dots for live tools, 13 of them filled to mark a New badge"
+      caption: "NEW_DAYS is 30. I shipped 13 tools last month."
       note: >
-        The last-group chip could never light until tested at scrollY 99999 —
-        Platforms is one row above the footer, so the page bottoms out before
-        its heading reaches the reading line. Found by asserting, not reading.
+        The badge was a sensible rule at two tools a month. At thirteen it is a texture,
+        not a signal. Suggested fix, not done: badge exactly what is on the shelf.
 
     - type: bullets
-      heading: "One fix nobody would have reported"
+      heading: "The page is still missing three of its own sites"
       bullets:
-        - "script-src and connect-src missing the terminal's hosts"
-        - "Admin login path was dead in production"
-        - "img-src missing googletagmanager — GA pixel blocked"
-        - "Found while testing something adjacent"
-
-    - type: divider
-      heading: "What it cost"
-      subtitle: "And where the time actually went"
-
-    - type: stats
-      background: ocean
-      heading: "The diff"
-      stats:
-        - value: "1076"
-          label: "Lines added"
-        - value: "144"
-          label: "Lines removed"
-        - value: "3"
-          label: "New JS modules"
-        - value: "6"
-          label: "Files touched"
-
-    - type: bullets
-      heading: "Where the time went that was not the feature"
-      bullets:
-        - "~8 turns lost to Chrome replaying cached JS"
-        - "transferSize: 0 diagnosed it, matching the committed file"
-        - "F5, cachebust, hash, touch, restart — none worked"
-        - "Fresh port is the reliable workaround"
+        - "BattleCard, Failsafe, FitProfile: live, no card"
+        - "Four hub tools absent from llms.txt"
+        - "Tool count hardcoded in 4 crawlable places"
+        - "Registry and hub are two lists, nothing reconciles them"
       note: >
-        No service worker registered. Diagnosed with
-        performance.getEntriesByType('resource'). Also lost time to a
-        Playwright profile corrupted by repeated SIGKILL — deleting the whole
-        profile directory is the fix, killing processes is not.
-
-    - type: divider
-      heading: "What is still open"
-      subtitle: "Nothing here was silently dropped"
-
-    - type: bullets
-      heading: "Two hub cards are dead links right now"
-      bullets:
-        - "pieza.neorgon.com has no DNS record at all"
-        - "cardforge: 200 over HTTP, 000 over HTTPS, no cert"
-        - "Pages API returns 422 or 404; must wait"
-        - "pieza-site's git remote points at the wrong repo"
-      note: >
-        Both are infra, outside this repo. The pieza card shipped before its
-        subdomain existed, which is the same class of problem this whole
-        project was about.
-
-    - type: bullets
-      heading: "Known gaps we chose not to close"
-      bullets:
-        - "Registry disagrees with reality on 5 sites"
-        - "2 of 50 ship dates are proxies, marked inline"
-        - "Footer Kit migration deferred — fleet-wide runbook"
-        - "CDN header control deferred to an ops console"
-      note: >
-        Registry: 2 live with no card, 3 marked as carded but returning 000.
-        Reconciling means deciding per site which side is wrong, and guessing
-        would be worse than leaving the disagreement visible.
-
-    - type: quote
-      text: >
-        Every real defect on that page was countable. Not "the navigation
-        feels bad" — 4 cards unreachable, 2 footers, 19 badges for 13 tools,
-        12px of overlap, 8px of drift.
-      source: "Reading a page is not the same as measuring it"
+        PROJECTS.md already requires every live tool to have a card. Nothing checks it.
+        The hardcoded count had already drifted by three before this session; the Soon
+        change resynced it by luck. Nothing here was committed.
 
     - type: cta
-      heading: "Two things to carry forward"
-      action: "Give one number one owner, and assert with a number rather than reading the code"
-      subtext: "The 12px, the 8px and the deep link were one bug in three costumes"
+      heading: "Add the check, not the generator"
+      subtitle: "A smoke test that fails when a hub card and the registry disagree"
+      note: >
+        Generating cards from the registry is the wrong altitude: the card copy is real
+        writing and does not belong in a Python catalog. Validating the two against each
+        other catches this exact class of bug, including the three missing cards, and
+        costs one script. That is the decision I want.
