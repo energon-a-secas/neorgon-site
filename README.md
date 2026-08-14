@@ -83,12 +83,33 @@ A minimal, neon-space landing page that links to every Neorgon site with a short
 ## Running locally
 
 ```bash
-cd neorgon-site
-python3 -m http.server 8080
-# open http://localhost:8080
+make serve
+# open http://localhost:8800
 ```
 
 Or open `index.html` directly — no dependencies, no install.
+
+The port is 8800, which is what `scripts/repo-tools.sh` `get_port()` assigns this project in
+the monorepo. It is the one source of truth for it; the Makefile follows it.
+
+---
+
+## Checks
+
+The card icons follow a standard (one stroke weight, one colour, masked so each takes its
+card's accent) that is machine-checked rather than described and hoped for:
+
+```bash
+make check     # lint the icons, regenerate docs/icon-sheet.html, fail if either is off
+make hooks     # opt in to running that automatically before each commit
+```
+
+`make hooks` points git at `.githooks/`, and the pre-commit hook only fires on commits that
+actually touch `assets/icons/`, `index.html`, `css/style.css` or `scripts/icon-*`. It is
+per-clone git config, so **a fresh clone has to run it once**. Undo with
+`git config --unset core.hooksPath`, bypass a single commit with `git commit --no-verify`.
+
+Full rules and the reasoning behind them: [`docs/ICONS.md`](docs/ICONS.md).
 
 ---
 

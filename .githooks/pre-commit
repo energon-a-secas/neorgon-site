@@ -1,0 +1,15 @@
+#!/bin/sh
+# Installed by `make hooks` (sets core.hooksPath). Undo with:
+#   git config --unset core.hooksPath
+#
+# Only runs when the commit actually touches the icon system. A hook that fires
+# on every commit regardless of content is a hook people disable.
+if git diff --cached --name-only | grep -Eq '^(assets/icons/|index\.html$|css/style\.css$|scripts/icon-)'; then
+  echo "pre-commit: checking the icon standard..."
+  make check || {
+    echo
+    echo "pre-commit: icon check failed. Fix it, or run 'python3 scripts/icon-lint.py --fix'."
+    echo "To commit anyway: git commit --no-verify"
+    exit 1
+  }
+fi

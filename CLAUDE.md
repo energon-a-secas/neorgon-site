@@ -5,11 +5,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-make serve          # Start local dev server on port 8877 (opens http://localhost:8877)
+make serve          # Start local dev server on port 8800 (opens http://localhost:8800)
 make stop           # Kill the dev server
+make check          # Icon standard: lint + regenerate docs/icon-sheet.html, non-zero if off
+make hooks          # Opt in to running `make check` before each commit (per-clone, run once)
 
 npx convex dev      # Run Convex backend (required for terminal auth features)
 ```
+
+Card icons are masked `<span>`s that take their card's `--card-accent`; the four third-party
+brand marks stay `<img>`. `scripts/icon-lint.py` enforces both the file rules and which of
+the two an icon uses. Details and reasoning: `docs/ICONS.md`.
 
 No build step — open `index.html` directly or serve via `make serve`. ES modules are not used here; all scripts are plain `<script>` tags loaded in `index.html`.
 
