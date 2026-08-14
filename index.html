@@ -185,6 +185,7 @@
     <h2 id="catalog-heading" class="visually-hidden">Tool catalog</h2>
     <div class="search-no-results" id="searchNoResults" role="status">No tools match your search.</div>
     <div class="search-count" id="searchCount" aria-live="polite"></div>
+    <div class="search-cats" id="searchCats" aria-label="Matched categories"></div>
 
     <!-- Single combined grid while search is active (cards reparented via JS) -->
     <div id="catalogSearchMerged" class="card-group catalog-search-merge catalog-merge-empty" style="--group-color: #818cf8" aria-labelledby="catalog-search-merge-heading">
@@ -203,7 +204,7 @@
          style="--card-glow: rgba(74,222,128,.3); --card-glow-border: rgba(74,222,128,.35); --card-accent: #4ade80;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/pathfinder.svg" class="card-site-icon" alt="Pathfinder" width="36" height="36" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/pathfinder.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">pathfinder.neorgon.com</div>
@@ -223,7 +224,7 @@
          style="--card-glow: rgba(167,139,250,.3); --card-glow-border: rgba(167,139,250,.35); --card-accent: #a78bfa;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/skill-roadmap.svg" class="card-site-icon" alt="Skill Map" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/skill-roadmap.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">skillmap.neorgon.com</div>
@@ -242,7 +243,7 @@
          style="--card-glow: rgba(194,144,74,.3); --card-glow-border: rgba(194,144,74,.35); --card-accent: #c2904a;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/doorman.svg" class="card-site-icon" alt="Doorman" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/doorman.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">doorman.neorgon.com</div>
@@ -262,7 +263,7 @@
          style="--card-glow: rgba(217,119,6,.3); --card-glow-border: rgba(217,119,6,.35); --card-accent: #d97706;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/loadout.svg" class="card-site-icon" alt="Loadout" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/loadout.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">loadout.neorgon.com</div>
@@ -290,7 +291,7 @@
          style="--card-glow: rgba(14,165,233,.3); --card-glow-border: rgba(14,165,233,.35); --card-accent: #0ea5e9;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/cardforge.svg" class="card-site-icon" alt="CardForge" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/cardforge.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">cardforge.neorgon.com</div>
@@ -310,7 +311,7 @@
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #fbbf24;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/local-drills.svg" class="card-site-icon" alt="Infra Drills" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/local-drills.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">infradrills.neorgon.com</div>
@@ -330,7 +331,7 @@
          style="--card-glow: rgba(250,204,21,.3); --card-glow-border: rgba(250,204,21,.35); --card-accent: #facc15;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/snippets.svg" class="card-site-icon" alt="Snippets" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/snippets.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">snippets.neorgon.com</div>
@@ -350,7 +351,7 @@
          style="--card-glow: rgba(248,113,113,.3); --card-glow-border: rgba(248,113,113,.35); --card-accent: #f87171;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/safeguard.svg" class="card-site-icon" alt="SafeGuard" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/safeguard.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">safeguard.neorgon.com</div>
@@ -370,7 +371,7 @@
          style="--card-glow: rgba(249,115,22,.3); --card-glow-border: rgba(249,115,22,.35); --card-accent: #f97316;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/lockdown.svg" class="card-site-icon" alt="Lockdown" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/lockdown.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">lockdown.neorgon.com</div>
@@ -389,7 +390,7 @@
          style="--card-glow: rgba(236,72,153,.3); --card-glow-border: rgba(236,72,153,.35); --card-accent: #ec4899;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/incident-runbook.svg" class="card-site-icon" alt="Incident Runbook" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/incident-runbook.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">runbook.neorgon.com</div>
@@ -418,7 +419,7 @@
            style="--card-glow: rgba(45,212,191,.3); --card-glow-border: rgba(45,212,191,.35); --card-accent: #2dd4bf;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/json-builder.svg" class="card-site-icon" alt="JSON Studio" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/json-builder.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">jsonstudio.neorgon.com</div>
@@ -453,7 +454,7 @@
            style="--card-glow: rgba(244,114,182,.3); --card-glow-border: rgba(244,114,182,.35); --card-accent: #f472b6;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/reference-matrix.svg" class="card-site-icon" alt="Reference Matrix" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/reference-matrix.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">references.neorgon.com</div>
@@ -483,7 +484,7 @@
          style="--card-glow: rgba(220,38,38,.3); --card-glow-border: rgba(220,38,38,.35); --card-accent: #dc2626;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/sitrep.svg" class="card-site-icon" alt="Radar" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/sitrep.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">radar.neorgon.com</div>
@@ -511,7 +512,7 @@
          style="--card-glow: rgba(251,146,60,.3); --card-glow-border: rgba(251,146,60,.35); --card-accent: #fb923c;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/presentation-sage.svg" class="card-site-icon" alt="Presentation Sage" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/presentation-sage.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">slides.neorgon.com</div>
@@ -531,7 +532,7 @@
          style="--card-glow: rgba(219,39,119,.3); --card-glow-border: rgba(219,39,119,.35); --card-accent: #db2777;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/prompt-forge.svg" class="card-site-icon" alt="Prompt Forge" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/prompt-forge.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">promptforge.neorgon.com</div>
@@ -551,7 +552,7 @@
          style="--card-glow: rgba(163,230,53,.3); --card-glow-border: rgba(163,230,53,.35); --card-accent: #a3e635;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/og-studio.svg" class="card-site-icon" alt="OG Studio" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/og-studio.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">ogstudio.neorgon.com</div>
@@ -572,7 +573,7 @@
            style="--card-glow: rgba(96,165,250,.3); --card-glow-border: rgba(96,165,250,.35); --card-accent: #60a5fa;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/agentlore.svg" class="card-site-icon" alt="Agent Lore" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/agentlore.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">agentlore.neorgon.com</div>
@@ -606,7 +607,7 @@
          style="--card-glow: rgba(204,120,92,.3); --card-glow-border: rgba(204,120,92,.35); --card-accent: #cc785c;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/glassbox.svg" class="card-site-icon" alt="Glass Box" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/glassbox.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">glassbox.neorgon.com</div>
@@ -626,7 +627,7 @@
          style="--card-glow: rgba(192,38,211,.3); --card-glow-border: rgba(192,38,211,.35); --card-accent: #c026d3;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/stash.svg" class="card-site-icon" alt="Stash" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/stash.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">stash.neorgon.com</div>
@@ -646,7 +647,7 @@
          style="--card-glow: rgba(139,92,246,.3); --card-glow-border: rgba(139,92,246,.35); --card-accent: #8b5cf6;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/resume-forge.svg" class="card-site-icon" alt="Resume Forge" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/resume-forge.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">resume.neorgon.com</div>
@@ -666,7 +667,7 @@
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #f59e0b;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/stackrank.svg" class="card-site-icon" alt="Stack Rank" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/stackrank.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">stackrank.neorgon.com</div>
@@ -686,7 +687,7 @@
          style="--card-glow: rgba(249,115,22,.3); --card-glow-border: rgba(249,115,22,.35); --card-accent: #f97316;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/awesomesites.svg" class="card-site-icon" alt="Awesome Sites" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/awesomesites.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">awesomesites.neorgon.com</div>
@@ -705,7 +706,7 @@
            style="--card-glow: rgba(14,165,233,.3); --card-glow-border: rgba(14,165,233,.35); --card-accent: #0ea5e9;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/rigcheck.svg" class="card-site-icon" alt="Rigcheck" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/rigcheck.svg')"></span></div>
             <span class="soon-badge">Soon</span>
           </div>
           <div class="card-domain">rigcheck.neorgon.com</div>
@@ -724,7 +725,7 @@
            style="--card-glow: rgba(34,197,94,.3); --card-glow-border: rgba(34,197,94,.35); --card-accent: #22c55e;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/tickbox.svg" class="card-site-icon" alt="TickBox" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/tickbox.svg')"></span></div>
             <span class="soon-badge">Soon</span>
           </div>
           <div class="card-domain">tickbox.neorgon.com</div>
@@ -752,7 +753,7 @@
          style="--card-glow: rgba(125,211,252,.3); --card-glow-border: rgba(125,211,252,.35); --card-accent: #7dd3fc;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/anatomy.svg" class="card-site-icon" alt="UI Anatomy" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/anatomy.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">uianatomy.neorgon.com</div>
@@ -772,7 +773,7 @@
          style="--card-glow: rgba(251,146,60,.3); --card-glow-border: rgba(251,146,60,.35); --card-accent: #fb923c;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/guild-hub.svg" class="card-site-icon" alt="Guild Hall" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/guild-hub.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">guildhall.neorgon.com</div>
@@ -792,7 +793,7 @@
          style="--card-glow: rgba(42,168,255,.3); --card-glow-border: rgba(42,168,255,.35); --card-accent: #2aa8ff;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/questline.svg" class="card-site-icon" alt="Questline" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/questline.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">questline.neorgon.com</div>
@@ -811,7 +812,7 @@
            style="--card-glow: rgba(147,51,234,.3); --card-glow-border: rgba(147,51,234,.35); --card-accent: #9333ea;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/rewind.svg" class="card-site-icon" alt="Rewind" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/rewind.svg')"></span></div>
             <span class="soon-badge">Soon</span>
           </div>
           <div class="card-domain">rewind.neorgon.com</div>
@@ -840,7 +841,7 @@
            style="--card-glow: rgba(52,211,153,.3); --card-glow-border: rgba(52,211,153,.35); --card-accent: #34d399;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/spin-the-wheel.svg" class="card-site-icon" alt="Decision Wheel" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/spin-the-wheel.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">decisionwheel.neorgon.com</div>
@@ -869,7 +870,7 @@
          style="--card-glow: rgba(244,63,94,.3); --card-glow-border: rgba(244,63,94,.35); --card-accent: #f43f5e;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/memes.svg" class="card-site-icon" alt="Meme Vault" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/memes.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">memes.neorgon.com</div>
@@ -890,7 +891,7 @@
            style="--card-glow: rgba(236,72,153,.3); --card-glow-border: rgba(236,72,153,.35); --card-accent: #f472b6;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/client-says.svg" class="card-site-icon" alt="Client Says" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/client-says.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">clientsays.neorgon.com</div>
@@ -921,7 +922,7 @@
            style="--card-glow: rgba(34,211,238,.3); --card-glow-border: rgba(34,211,238,.35); --card-accent: #22d3ee;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/emojis.svg" class="card-site-icon" alt="Emoji Archive" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/emojis.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">emojis.neorgon.com</div>
@@ -950,7 +951,7 @@
          style="--card-glow: rgba(13,148,136,.3); --card-glow-border: rgba(13,148,136,.35); --card-accent: #0d9488;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/team-play.svg" class="card-site-icon" alt="Team Play" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/team-play.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">teamplay.neorgon.com</div>
@@ -970,7 +971,7 @@
          style="--card-glow: rgba(0,99,229,.3); --card-glow-border: rgba(0,99,229,.35); --card-accent: #0063e5;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/gamebin.svg" class="card-site-icon" alt="GameBin" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/gamebin.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">gamebin.neorgon.com</div>
@@ -990,7 +991,7 @@
          style="--card-glow: rgba(125,211,252,.3); --card-glow-border: rgba(125,211,252,.35); --card-accent: #7dd3fc;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/minimap.svg" class="card-site-icon" alt="Minimap" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/minimap.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">minimap.neorgon.com</div>
@@ -1009,7 +1010,7 @@
            style="--card-glow: rgba(234,88,12,.3); --card-glow-border: rgba(234,88,12,.35); --card-accent: #ea580c;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/pieza.svg" class="card-site-icon" alt="Pieza" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/pieza.svg')"></span></div>
             <span class="soon-badge">Soon</span>
           </div>
           <div class="card-domain">pieza.neorgon.com</div>
@@ -1029,7 +1030,7 @@
          style="--card-glow: rgba(255,0,0,.25); --card-glow-border: rgba(255,0,0,.3); --card-accent: #ff4444;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/youtube.svg" class="card-site-icon" alt="YouTube" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/youtube.svg" class="card-site-icon" alt="" width="28" height="28" loading="lazy"></div>
             <span class="external-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>External</span>
           </div>
           <div class="card-domain">youtube.com/@energon-hq</div>
@@ -1057,7 +1058,7 @@
          style="--card-glow: rgba(56,189,248,.3); --card-glow-border: rgba(56,189,248,.35); --card-accent: #38bdf8;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/interviews.svg" class="card-site-icon" alt="Vibe Check" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/interviews.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">interviews.neorgon.com</div>
@@ -1076,7 +1077,7 @@
          style="--card-glow: rgba(52,211,153,.3); --card-glow-border: rgba(52,211,153,.35); --card-accent: #34d399;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/hiring-pack.svg" class="card-site-icon" alt="Hiring Pack" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/hiring-pack.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">hiringpack.neorgon.com</div>
@@ -1096,7 +1097,7 @@
          style="--card-glow: rgba(232,121,249,.3); --card-glow-border: rgba(232,121,249,.35); --card-accent: #e879f9;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/character-sheet.svg" class="card-site-icon" alt="Character Sheet" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/character-sheet.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">charactersheet.neorgon.com</div>
@@ -1116,7 +1117,7 @@
          style="--card-glow: rgba(52,211,153,.3); --card-glow-border: rgba(52,211,153,.35); --card-accent: #34d399;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/parla.svg" class="card-site-icon" alt="Parla" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/parla.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">parla.neorgon.com</div>
@@ -1136,7 +1137,7 @@
          style="--card-glow: rgba(16,185,129,.3); --card-glow-border: rgba(16,185,129,.35); --card-accent: #10b981;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/playbook.svg" class="card-site-icon" alt="Playbook" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/playbook.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">playbook.neorgon.com</div>
@@ -1156,7 +1157,7 @@
          style="--card-glow: rgba(103,232,249,.3); --card-glow-border: rgba(103,232,249,.35); --card-accent: #67e8f9;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/tubestack.svg" class="card-site-icon" alt="TubeStack" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/tubestack.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">tubestack.neorgon.com</div>
@@ -1184,7 +1185,7 @@
          style="--card-glow: rgba(245,158,11,.3); --card-glow-border: rgba(245,158,11,.35); --card-accent: #f59e0b;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/buyhacks.svg" class="card-site-icon" alt="BuyHacks" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/buyhacks.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">buyhacks.neorgon.com</div>
@@ -1213,7 +1214,7 @@
          style="--card-glow: rgba(5,150,105,.3); --card-glow-border: rgba(5,150,105,.35); --card-accent: #059669;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/headmap.svg" class="card-site-icon" alt="HeadPain" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/headmap.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">headpain.neorgon.com</div>
@@ -1242,7 +1243,7 @@
          style="--card-glow: rgba(252,211,77,.3); --card-glow-border: rgba(252,211,77,.35); --card-accent: #fcd34d;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/mettle.svg" class="card-site-icon" alt="Mettle" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/mettle.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">mettle.neorgon.com</div>
@@ -1262,7 +1263,7 @@
          style="--card-glow: rgba(99,102,241,.3); --card-glow-border: rgba(99,102,241,.35); --card-accent: #6366f1;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/primer.svg" class="card-site-icon" alt="Primer" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/primer.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">primer.neorgon.com</div>
@@ -1282,7 +1283,7 @@
          style="--card-glow: rgba(8,145,178,.3); --card-glow-border: rgba(8,145,178,.35); --card-accent: #0891b2;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/proctor.svg" class="card-site-icon" alt="Proctor" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/proctor.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">proctor.neorgon.com</div>
@@ -1311,7 +1312,7 @@
          style="--card-glow: rgba(139,148,158,.3); --card-glow-border: rgba(139,148,158,.35); --card-accent: #8b949e;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/github.svg" class="card-site-icon" alt="GitHub" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/github.svg" class="card-site-icon" alt="" width="28" height="28" loading="lazy"></div>
             <span class="external-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>External</span>
           </div>
           <div class="card-domain">github.com/energon-a-secas</div>
@@ -1331,7 +1332,7 @@
          style="--card-glow: rgba(252,109,38,.25); --card-glow-border: rgba(252,109,38,.3); --card-accent: #fc6d26;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/gitlab.svg" class="card-site-icon" alt="GitLab" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/gitlab.svg" class="card-site-icon" alt="" width="28" height="28" loading="lazy"></div>
             <span class="external-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>External</span>
           </div>
           <div class="card-domain">gitlab.com/energonhq</div>
@@ -1351,7 +1352,7 @@
          style="--card-glow: rgba(36,150,237,.25); --card-glow-border: rgba(36,150,237,.3); --card-accent: #2496ed;">
         <div class="card-content">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/docker.svg" class="card-site-icon" alt="Docker Hub" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><img src="assets/icons/docker.svg" class="card-site-icon" alt="" width="28" height="28" loading="lazy"></div>
             <span class="external-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>External</span>
           </div>
           <div class="card-domain">hub.docker.com/u/energonhq</div>
@@ -1396,7 +1397,7 @@
         </div>
         <a class="card-content ghost-revealed" href="https://autopilot.neorgon.com/" style="text-decoration:none;color:inherit;">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/autopilot.svg" class="card-site-icon" alt="Autopilot" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/autopilot.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">autopilot.neorgon.com</div>
@@ -1420,7 +1421,7 @@
         </div>
         <a class="card-content ghost-revealed" href="https://rushq.neorgon.com/" style="text-decoration:none;color:inherit;">
           <div class="card-top">
-            <div class="card-icon-wrap"><img src="assets/icons/rush-q-cards.svg" class="card-site-icon" alt="Rush Q Cards" width="28" height="28" loading="lazy"></div>
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/rush-q-cards.svg')"></span></div>
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">internal</div>

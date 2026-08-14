@@ -494,7 +494,63 @@ body.search-active #tools > .card-group.catalog-native-suppressed {
 }
 .card-site-icon {
   width: 28px; height: 28px; display: block;
-  filter: drop-shadow(0 0 3px rgba(227, 38, 228, .7));
+  /* Was `drop-shadow(0 0 3px rgba(227,38,228,.7))`. A 3px blur radius on a
+     ~2.3px stroke lays a magenta halo roughly as wide as the line itself on
+     both sides of every path — the artwork was competing with its own glow and
+     every icon read as slightly out of focus. What the icon actually needs from
+     a shadow is separation from the tile behind it, which is one dark pixel,
+     not three magenta ones. */
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .55));
+}
+
+/* Every card sets a `--card-accent`, and the tags, the domain line, the Soon
+   badge and the New badge all take their colour from it. The icon was the last
+   thing on the card still hardcoding fleet magenta, which read as a sticker
+   applied to a coloured tile rather than part of it.
+
+   An `<img>` cannot inherit the page's colour, so the icon is a `<span>` whose
+   SVG is a **mask**: the file supplies the shape, the element supplies the fill.
+   That also makes the icon a solid saturated shape rather than a thin line under
+   a tinted tile, which is the other half of "bolder".
+
+   The four third-party brand marks stay `<img>` — recolouring someone else's
+   trademark to match a card is not consistency — and so does the raster
+   energon logo, which has no shape to mask.
+
+   The `url()` in `--icon` is written in index.html but substituted here, and a
+   relative URL in a custom property resolves against the stylesheet doing the
+   substituting — so `assets/icons/x.svg` became `/css/assets/icons/x.svg` and
+   every mask 404'd silently, leaving 49 invisible icons. The paths are
+   root-relative for that reason; do not "tidy" them back. */
+span.card-site-icon {
+  background-color: var(--card-accent, #E326E4);
+  -webkit-mask-image: var(--icon);
+          mask-image: var(--icon);
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+          mask-position: center;
+  -webkit-mask-size: contain;
+          mask-size: contain;
+}
+
+/* Without mask support, `background-color` alone would paint a solid 28px block
+   of accent. Fall back to drawing the same file as an ordinary background image
+   instead: the icon still appears, in the `#E326E4` written inside the SVG.
+
+   That fallback is also the answer to "why does the linter still enforce a
+   stroke colour the hub never reads". Under a mask only the alpha channel
+   matters, so the colour looks like dead metadata — but it is exactly what this
+   path renders, and what you see opening the file on its own. It is a fallback,
+   not a second source of truth. */
+@supports not ((-webkit-mask-image: url("#i")) or (mask-image: url("#i"))) {
+  span.card-site-icon {
+    background-color: transparent;
+    background-image: var(--icon);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
 }
 .card-initial {
   font-size: 1rem;
@@ -853,8 +909,8 @@ body.search-active #tools > .card-group.catalog-native-suppressed {
 .soon-card:hover::after { opacity: 0; }
 .soon-card:hover .card-icon-wrap { transform: none; box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 2px 6px rgba(0,0,0,.28); }
 /* Desaturated until it ships, so a row of live tools still reads first. */
-.soon-card .card-site-icon { filter: grayscale(.6) drop-shadow(0 0 3px rgba(227, 38, 228, .35)); }
-.soon-card:hover .card-site-icon { filter: drop-shadow(0 0 3px rgba(227, 38, 228, .7)); }
+.soon-card .card-site-icon { filter: grayscale(.6) drop-shadow(0 1px 1.5px rgba(0, 0, 0, .55)); }
+.soon-card:hover .card-site-icon { filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .55)); }
 
 .soon-badge {
   display: inline-flex;
@@ -2074,6 +2130,98 @@ body.search-active .sites-grid {
   }
 }
 
+/* ── Search is a mode, not a filter ───────────────────────────────────
+   The three browse surfaces — the saved-favorites shelf, Recently shipped,
+   and the sticky category rail — exist for someone who has *not* asked for
+   anything specific. Left in the flow they put the first match ~1800px below
+   the field that produced it: you typed, the page did not appear to move, and
+   the result count was off-screen too. Nothing is lost by dropping them while
+   a query is live — both rails render `.site-card--echo` clones of catalog
+   cards, so every card they could show is already in the merged grid, and the
+   rail's section chips point at groups that search has collapsed anyway. */
+body.search-active #favShelf,
+body.search-active #recentRail,
+body.search-active .cat-rail {
+  display: none !important;
+}
+
+/* The constellation collapses instead of unmounting: the pill physics keeps
+   its coordinates, so clearing the query does not re-scatter the cloud. */
+.constellation-box {
+  transition: height .3s var(--ease-out), margin-top .3s var(--ease-out), opacity .22s ease;
+}
+body.search-active .constellation-box {
+  height: 0;
+  margin-top: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* With everything above it gone, the catalog would butt straight into the hero. */
+body.search-active #tools {
+  padding-top: 8px;
+}
+
+/* Matched categories, promoted out of the collapsed cloud. The pills' one
+   irreplaceable signal was "your query hit the DevOps group"; it now costs a
+   ~24px chip row beside the count instead of 200px of canvas. */
+.search-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -6px 0 14px;
+}
+.search-cats:empty { display: none; }
+
+/* Narrow screens: one scrollable line instead of two wrapped ones. Five matched
+   categories wrap to 52px at 375px wide, which is a chunk of the fold this whole
+   change exists to give back. The catalog's own `.cat-rail-inner` already solves
+   exactly this with a hidden-scrollbar horizontal strip, so the chip row borrows
+   it rather than inventing a "+2 more" affordance nobody has asked for. */
+@media (max-width: 600px) {
+  .search-cats {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    /* Bleed to the screen edges and pad back in: a strip that stops short of the
+       edge reads as clipped rather than scrollable. 18px is not --layout-gutter,
+       it is the literal padding `.sites-section` takes in this same breakpoint
+       (see the Responsive block above). The two happen to be equal at 375px;
+       hardcoding the one being cancelled means they cannot drift apart. */
+    margin-inline: -18px;
+    padding-inline: 18px;
+  }
+  .search-cats::-webkit-scrollbar { display: none; }
+  .search-cat-chip { flex-shrink: 0; }
+}
+.search-cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--chip-color, var(--text-muted));
+  border: 1px solid color-mix(in srgb, var(--chip-color, #818cf8) 32%, transparent);
+  background: color-mix(in srgb, var(--chip-color, #818cf8) 10%, transparent);
+}
+.search-cat-chip::before {
+  content: "";
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellation-box { transition: none; }
+}
+
 /* FLIP / rise motion during filter */
 @keyframes catalog-rise-in {
   from {
@@ -2522,21 +2670,39 @@ body.search-active .sites-grid {
   .card-shipped-dot { animation: none; opacity: .9; }
 }
 
-/* ── NEW badge (on the canonical card, self-expiring via js/recent.js) ──── */
+/* ── NEW badge (on the canonical card, self-expiring via js/recent.js) ────
+   Was a solid amber gradient with dark text and a 12px amber glow — the only
+   warm, fully-saturated, filled element anywhere in a cool navy UI, and the
+   only card element that ignored `--card-accent`. It read as a sticker someone
+   had pasted on. `.soon-badge` two hundred lines up already had the right
+   pattern (accent-keyed, outlined, leading dot), so NEW now uses that same
+   family and simply sits one step louder: more fill, a firmer border, a
+   full-opacity dot. */
 .card-new-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   margin-left: auto;
   margin-right: 8px;
   align-self: center;
   font-size: .6rem;
   font-weight: 800;
-  letter-spacing: .1em;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  padding: 3px 7px;
-  border-radius: 8px;
-  color: #10131f;
-  background: linear-gradient(135deg, #fde68a, #fbbf24);
-  box-shadow: 0 0 12px rgba(251,191,36,.4);
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--card-accent, #818cf8);
+  background: color-mix(in srgb, var(--card-accent, #818cf8) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--card-accent, #818cf8) 55%, transparent);
   white-space: nowrap;
+  flex-shrink: 0;
+}
+.card-new-badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
   flex-shrink: 0;
 }
 

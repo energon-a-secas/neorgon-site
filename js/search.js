@@ -3,6 +3,7 @@
   const clearBtn = document.getElementById('searchClear');
   const countEl = document.getElementById('searchCount');
   const noResults = document.getElementById('searchNoResults');
+  const catsEl = document.getElementById('searchCats');
   const box = document.getElementById('constellationBox');
   const canvas = document.getElementById('constellationCanvas');
   if (!input || !box || !canvas) return;
@@ -429,6 +430,67 @@
     });
   }
 
+  /* ── Reveal ──────────────────────────────────────────────────────
+     Entering search mode drops the favorites shelf, the Recently shipped rail
+     and the category rail, so the merged grid lands right under the field. It
+     still opens below the fold, because the hero heading above the field is
+     ~370px tall. One scroll on the *transition* into search mode (never on
+     later keystrokes, which would fight the typist) parks the field just under
+     the header and gives the whole viewport to matches. Clearing the query
+     returns to wherever reading had got to. */
+  var preSearchScrollY = null;
+
+  function headerOffset() {
+    var raw = getComputedStyle(document.documentElement).getPropertyValue('--cat-rail-top');
+    var px = parseFloat(raw);
+    return isFinite(px) ? px : 62;
+  }
+
+  function revealResults() {
+    var wrap = document.querySelector('.hero-search-wrap');
+    if (!wrap) return;
+    var target = Math.max(0, wrap.getBoundingClientRect().top + window.scrollY - headerOffset() - 12);
+    /* Scroll in whichever direction the field is: searching from halfway down
+       the catalog has to come back *up*, and an earlier `target <= scrollY`
+       guard silently did nothing in exactly that case. */
+    if (Math.abs(target - window.scrollY) < 8) return;
+    window.scrollTo({
+      top: target,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth'
+    });
+  }
+
+  /* The collapsed constellation still owes the reader one thing the pill cloud
+     was showing: which curated categories the query hit. Rendered as chips
+     beside the count, in CATEGORIES order so the row is stable between
+     keystrokes rather than reshuffling as matches change.
+
+     Derived from CATEGORIES + the query rather than from the `pills` objects,
+     even though the pills carry the same `matched` flag. Pills only exist once
+     the rAF-gated `tryInit` sees a laid-out box, so reading them made the chips
+     disappear silently wherever that never happens — a throttled background
+     tab, a headless pane. The chip row is information, not decoration; it must
+     not depend on whether the decoration booted. */
+  function renderCategoryChips(q, matchedIds) {
+    if (!catsEl) return;
+    var matched = CATEGORIES.filter(function (cat) {
+      return cat.label.toLowerCase().includes(q) ||
+             cat.keywords.includes(q) ||
+             cat.ids.some(function (id) { return matchedIds.has(id); });
+    });
+    if (!matched.length) { catsEl.textContent = ''; return; }
+    var frag = document.createDocumentFragment();
+    matched.forEach(function (cat) {
+      var chip = document.createElement('span');
+      chip.className = 'search-cat-chip';
+      chip.style.setProperty('--chip-color', cat.color);
+      chip.textContent = cat.label;
+      frag.appendChild(chip);
+    });
+    catsEl.textContent = '';
+    catsEl.appendChild(frag);
+  }
+
   function doFilter() {
     var q = input.value.trim().toLowerCase();
     clearBtn.classList.toggle('show', q.length > 0);
@@ -468,6 +530,13 @@
       document.body.classList.remove('search-active');
       noResults.classList.remove('show');
       countEl.textContent = '';
+      if (catsEl) catsEl.textContent = '';
+
+      if (preSearchScrollY !== null) {
+        var back = preSearchScrollY;
+        preSearchScrollY = null;
+        window.scrollTo({ top: back, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+      }
 
       updateGroupVisibility();
 
@@ -478,7 +547,12 @@
     }
 
     isFiltering = true;
+    var enteringSearch = !document.body.classList.contains('search-active');
     document.body.classList.add('search-active');
+    if (enteringSearch) {
+      preSearchScrollY = window.scrollY;
+      revealResults();
+    }
 
     pills.forEach(function (p) {
       var catMatch = p.cat.label.toLowerCase().includes(q) ||
@@ -544,13 +618,27 @@
              !!i.el.closest('#tools');
     }).length;
 
+    /* Same trap, second occupant. The 4 external destinations (github, gitlab,
+       docker, youtube) are excluded from `countable` because they are not our
+       tools and must not inflate M — but the empty-state check was reading that
+       same number, so searching "github" put three cards on screen underneath
+       the words "No tools match your search." Counted separately for exactly
+       the reason the Soon cards above are. */
+    var externalVisible = currentIndex.filter(function (i) {
+      return matchedIds.has(i.id) &&
+             i.el.classList.contains('external-card') &&
+             !!i.el.closest('#tools');
+    }).length;
+
     pills.forEach(function (p) {
       if (!p.matched) {
         p.matched = p.cat.ids.some(function (id) { return matchedIds.has(id); });
       }
     });
 
-    if (visible === 0 && soonVisible === 0) {
+    renderCategoryChips(q, matchedIds);
+
+    if (visible === 0 && soonVisible === 0 && externalVisible === 0) {
       noResults.classList.add('show');
       countEl.textContent = '';
     } else {
@@ -558,6 +646,9 @@
       var parts = [];
       if (visible > 0) parts.push(visible + ' of ' + total + ' tools');
       if (soonVisible > 0) parts.push(soonVisible + ' coming soon');
+      if (externalVisible > 0) {
+        parts.push(externalVisible + ' external' + (externalVisible === 1 ? '' : 's'));
+      }
       countEl.textContent = parts.join(' · ');
     }
 
