@@ -2,11 +2,38 @@
 
 ## Overview
 
-All Neorgon site icons use the **Lucide icon system** for visual consistency. Lucide provides:
-- Unified stroke-based design (24×24 grid, 2px stroke weight)
-- Perfect compatibility with neon glow effects
-- 1000+ icons in the same style
-- MIT license
+All Neorgon card icons are stroke drawings on a **24×24 grid**, mostly sourced from
+[Lucide](https://lucide.dev/icons) (MIT) and hand-drawn in the same language where no
+Lucide icon fits. One weight, one colour, one corner treatment.
+
+The standard is **machine-checked**:
+
+```bash
+make check                            # lint + regenerate the sheet; non-zero if either is off
+make hooks                            # opt in to running that on every commit
+python3 scripts/icon-lint.py --fix    # rewrite the offenders in place
+```
+
+> **Why a linter and not just this document.** This file already said 24×24 / stroke 2 /
+> `#E326E4` / no fixed `width`/`height`. By August 2026 the set had drifted off all four
+> rules: fourteen icons were drawn on a 64-unit canvas, three carried
+> `stroke="currentColor"` (which resolves to **black** inside an `<img>` — those icons
+> were nearly invisible on a dark card), and several kept a `width="800px"` from
+> whichever icon site they were downloaded from. A rule nobody can run is a rule that
+> decays silently.
+
+### The number that actually matters
+
+Icons render at a fixed 28×28, so the authored `stroke-width` means nothing on its own.
+What the eye sees is:
+
+```
+effective stroke = stroke-width / viewBox-size × 28
+```
+
+Before the August 2026 sweep that ran from **0.88px** (64-unit canvas at stroke-width 2)
+to **2.33px** (the 24-unit majority at stroke-width 2) — a 2.7× spread with no visible
+cause, which read as "some of these icons are faint".
 
 ## Current Icon Mapping
 
@@ -102,11 +129,16 @@ In `index.html`, add a new card with your icon:
 In `js/search.js`, add your card ID to the appropriate category:
 
 ```javascript
-const CATEGORIES = {
-  development: ['local-drills', 'json-builder', 'snippets', 'new-tool'], // Add here
+const CATEGORIES = [
+  { label: 'DevOps', color: '#fbbf24',
+    ids: ['cardforge', 'infradrills', 'snippets', 'new-tool'],   // Add here
+    keywords: '… plus any words someone might search for' },
   // ...
-};
+];
 ```
+
+`ids` must match the `.card-group` the card actually sits in — a pill whose ids point at
+a section that does not hold them filters the catalog to nothing.
 
 ### 7. Add Preview GIF
 
@@ -143,20 +175,91 @@ Choose icons that:
 | **Interaction** | `mouse-pointer-click`, `touch-app`, `hand` |
 | **Intelligence** | `brain`, `sparkles`, `bot`, `zap` |
 
-## Brand Color
+## Colour: the file says magenta, the card decides
 
-**Primary icon color:** `#E326E4` (neon purple/pink)
+Card icons are rendered as **masks**, not images:
 
-This color is applied in the CSS with `filter: drop-shadow(0 0 5px rgba(255,255,255,.5))` for the neon glow effect.
+```html
+<span class="card-site-icon" aria-hidden="true"
+      style="--icon: url('/assets/icons/pathfinder.svg')"></span>
+```
+
+```css
+span.card-site-icon {
+  background-color: var(--card-accent, #E326E4);
+  mask-image: var(--icon);          /* plus -webkit- and the size/repeat/position longhands */
+}
+```
+
+The SVG supplies the **shape**; the element supplies the **colour**, from the card's own
+`--card-accent`. Every other coloured thing on a card (tags, domain line, Soon badge, New
+badge) already worked this way; the icon was the last holdout.
+
+Three consequences worth knowing:
+
+- **The path in `--icon` must be root-relative** (`/assets/icons/x.svg`). A relative `url()`
+  inside a custom property resolves against the stylesheet that *substitutes* the `var()`,
+  not the HTML that declared it, so `assets/icons/x.svg` becomes `/css/assets/icons/x.svg`
+  and every mask 404s silently, leaving invisible icons. Do not "tidy" these back.
+- **Only alpha survives.** A mask reads shape, not colour, so a part drawn at `opacity=".45"`
+  masks to 45% of the accent. That is how the de-emphasised halves of `tickbox.svg` and
+  `minimap.svg` still read as secondary.
+- **Icons are `aria-hidden`.** They repeat the card's own name, so labelling them made a
+  link announce "Pathfinder, pathfinder.neorgon.com, Pathfinder".
+
+**Primary icon color:** `#E326E4`, written literally into every file and enforced by the
+linter. Under a mask only alpha matters, so this looks like dead metadata — it is not. It is
+what the no-mask-support fallback paints (`@supports not (mask-image: …)` draws the same file
+as an ordinary `background-image`), and what you see opening the file on its own.
+
+Never `currentColor`. It is right for an inlined SVG and completely wrong here: an `<img>`
+loads the file as its own document with no access to the host page's colour, so
+`currentColor` resolves to black.
+
+**Exceptions that stay `<img>`:** the four third-party brand marks, and `energon-logo.png`
+(a raster file has no shape to mask). Recolouring someone else's trademark to match a card is
+not consistency. `icon-lint.py` enforces this in both directions — an exempt mark rendered as
+a masked `<span>`, or one of ours rendered as a plain `<img>`, both fail.
 
 ## Technical Details
 
-- **Viewbox:** `0 0 24 24` (standard)
-- **Stroke weight:** `2` (consistent across all icons)
-- **Stroke caps:** `round`
-- **Stroke joins:** `round`
-- **Fill:** `none` (stroke-based design)
-- **Size in HTML:** Icons are sized by CSS to `28px × 28px` inside a `44px × 44px` wrapper
+| Property | Value | Enforced by |
+|---|---|---|
+| viewBox | `0 0 24 24` | convention |
+| stroke-width | **2.2** | `icon-lint.py` |
+| stroke | `#E326E4` | `icon-lint.py` |
+| stroke-linecap / linejoin | `round` | `icon-lint.py` |
+| fill | `none` (stroke drawings) | convention |
+| root `width` / `height` | **absent** — CSS owns the box | `icon-lint.py` |
+| rendered as | masked `<span>` taking `--card-accent` | `icon-lint.py` |
+| rendered size | 28×28 inside a 42×42 wrapper | `css/style.css` |
+
+**Why 2.2 and not Lucide's stock 2.** 2.2/24 lands at ~2.55px effective at the 28px render
+size, against 2.33px for stock Lucide. A deliberate step up: at 28px on a dark tile a 2px-grid
+stroke reads thin. `icon-lint.py` derives it as `viewBox / 11`, so an icon on another canvas
+still lands on the same effective weight.
+
+## Hand-drawn icons
+
+Not every tool has a Lucide equivalent. The constraint that matters is 28px, not the 24-unit
+canvas you draw on: **three shapes is the budget**, and detail under ~1.5 units disappears.
+Two rules learned the hard way:
+
+- **A shape's silhouette outranks its parts.** Doorman was a doorman's cap above a door. A
+  wide brim on a narrower rounded body is, unmistakably, a *trash can*. It is an archway now.
+- **Simplifying can collide with a neighbour.** UI Anatomy reduced to "rectangle plus text
+  lines", which is what Incident Runbook and Hiring Pack already looked like. A header bar and
+  a sidebar split says *wireframe* and nothing else does.
+
+Check a new icon against the whole set at 28px before committing, not on its own:
+
+```bash
+python3 scripts/icon-sheet.py     # writes docs/icon-sheet.html
+```
+
+That sheet renders every card icon at 60px and 28px in its own card's colour. Scan it for
+exactly two things: a silhouette that reads as the wrong object, and two icons that read as
+each other. Both defects it has already caught were invisible file-by-file.
 
 ## Resources
 
@@ -166,14 +269,18 @@ This color is applied in the CSS with `filter: drop-shadow(0 0 5px rgba(255,255,
 
 ## Troubleshooting
 
-### Icon looks too thick
-Check that `stroke-width="2"` (not 3 or 4)
+### Icon looks too thick, too thin, or the wrong colour
+Run `make check`. It names the file and the exact rule broken.
 
-### Icon doesn't glow
-Verify the stroke color is `#E326E4` and CSS applies `filter: drop-shadow()`
+### Icon renders black / barely visible
+`stroke="currentColor"`. Inside an `<img>` there is no inherited colour to take.
+`--fix` rewrites it to `#E326E4`.
 
-### Icon looks pixelated
-Ensure the SVG has `viewBox="0 0 24 24"` and no fixed `width`/`height` attributes (or set to "24")
+### Icon renders as a solid coloured square, or not at all
+The mask is failing. Check the `--icon` path is root-relative.
+
+### Icon looks pixelated or the wrong size
+A root `width`/`height` attribute is fighting the CSS box. `--fix` strips it.
 
 ### Icon isn't showing
 - Check the file path in HTML matches the filename exactly (case-sensitive)

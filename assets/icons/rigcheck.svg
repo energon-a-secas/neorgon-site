@@ -1,11 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#E326E4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-  <!-- camera body -->
-  <rect x="5" y="19" width="54" height="36" rx="5"/>
-  <!-- viewfinder hump -->
-  <path d="M23 19l3.5-6h11l3.5 6"/>
-  <!-- lens, with the settings that hold up -->
-  <circle cx="32" cy="38" r="11"/>
-  <path d="M27 38l4 4 7-8"/>
-  <!-- mode indicator -->
-  <circle cx="50" cy="27" r="2" fill="#E326E4" stroke="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#E326E4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="2" y="7" width="20" height="13.5" rx="2.6"/>
+  <path d="M8.6 7 10 4.4h4L15.4 7"/>
+  <circle cx="12" cy="13.9" r="4.6"/>
+  <path d="M9.9 13.9 11.3 15.3 14.2 12.2"/>
 </svg>

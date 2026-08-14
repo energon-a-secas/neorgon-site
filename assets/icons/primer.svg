@@ -1,12 +1,7 @@
-<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <g fill="none" stroke="#E326E4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Open book: learning by doing -->
-    <path d="M32 18 C26 13 18 13 12 15 V47 C18 45 26 45 32 50"/>
-    <path d="M32 18 C38 13 46 13 52 15 V47 C46 45 38 45 32 50"/>
-    <line x1="32" y1="18" x2="32" y2="50"/>
-    <!-- Spark / node: the ML idea rising off the page -->
-    <circle cx="44" cy="24" r="3" fill="#E326E4" stroke="none"/>
-    <circle cx="52" cy="12" r="2" fill="#E326E4" stroke="none"/>
-    <line x1="44" y1="24" x2="52" y2="12"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#E326E4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 7C9.8 5 6.6 5 4 6v12c2.6-1 5.8-1 8 1"/>
+  <path d="M12 7c2.2-2 5.4-2 8-1v12c-2.6-1-5.8-1-8 1"/>
+  <path d="M12 7v13"/>
+  <path d="M16.6 9.6 20 4.9"/>
+  <circle cx="20.4" cy="4.2" r="1.5" fill="#E326E4" stroke="none"/>
 </svg>

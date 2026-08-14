@@ -1,12 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
-  <!-- back card, tilted -->
-  <rect x="14" y="12" width="28" height="38" rx="4" transform="rotate(-12 28 31)" stroke="#E326E4" stroke-width="3" opacity="0.4"/>
-  <!-- front card -->
-  <rect x="24" y="16" width="28" height="38" rx="4" stroke="#E326E4" stroke-width="3"/>
-  <!-- die pips on the front card (a 5-face) -->
-  <circle cx="32" cy="24" r="2.4" fill="#E326E4"/>
-  <circle cx="44" cy="24" r="2.4" fill="#E326E4"/>
-  <circle cx="38" cy="35" r="2.4" fill="#E326E4"/>
-  <circle cx="32" cy="46" r="2.4" fill="#E326E4"/>
-  <circle cx="44" cy="46" r="2.4" fill="#E326E4"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#E326E4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="5" width="10.5" height="14.5" rx="2.2" transform="rotate(-12 8.25 12.25)" opacity=".45"/>
+  <rect x="10" y="5.5" width="11" height="14.5" rx="2.2"/>
+  <circle cx="13.4" cy="9.4" r="1.15" fill="#E326E4" stroke="none"/>
+  <circle cx="15.5" cy="12.75" r="1.15" fill="#E326E4" stroke="none"/>
+  <circle cx="17.6" cy="16.1" r="1.15" fill="#E326E4" stroke="none"/>
 </svg>
