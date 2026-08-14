@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 1036.8" width="1240" height="1036.8" font-family="'Avenir Next','Segoe UI',Roboto,sans-serif">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#1a1040" stop-opacity=".85"/>
+      <stop offset="55%" stop-color="#0a0a24" stop-opacity=".45"/>
+      <stop offset="100%" stop-color="#040714" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <rect width="1240" height="1036.8" fill="#040714"/>
+  <rect width="1240" height="1036.8" fill="url(#glow)"/>
+  
+  
+  <text x="80" y="92" fill="#B015B0" font-size="20" font-weight="700" letter-spacing="3.4">SEARCH</text>
+  <text x="80" y="140" fill="#f9f9f9" font-size="42" font-weight="700" letter-spacing="-.4">The answer was 1747px below the question</text>
+  <text x="80" y="176" fill="rgba(255,255,255,.46)" font-size="21">Chrome 1280x800, 6 favorites saved, query "json"</text>
+
+  <text x="300" y="214" fill="rgba(255,255,255,.46)" font-size="20" font-weight="700" letter-spacing="2.5">BEFORE</text>
+  
+    <rect x="300" y="244" width="260" height="56" rx="10"
+          fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.16)"/>
+    <text x="430" y="279" text-anchor="middle" fill="rgba(255,255,255,.62)" font-size="19">type "json"</text>
+  
+    <rect x="300" y="340.0" width="260" height="56.0" rx="6"
+          fill="#B015B0" fill-opacity=".18" stroke="#B015B0" stroke-opacity=".38"/>
+    <text x="430" y="372.0" text-anchor="middle"
+          fill="#f9f9f9" font-size="18" font-weight="600">Constellation pills</text>
+    <text x="578" y="376.0"
+          fill="rgba(255,255,255,.46)" font-size="17">200px</text>
+    <rect x="300" y="400.0" width="260" height="194.0" rx="6"
+          fill="#B015B0" fill-opacity=".18" stroke="#B015B0" stroke-opacity=".38"/>
+    <text x="430" y="501.0" text-anchor="middle"
+          fill="#f9f9f9" font-size="18" font-weight="600">Your favorites</text>
+    <text x="578" y="505.0"
+          fill="rgba(255,255,255,.46)" font-size="17">660px</text>
+    <rect x="300" y="598.0" width="260" height="192.2" rx="6"
+          fill="#B015B0" fill-opacity=".18" stroke="#B015B0" stroke-opacity=".38"/>
+    <text x="430" y="698.1" text-anchor="middle"
+          fill="#f9f9f9" font-size="18" font-weight="600">Recently shipped</text>
+    <text x="578" y="702.1"
+          fill="rgba(255,255,255,.46)" font-size="17">654px</text>
+    <rect x="300" y="794.2" width="260" height="14.6" rx="6"
+          fill="#B015B0" fill-opacity=".18" stroke="#B015B0" stroke-opacity=".38"/>
+    <text x="430" y="804.5" text-anchor="middle"
+          fill="#f9f9f9" font-size="15" font-weight="600">Category rail</text>
+    <text x="578" y="809.5"
+          fill="rgba(255,255,255,.46)" font-size="17">62px</text>
+  
+    <rect x="300" y="820.8000000000001" width="260" height="120" rx="10"
+          fill="rgba(74,222,128,.07)" stroke="#4ade80" stroke-opacity=".6"/>
+    <text x="430" y="887.8000000000001" text-anchor="middle" fill="#4ade80"
+          font-size="20" font-weight="700">FIRST MATCH</text>
+  
+    <path d="M240 340 L240 820.8000000000001" stroke="#B015B0" stroke-width="3"/>
+    <path d="M231 340 h18 M231 820.8000000000001 h18" stroke="#B015B0" stroke-width="3"/>
+    <text x="220" y="591.4" text-anchor="end" fill="#B015B0"
+          font-size="32" font-weight="700">1747px</text>
+
+  <text x="780" y="214" fill="#4ade80" font-size="20" font-weight="700" letter-spacing="2.5">AFTER</text>
+  
+    <rect x="780" y="244" width="260" height="56" rx="10"
+          fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.16)"/>
+    <text x="910" y="279" text-anchor="middle" fill="rgba(255,255,255,.62)" font-size="19">type "json"</text>
+  <rect x="780" y="340" width="260" height="6.9" rx="3"
+        fill="#4ade80" fill-opacity=".3" stroke="#4ade80" stroke-opacity=".5"/>
+  <text x="1058" y="350.9" fill="rgba(255,255,255,.46)" font-size="17">23px</text>
+  <text x="780" y="520.9" fill="rgba(255,255,255,.62)" font-size="18">The chip row replaces the 200px</text>
+  <text x="780" y="546.9" fill="rgba(255,255,255,.62)" font-size="18">pill cloud: same signal, one</text>
+  <text x="780" y="572.9" fill="rgba(255,255,255,.62)" font-size="18">eighth the height.</text>
+  
+    <rect x="780" y="360.9" width="260" height="120" rx="10"
+          fill="rgba(74,222,128,.07)" stroke="#4ade80" stroke-opacity=".6"/>
+    <text x="910" y="427.9" text-anchor="middle" fill="#4ade80"
+          font-size="20" font-weight="700">FIRST MATCH</text>
+  
+    <path d="M720 340 L720 360.9" stroke="#4ade80" stroke-width="3"/>
+    <path d="M711 340 h18 M711 360.9 h18" stroke="#4ade80" stroke-width="3"/>
+    <text x="700" y="361.4" text-anchor="end" fill="#4ade80"
+          font-size="32" font-weight="700">126px</text>
+
+  <text x="80" y="960.8" fill="rgba(255,255,255,.34)" font-size="17">Same viewport, same query, drawn to scale. The four blocks are browse surfaces:</text>
+  <text x="80" y="990.8" fill="rgba(255,255,255,.34)" font-size="17">none of them can hold a match that the merged results grid does not already show.</text>
+</svg>

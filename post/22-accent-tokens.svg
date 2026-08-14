@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 830" width="1240" height="830" font-family="'Avenir Next','Segoe UI',Roboto,sans-serif">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#1a1040" stop-opacity=".85"/>
+      <stop offset="55%" stop-color="#0a0a24" stop-opacity=".45"/>
+      <stop offset="100%" stop-color="#040714" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <rect width="1240" height="830" fill="#040714"/>
+  <rect width="1240" height="830" fill="url(#glow)"/>
+  
+  
+  <text x="80" y="92" fill="#B015B0" font-size="20" font-weight="700" letter-spacing="3.4">COLOUR</text>
+  <text x="80" y="140" fill="#f9f9f9" font-size="42" font-weight="700" letter-spacing="-.4">Everything on a card takes the card's colour</text>
+  <text x="80" y="176" fill="rgba(255,255,255,.46)" font-size="21">Which selectors in css/style.css resolve their colour from var(--card-accent)</text>
+  <text x="343" y="278" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="19" font-weight="700" letter-spacing="2">BEFORE</text>
+  <text x="553" y="278" text-anchor="middle" fill="#4ade80" font-size="19" font-weight="700" letter-spacing="2">AFTER</text>
+  
+    <text x="244" y="344" text-anchor="end" fill="#f9f9f9" font-size="21"
+          font-weight="600" font-family="monospace">.card-tag</text>
+    
+      <rect x="268" y="314" width="150" height="46" rx="8"
+            fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-opacity=".5"/>
+      <text x="343" y="344" text-anchor="middle" fill="#4ade80"
+            font-size="17" font-weight="700">card accent</text>
+    
+      <rect x="478" y="314" width="150" height="46" rx="8"
+            fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-opacity=".5"/>
+      <text x="553" y="344" text-anchor="middle" fill="#4ade80"
+            font-size="17" font-weight="700">card accent</text>
+    <text x="244" y="418" text-anchor="end" fill="#f9f9f9" font-size="21"
+          font-weight="600" font-family="monospace">.card-domain</text>
+    
+      <rect x="268" y="388" width="150" height="46" rx="8"
+            fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-opacity=".5"/>
+      <text x="343" y="418" text-anchor="middle" fill="#4ade80"
+            font-size="17" font-weight="700">card accent</text>
+    
+      <rect x="478" y="388" width="150" height="46" rx="8"
+            fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-opacity=".5"/>
+      <text x="553" y="418" text-anchor="middle" fill="#4ade80"
+            font-size="17" font-weight="700">card accent</text>
+    <text x="244" y="492" text-anchor="end" fill="#f9f9f9" font-size="21"
+          font-weight="600" font-family="monospace">.card-initial</text>
+    
+      <rect x="268" y="462" width="150" height="46" rx="8"
+            fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-opacity=".5"/>
+      <text x="343" y="492" text-anchor="middle" fill="#4ade80"
+            font-size="17" font-weight="700">card accent</text>
+    
+      <rect x="478" y="462" width="150" height="46" rx="8"
+            fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-opacity=".5"/>
+      <text x="553" y="492" text-anchor="middle" fill="#4ade80"
+            font-size="17" font-weight="700">card accent</text>
+    <text x="244" y="566" text-anchor="end" fill="#f9f9f9" font-size="21"
+          font-weight="600" font-family="monospace">.soon-badge</text>
+    
+      <rect x="268" y="536" width="150" height="46" rx="8"
+            fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-opacity=".5"/>
+      <text x="343" y="566" text-anchor="middle" fill="#4ade80"
+            font-size="17" font-weight="700">card accent</text>
+    
+      <rect x="478" y="536" width="150" height="46" rx="8"
+            fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-opacity=".5"/>
+      <text x="553" y="566" text-anchor="middle" fill="#4ade80"
+            font-size="17" font-weight="700">card accent</text>
+    <text x="244" y="640" text-anchor="end" fill="#f9f9f9" font-size="21"
+          font-weight="600" font-family="monospace">.card-new-badge</text>
+    
+      <rect x="268" y="610" width="150" height="46" rx="8"
+            fill="#B015B0" fill-opacity=".16" stroke="#B015B0" stroke-opacity=".5"/>
+      <text x="343" y="640" text-anchor="middle" fill="#B015B0"
+            font-size="17" font-weight="700">its own</text>
+    
+      <rect x="478" y="610" width="150" height="46" rx="8"
+            fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-opacity=".5"/>
+      <text x="553" y="640" text-anchor="middle" fill="#4ade80"
+            font-size="17" font-weight="700">card accent</text>
+    <text x="244" y="714" text-anchor="end" fill="#f9f9f9" font-size="21"
+          font-weight="600" font-family="monospace">.card-site-icon</text>
+    
+      <rect x="268" y="684" width="150" height="46" rx="8"
+            fill="#B015B0" fill-opacity=".16" stroke="#B015B0" stroke-opacity=".5"/>
+      <text x="343" y="714" text-anchor="middle" fill="#B015B0"
+            font-size="17" font-weight="700">its own</text>
+    
+      <rect x="478" y="684" width="150" height="46" rx="8"
+            fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-opacity=".5"/>
+      <text x="553" y="714" text-anchor="middle" fill="#4ade80"
+            font-size="17" font-weight="700">card accent</text>
+  <rect x="708" y="262" width="18" height="18" rx="4" fill="#4ade80"/><text x="736" y="277" fill="rgba(255,255,255,.46)" font-size="18">takes the card colour</text><rect x="959" y="262" width="18" height="18" rx="4" fill="#B015B0"/><text x="987" y="277" fill="rgba(255,255,255,.46)" font-size="18">hardcodes its own</text>
+  <text x="708" y="366" fill="rgba(255,255,255,.62)" font-size="19">Two holdouts. The NEW badge was a</text>
+  <text x="708" y="394" fill="rgba(255,255,255,.62)" font-size="19">solid amber gradient, the only warm</text>
+  <text x="708" y="422" fill="rgba(255,255,255,.62)" font-size="19">saturated fill in a cool interface.</text>
+  <text x="708" y="450" fill="rgba(255,255,255,.62)" font-size="19">The icon was fleet magenta on every</text>
+  <text x="708" y="478" fill="rgba(255,255,255,.62)" font-size="19">card, whatever colour the card was.</text>
+  <text x="80" y="786" fill="rgba(255,255,255,.34)" font-size="17">Read by matching each selector block in css/style.css against git HEAD.</text>
+</svg>

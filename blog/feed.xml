@@ -8,6 +8,13 @@
   <lastBuildDate>Mon, 15 Jun 2026 15:53:31 GMT</lastBuildDate>
   <atom:link href="https://neorgon.com/blog/feed.xml" rel="self" type="application/rss+xml" />
   <item>
+    <title>Everything on the page was correct</title>
+    <link>https://neorgon.com/blog/everything-on-the-page-was-correct.html</link>
+    <guid>https://neorgon.com/blog/everything-on-the-page-was-correct.html</guid>
+    <pubDate>Thu, 13 Aug 2026 00:00:00 GMT</pubDate>
+    <description>Three fixes to the Neorgon hub: search results buried 1747px below the search box, an icon set 2.7x apart in stroke weight, and a badge that ignored its own card. Each decision was right on its own.</description>
+  </item>
+  <item>
     <title>How We Set Up Google Analytics for Privacy-First Tracking</title>
     <link>https://neorgon.com/blog/how-we-setup-google-analytics.html</link>
     <guid>https://neorgon.com/blog/how-we-setup-google-analytics.html</guid>

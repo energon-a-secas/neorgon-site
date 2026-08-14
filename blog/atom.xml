@@ -6,6 +6,13 @@
   <updated>2026-06-15T15:53:31Z</updated>
   <id>https://neorgon.com/blog/</id>
   <entry>
+    <title>Everything on the page was correct</title>
+    <link href="https://neorgon.com/blog/everything-on-the-page-was-correct.html" />
+    <id>https://neorgon.com/blog/everything-on-the-page-was-correct.html</id>
+    <updated>2026-08-13T00:00:00Z</updated>
+    <summary>Three fixes to the Neorgon hub: search results buried 1747px below the search box, an icon set 2.7x apart in stroke weight, and a badge that ignored its own card. Each decision was right on its own.</summary>
+  </entry>
+  <entry>
     <title>How We Set Up Google Analytics for Privacy-First Tracking</title>
     <link href="https://neorgon.com/blog/how-we-setup-google-analytics.html" />
     <id>https://neorgon.com/blog/how-we-setup-google-analytics.html</id>

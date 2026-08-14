@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 890" width="1240" height="890" font-family="'Avenir Next','Segoe UI',Roboto,sans-serif">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#1a1040" stop-opacity=".85"/>
+      <stop offset="55%" stop-color="#0a0a24" stop-opacity=".45"/>
+      <stop offset="100%" stop-color="#040714" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <rect width="1240" height="890" fill="#040714"/>
+  <rect width="1240" height="890" fill="url(#glow)"/>
+  
+  
+  <text x="80" y="92" fill="#B015B0" font-size="20" font-weight="700" letter-spacing="3.4">ICONS</text>
+  <text x="80" y="140" fill="#f9f9f9" font-size="42" font-weight="700" letter-spacing="-.4">One weight, or a different call every time</text>
+  <text x="80" y="176" fill="rgba(255,255,255,.46)" font-size="21">Effective stroke = stroke-width / viewBox x 28px. Bar height is how many icons drew at that weight.</text>
+  
+    <path d="M130 232 L130 696" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
+    <text x="130" y="732" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="17">0.0px</text>
+    <path d="M296.66666666666663 232 L296.66666666666663 696" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
+    <text x="296.66666666666663" y="732" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="17">0.5px</text>
+    <path d="M463.3333333333333 232 L463.3333333333333 696" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
+    <text x="463.3333333333333" y="732" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="17">1.0px</text>
+    <path d="M630 232 L630 696" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
+    <text x="630" y="732" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="17">1.5px</text>
+    <path d="M796.6666666666666 232 L796.6666666666666 696" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
+    <text x="796.6666666666666" y="732" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="17">2.0px</text>
+    <path d="M963.3333333333334 232 L963.3333333333334 696" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
+    <text x="963.3333333333334" y="732" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="17">2.5px</text>
+    <path d="M1130 232 L1130 696" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
+    <text x="1130" y="732" text-anchor="middle" fill="rgba(255,255,255,.46)" font-size="17">3.0px</text>
+  <path d="M130 440 L1130 440" stroke="rgba(255,255,255,.16)" stroke-width="1.5"/>
+  <path d="M130 680 L1130 680" stroke="rgba(255,255,255,.16)" stroke-width="1.5"/>
+  <text x="104" y="436" text-anchor="end" fill="#f9f9f9" font-size="23" font-weight="600">before</text>
+  
+    <rect x="894.7" y="325.6" width="26" height="114.4" rx="4"
+          fill="#B015B0" fill-opacity=".85"/>
+    <text x="907.7" y="313.6" text-anchor="middle"
+          fill="#B015B0" font-size="18" font-weight="700">32</text>
+    <rect x="700.3" y="425.7" width="26" height="14.3" rx="4"
+          fill="#B015B0" fill-opacity=".85"/>
+    <text x="713.3" y="413.7" text-anchor="middle"
+          fill="#B015B0" font-size="18" font-weight="700">4</text>
+    <rect x="554.7" y="422.1" width="26" height="17.9" rx="4"
+          fill="#B015B0" fill-opacity=".85"/>
+    <text x="567.7" y="410.1" text-anchor="middle"
+          fill="#B015B0" font-size="18" font-weight="700">5</text>
+    <rect x="408.7" y="425.7" width="26" height="14.3" rx="4"
+          fill="#B015B0" fill-opacity=".85"/>
+    <text x="421.7" y="413.7" text-anchor="middle"
+          fill="#B015B0" font-size="18" font-weight="700">4</text>
+    <rect x="846.3" y="436.4" width="26" height="3.6" rx="4"
+          fill="#B015B0" fill-opacity=".85"/>
+    <text x="859.3" y="424.4" text-anchor="middle"
+          fill="#B015B0" font-size="18" font-weight="700">1</text>
+    <rect x="627.3" y="436.4" width="26" height="3.6" rx="4"
+          fill="#B015B0" fill-opacity=".85"/>
+    <text x="640.3" y="424.4" text-anchor="middle"
+          fill="#B015B0" font-size="18" font-weight="700">1</text>
+  <path d="M421.6666666666667 466 L907.7777777777777 466" stroke="#B015B0" stroke-width="3" stroke-opacity=".6"/>
+  <path d="M421.6666666666667 458 v16 M907.7777777777777 458 v16" stroke="#B015B0" stroke-width="3"/>
+  <text x="664.7" y="498" text-anchor="middle"
+        fill="#B015B0" font-size="21" font-weight="700">0.88px to 2.33px, a 2.7x spread</text>
+  <text x="104" y="676" text-anchor="end" fill="#f9f9f9" font-size="23" font-weight="600">after</text>
+  
+    <rect x="972.7" y="512.0" width="26" height="168.0" rx="4"
+          fill="#4ade80" fill-opacity=".85"/>
+    <text x="985.7" y="500.0" text-anchor="middle"
+          fill="#4ade80" font-size="18" font-weight="700">47</text>
+  <text x="1019.6" y="596.0" fill="#4ade80"
+        font-size="21" font-weight="700">every one at 2.57px</text>
+  <text x="80" y="814" fill="rgba(255,255,255,.34)" font-size="17">Read from the files themselves: before = git HEAD, after = working tree. 47 of the 49 linted icons appear here;</text>
+  <text x="80" y="844" fill="rgba(255,255,255,.34)" font-size="17">the other two were solid-fill glyphs with no stroke to measure until this change gave them one.</text>
+</svg>

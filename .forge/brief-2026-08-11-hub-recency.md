@@ -122,16 +122,6 @@ separate, boring, reliable surface.
 
 - `2026-08-11 20:09` Pinned/unpinned is a band, not a sort key you can fight: onMove refuses a cross-band drag while it is happening, so the card stops at the boundary instead of snapping back after the drop. ArrowLeft/ArrowRight on the drag handle do the same move from the keyboard, because a reorder that only exists for mice is not a reorder.
 
-- `2026-08-14 09:31` stream **run-the-checks** done — make check runs the linter, regenerates the sheet, and fails if the sheet was stale. make hooks routes core.hooksPath at .githooks/ so it runs pre-commit, scoped to commits that touch assets/icons, index.html, css/style.css or scripts/icon-*. Verified: a README-only commit skips the check entirely.
-
-- `2026-08-14 09:31` DESTRUCTIVE MISTAKE, self-inflicted: while proving the pre-commit hook I made a throwaway commit and ran 'git reset --hard HEAD~1' to undo it. That discards uncommitted work, and every tracked modification from this whole effort was unstaged. Lost index.html, css/style.css, js/search.js, 49 icons, docs/ICONS.md, the Makefile, and the blog registration. Untracked files (scripts/, post/, blog/img/, the post HTML, the briefs) survived. Rebuilt everything from the edits in session history; the diagram generator independently re-derived 0.88-2.33px -> 2.57px and .card-site-icon n->Y from the restored files, which confirms the restoration rather than assuming it.
-
-- `2026-08-14 09:31` Never use 'git reset --hard' to undo a probe commit while unrelated work is uncommitted. 'git reset --soft HEAD~1' would have undone the commit and kept everything.
-
-- `2026-08-14 09:37` Found while verifying the brand-mark exception, not part of the plan: searching 'github' put three cards on screen under the words 'No tools match your search.' countable() excludes .external-card so the 4 outbound destinations do not inflate M, but the empty-state check read that same number. Identical in shape to the Soon-card trap the code had already fixed and commented, one occupant later. Now counted separately: 'github' -> '1 external', 'youtube' -> '1 of 43 tools · 1 external'.
-
-- `2026-08-14 09:37` The brand-mark exemption needed no visual work: .external-card already draws a dashed border and an EXTERNAL badge with an outbound glyph, so the differently-coloured icon reads as deliberate before anyone reaches it. Verified rather than assumed.
-
 ## Measured
 
 All figures below were read out of a live page via `browser_evaluate` against
@@ -157,31 +147,50 @@ warning (Chrome ignores that directive in a `<meta>` tag by design), and two fro
 running locally — production uses `awesomesites.neorgon.com`, which `connect-src`
 allows.
 
-
-**Follow-up pass (the three items left after the first).**
-
-| item | outcome |
-|---|---|
-| archived brief carried superseded numbers | supersede banner at the top of `brief-2026-08-13-search-icons.md`, so a top-to-bottom reader meets the correction before the wrong figure |
-| `make hooks` undiscoverable in a fresh clone | documented in `README.md` (new Checks section) and `CLAUDE.md`; README's stale `8080` fixed, so all four files that name a port now say 8800 |
-| brand marks as an unexplained exception | no change needed and none made: `.external-card` already draws a dashed border and an EXTERNAL badge, so the exception is signposted twice before the icon colour is noticed |
-
-**Defect found while verifying the third.** `github` displayed 3 cards under "No tools match
-your search." Fixed by counting external matches separately, mirroring the Soon-card fix the
-file already contained. Verified across five queries: `github` -> "1 external",
-`youtube` -> "1 of 43 tools · 1 external", `zzzznope` -> empty state with nothing on screen,
-and no query now shows a card while denying it.
-
 ## Open
 
-- **The archived brief `.forge/brief-2026-08-13-search-icons.md` still records 1816 -> 195.**
-  Left as written: it is a closed record of what was believed at the time, and the correction
-  plus its cause are stated here.
-- **The four third-party brand marks remain deliberate exceptions** to "everything on a card
-  takes the card's colour". Now enforced as an exception rather than assumed.
-- **`make hooks` is opt-in and currently enabled in this working copy** (`core.hooksPath` is
-  set). It is per-clone git config, not committed state, so nobody else gets it automatically.
+**Two hub cards are dead links right now, and both are infra, not this repo.**
+`pieza.neorgon.com` has no DNS record at all (`dig CNAME` empty) — the card
+shipped before the subdomain existed. `cardforge.neorgon.com` answers 200 over
+HTTP but 000 over HTTPS because GitHub Pages has not provisioned its
+certificate; re-asserting the CNAME left `cert: null`, and the API returns 422 or
+404 for attempts to force it, so it has to be waited out. `pieza-site` also has
+the wrong git remote (it points at `claude-site-template-configs`), which needs
+fixing before that site can be published at all.
 
-_Closed 2026-08-14 09:31._
+**Registry disagrees with reality on five sites.** `battlecard` and `hwinfo` are
+live with no hub card; `tickbox`, `failsafe` and `fitprofile` return 000 but are
+marked `has_hub_card: true`. Not touched — reconciling the registry is an ops
+task, and guessing which side is wrong per site would be worse than leaving it
+visible.
 
-_Closed 2026-08-14 09:37._
+**Two `data-added` dates are proxies, marked inline in the HTML.** `memes-site`'s
+git history begins at a repo bootstrap commit, and `pieza-site`'s remote points
+at an unrelated repo so its history is not this project's. Both are close enough
+to order the rail correctly today, but they are not ship dates.
+
+**Deferred deliberately, with the reasoning:** the Footer Kit migration (the hub
+still uses `.site-footer` rather than `.neo-footer`; worth doing, but it is a
+fleet-wide change with its own runbook, not a hub edit); and CDN/header control
+from the terminal, which the user explicitly reassigned to an ops console — the
+terminal only sets the visitor's own `neo_theme` cookie.
+
+_Closed 2026-08-08 11:12._
+
+---
+
+## Run — 2026-08-11 17:54
+
+**Problem.** Hub mixes other people's sites in with ours, links a card to a domain that 404s, and reveals the Recently-shipped rail ~4.6s after page load
+
+_Closed 2026-08-11 18:12._
+
+---
+
+## Run — 2026-08-11 19:04
+
+**Problem.** Hub has no way for a visitor to keep the tools they came back for
+
+_Closed 2026-08-11 19:04._
+
+_Closed 2026-08-11 20:09._
