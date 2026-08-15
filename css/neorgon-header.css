@@ -377,8 +377,17 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   min-height: var(--header-control-h);
 }
 /* rem, not em: a shared component must not rescale because a site set its
-   own body font-size. 1.2rem == 19.2px == today's rendered size. */
+   own body font-size. 1.2rem == 19.2px == today's rendered size.
+
+   `margin: 0` for the same reason, and it is load-bearing: the UA gives h1
+   `.67em 0`, which at this size is 12.86px above and below. The kit never
+   reset it, so the title block came out 67px inside app mode's fixed 56px
+   bar — the title rode high and the subtitle hung out of the header into the
+   page. It looked fine on most sites only because they link the CDN
+   `styles/base.css`, whose `*` reset zeroed it for us; the sites that don't
+   (headpain, autopilot, references-api in app mode) showed the real geometry. */
 .header-logo h1 {
+  margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
   line-height: 1.2;
@@ -386,12 +395,14 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   color: var(--header-text);
   white-space: nowrap;
 }
+/* All four sides declared, so a site that authors the subtitle as a <p>
+   rather than a <div> does not reintroduce the same UA margin. */
 .header-subtitle {
   font-size: .8125rem;
   line-height: 1.25;
   color: var(--header-text-dim);
   font-weight: 500;
-  margin-top: 2px;
+  margin: 2px 0 0;
   letter-spacing: .005em;
   white-space: nowrap;
 }
@@ -431,6 +442,26 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   align-items: center;
 }
 
+/* Same guarantee one level down, for the kit's own grouping idiom.
+   header.js already knows .header-btn-group as a unit that travels into the ⋯
+   menu whole; the geometry rule above did not, so a grouped button kept its
+   own height and the row went ragged — pathfinder shipped 37px Fit/Clear
+   buttons flanked by 40px icon controls. Scoped to a group still sitting in
+   the bar: once the ⋯ menu adopts it the selector stops matching and menu
+   styling takes over, which is the same boundary the direct-child rule draws.
+   Deliberately NOT `> div > *` — battlecard's .bc-menu-wrap holds dropdown
+   items that are not bar controls and must not be stretched to 40px. */
+.header-actions > .header-btn-group > .btn,
+.header-actions > .header-btn-group > .nav-link,
+.header-actions > .header-btn-group > button,
+.header-actions > .header-btn-group > a {
+  height: var(--header-control-h);
+  min-height: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+}
+
 /* Appearance fallback for action buttons.
    The kit enforces geometry on .header-actions children but never styled
    them, so a site that uses the canonical .btn / .nav-link classes without
@@ -456,6 +487,48 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
 :where(.header-actions) > :where(.btn, .nav-link, button, a):hover {
   background: var(--header-menu-hover);
   border-color: var(--header-control-border, var(--header-border-strong));
+}
+
+/* An icon-only control has no label to pad around, and the fallback above
+   assumes there is one. Its 12px side padding lands inside a border-box
+   control the site already sized square, leaving 40 - 24 - 2 = 14px of
+   content — and an SVG is a flex item that will shrink into it. neorgon-site's
+   GitHub mark rendered 14x26 and hiring-pack's 10x24 before this rule.
+
+   Specificity note, because it is not what the :where() wrapper suggests:
+   :has() is NOT zero-specificity — it takes the specificity of its most
+   specific argument, so `svg:only-child` puts this selector at (0,1,1), the
+   same weight as the `.header-actions > a` geometry rule above and ABOVE a
+   site's single-class `.header-link { width: 36px }`. That is deliberate and
+   matches the contract: the uniform control row is kit-owned, and a site that
+   truly needs different geometry sets --header-control-h rather than
+   restyling the control. hiring-pack declared 36px and now renders 40px. */
+:where(.header-actions) > :where(.btn, .nav-link, button, a):has(> svg:only-child) {
+  padding: 0;
+  width: var(--header-control-h);
+  justify-content: center;
+}
+
+/* …and the fallback's border does not belong on one either. .header-home is
+   an unboxed glyph, so a site that styles neither ends up with a boxed icon
+   sitting next to an unboxed one in the same row (hiring-pack shipped exactly
+   that pair). Geometry above is kit-owned at (0,1,1); appearance is not — the
+   extra :where() flattens this to zero specificity, so pathfinder and
+   cartograph, whose icon buttons are deliberately boxed to match the text
+   buttons beside them, keep their border on a single class. */
+:where(.header-actions > :where(.btn, .nav-link, button, a):has(> svg:only-child)),
+:where(.header-actions > :where(.btn, .nav-link, button, a):has(> svg:only-child)):hover {
+  border-color: transparent;
+}
+
+/* Belt and braces for the same failure: whatever padding a site declares, an
+   icon inside a header control is never the thing that gives way. Carries real
+   specificity on purpose — a squeezed icon is always a bug, never a choice. */
+.header-actions > .btn > svg,
+.header-actions > .nav-link > svg,
+.header-actions > button > svg,
+.header-actions > a > svg {
+  flex: none;
 }
 
 /* ── Theme toggle ────────────────────────────────────────────── */

@@ -14,6 +14,12 @@
   --footer-pad-block-content: 40px;
   --footer-max-w: 1100px;
   --footer-control-h: 32px;
+  /* One line of footer copy, and the WCAG 2.5.8 minimum a bar target has to
+     reach. They are tokens because the bar compensates its target boxes
+     against the line height exactly — see .neo-footer-bar a below — and a
+     hand-edited `line-height: 1.7` would silently put that compensation out. */
+  --footer-line: 1.7;
+  --footer-target: 24px;
 
   /* Palette — inherits the header theme tokens so ?theme=matrix and the
      fleet-wide season.css re-skin the footer too. Fallbacks keep the kit
@@ -83,7 +89,7 @@ body.neo-footer-root {
   border-top: 1px solid var(--footer-border);
   color: var(--footer-text);
   font-size: .78rem;
-  line-height: 1.7;
+  line-height: var(--footer-line);
   text-align: center;
 }
 
@@ -126,6 +132,30 @@ body.neo-footer-root {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 12px;
+}
+
+/* Target size — WCAG 2.5.8 (Minimum, 24x24). Bar links are standalone
+   controls in a row, not links inside a sentence, so the inline exception
+   does not cover them: they measured ~84x20 and ~37x20.
+
+   Each one is grown to a 24px box and handed the difference straight back as
+   negative block margin, so the item's *margin* box still measures exactly one
+   line and the bar does not get taller. That matters here more than usual —
+   `minimal` is tuned to ~70px against the .info-footer it replaced and `app`
+   to ~50px, and this row is what sets both. The text keeps the baseline it
+   had; only the hit area grows, ~2px above and below the line.
+
+   min() clamps the compensation at zero, so a site that sets a line taller
+   than the 24px minimum keeps its own spacing instead of being pulled tight.
+   Sized in em, not px, because `app` mode runs a smaller font than the rest. */
+.neo-footer-bar a,
+.neo-footer-bar .neo-footer-disclaimer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--footer-target);
+  min-width: var(--footer-target);
+  margin-block: min(0px, calc((var(--footer-line) * 1em - var(--footer-target)) / 2));
 }
 
 .neo-footer-sep { opacity: .4; user-select: none; }
@@ -351,10 +381,127 @@ body.neo-footer-root {
   .neo-top { transform: none; }
 }
 
+/* ── Disclaimer: bar trigger + modal (built by footer.js) ──────
+   The trigger is a <button> that has to sit in a row of <a>s without
+   announcing itself as the odd one out, so it borrows the link treatment
+   rather than the kit's control treatment. */
+.neo-footer-disclaimer {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--footer-text);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color var(--dur, 200ms) ease;
+}
+.neo-footer-disclaimer:hover,
+.neo-footer-disclaimer:focus-visible {
+  color: var(--footer-text-strong);
+  text-decoration-style: solid;
+}
+.neo-footer-disclaimer:focus-visible { outline: 2px solid var(--footer-accent); outline-offset: 3px; }
+
+.neo-modal {
+  width: min(640px, calc(100vw - 32px));
+  max-height: min(78dvh, 640px);
+  /* Centring is declared, not inherited. showModal() centres via the UA's
+     `margin: auto` on inset:0, and any site carrying a `* { margin: 0 }`
+     reset beats the UA sheet and pins the dialog to the top-left — affinity
+     did exactly that. Too site-dependent to leave implicit. */
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--footer-border-strong);
+  border-radius: 12px;
+  background: var(--header-bg-end, #0d0d12);
+  color: var(--footer-text-strong);
+  overflow: hidden;
+}
+/* A <dialog> is display:none until opened; showModal() flips it to the
+   UA default (block), so the flex layout has to be scoped to [open] or
+   the closed dialog counts as shown. */
+.neo-modal[open] { display: flex; flex-direction: column; }
+.neo-modal::backdrop { background: rgba(0, 0, 0, .62); backdrop-filter: blur(2px); }
+
+.neo-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--footer-border);
+}
+.neo-modal-title {
+  margin: 0;
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: .01em;
+  color: var(--footer-text-strong);
+}
+.neo-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--footer-control-h);
+  height: var(--footer-control-h);
+  padding: 0;
+  border: 1px solid var(--footer-border-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--footer-text);
+  cursor: pointer;
+  transition: color var(--dur, 200ms) ease, background var(--dur, 200ms) ease;
+}
+.neo-modal-close:hover { color: var(--footer-text-strong); background: var(--footer-hover); }
+.neo-modal-close:focus-visible { outline: 2px solid var(--footer-accent); outline-offset: 2px; }
+.neo-modal-close svg { width: 18px; height: 18px; display: block; }
+
+.neo-modal-body {
+  padding: 18px;
+  overflow-y: auto;
+  font-size: .9rem;
+  line-height: 1.65;
+  color: var(--footer-text);
+}
+.neo-modal-body > :first-child { margin-top: 0; }
+.neo-modal-body > :last-child { margin-bottom: 0; }
+.neo-modal-body p { margin: 0 0 .9em; }
+.neo-modal-body strong { color: var(--footer-text-strong); font-weight: 620; }
+.neo-modal-body a { color: var(--footer-accent); text-decoration: underline; }
+
+@media (max-width: 700px) {
+  .neo-modal { width: calc(100vw - 20px); max-height: 84dvh; }
+}
+
 /* ── Print — the footer is the only place a printed page can show
    provenance, so expand link URLs and drop the floating control. ── */
 @media print {
   .neo-top, .neo-footer-theme { display: none !important; }
+
+  /* Provenance must survive the move into the dialog. On paper there is
+     nothing to click, so the trigger goes and the copy itself comes back —
+     laid out in flow at the end of the document rather than as an overlay. */
+  .neo-footer-disclaimer, .neo-modal-close { display: none !important; }
+  .neo-modal {
+    display: block !important;
+    position: static;
+    width: auto;
+    max-height: none;
+    border: 0;
+    border-top: 1px solid #999;
+    border-radius: 0;
+    background: none;
+    color: #000;
+    overflow: visible;
+  }
+  .neo-modal::backdrop { display: none; }
+  .neo-modal-head { border-bottom: 0; padding: 12px 0 0; }
+  .neo-modal-body { padding: 0; color: #000; }
+
   .neo-footer {
     color: #000;
     border-top: 1px solid #999;
@@ -362,6 +509,15 @@ body.neo-footer-root {
     page-break-inside: avoid;
   }
   .neo-footer a { color: #000; text-decoration: underline; }
+  /* Paper has no pointers, so the 24px target boxes come off — and they have
+     to: inside an inline-flex link the expanded href below would be laid out
+     as a second flex item beside the label instead of flowing after it. */
+  .neo-footer-bar a {
+    display: inline;
+    min-height: 0;
+    min-width: 0;
+    margin-block: 0;
+  }
   .neo-footer a[href^="http"]::after {
     content: " (" attr(href) ")";
     font-size: .9em;

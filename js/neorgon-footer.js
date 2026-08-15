@@ -181,8 +181,9 @@
     return 'updated ' + d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
   }
 
-  function buildBar(footer, inner) {
+  function buildBar(footer, inner, disclaimer) {
     var items = [];
+    if (disclaimer) items.push(disclaimer);
 
     /* Only add the hub link when the site's own copy doesn't already
        carry one — retrofits keep their hand-written "Part of Neorgon". */
@@ -220,6 +221,84 @@
       host.appendChild(item);
     });
     return bar;
+  }
+
+  /* ── Disclaimer dialog ───────────────────────────────────────────────
+     Long-form copy — provenance, licensing, "this is not advice" — is worth
+     keeping and worth reading once. Stacked above the footer bar it is
+     neither: it pushes the bar down the page and nobody reads a 99-word
+     paragraph in 12px grey (affinity ran 99 words, glassbox 57, headpain 51).
+     So the site authors it inside a <template> and the kit turns it into one
+     bar link plus a modal.
+
+     Native <dialog> on purpose: showModal() brings the focus trap, the Esc
+     handler, the inert background and ::backdrop with it. A hand-rolled
+     overlay would have to re-earn all four, and the two the fleet usually
+     forgets are the ones a keyboard user notices first.
+
+       <footer class="neo-footer" data-footer-mode="minimal">
+         One line that stays visible.
+         <template data-neo-disclaimer data-label="Full notice" data-title="About this tool">
+           <p>The long copy, as much of it as you like.</p>
+         </template>
+       </footer> ───────────────────────────────────────────────────────── */
+  var dialogSeq = 0;
+
+  function buildDisclaimer(footer) {
+    var tpl = footer.querySelector(':scope > template[data-neo-disclaimer]');
+    if (!tpl) return null;
+    tpl.parentNode.removeChild(tpl);
+
+    var label = tpl.getAttribute('data-label') || 'Disclaimer';
+    var title = tpl.getAttribute('data-title') || label;
+    var titleId = 'neo-disclaimer-title-' + (++dialogSeq);
+
+    var dlg = el('dialog', 'neo-modal');
+    dlg.setAttribute('aria-labelledby', titleId);
+
+    var head = el('div', 'neo-modal-head');
+    var h = el('h2', 'neo-modal-title', title);
+    h.id = titleId;
+    var close = el('button', 'neo-modal-close');
+    close.type = 'button';
+    close.setAttribute('aria-label', 'Close');
+    close.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+      'stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+    head.appendChild(h);
+    head.appendChild(close);
+
+    var body = el('div', 'neo-modal-body');
+    body.appendChild(tpl.content.cloneNode(true));
+
+    dlg.appendChild(head);
+    dlg.appendChild(body);
+    document.body.appendChild(dlg);
+
+    close.addEventListener('click', function () { dlg.close(); });
+
+    /* Esc is handled explicitly rather than left to showModal()'s built-in
+       close request. Two reasons: the built-in could not be demonstrated in
+       this environment (the key reached the document but no `cancel` fired),
+       and several sites in the fleet already bind Esc at document level for
+       their own panels. Closing here and stopping propagation means exactly
+       one thing closes per press, and it is the thing on top. Harmless when
+       the UA also handles it — close() on a closed dialog is a no-op. */
+    dlg.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || !dlg.open) return;
+      e.stopPropagation();
+      dlg.close();
+    });
+    /* Backdrop click: a click on the backdrop reports the <dialog> itself as
+       target, since the backdrop is its pseudo-element and not a node. */
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+
+    var trigger = el('button', 'neo-footer-disclaimer', label);
+    trigger.type = 'button';
+    trigger.addEventListener('click', function () {
+      if (typeof dlg.showModal === 'function') dlg.showModal();
+      else dlg.setAttribute('open', '');
+    });
+    return trigger;
   }
 
   /* ── Back to top ─────────────────────────────────────────────────── */
@@ -274,8 +353,12 @@
       if (footer.__neoDone) return;
       footer.__neoDone = true;
       if (!footer.hasAttribute('data-footer-mode')) footer.setAttribute('data-footer-mode', 'minimal');
+      /* Lift the template out before ensureInner sweeps loose children into
+         .neo-footer-inner — otherwise the dialog's source ends up nested in
+         the visible note it exists to replace. */
+      var disclaimer = buildDisclaimer(footer);
       var inner = ensureInner(footer);
-      var bar = buildBar(footer, inner);
+      var bar = buildBar(footer, inner, disclaimer);
       if (bar) footer.appendChild(bar);
     });
 
