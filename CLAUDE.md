@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 make serve          # Start local dev server on port 8800 (opens http://localhost:8800)
 make stop           # Kill the dev server
 make check          # Icon standard: lint + regenerate docs/icon-sheet.html, non-zero if off
-make hooks          # Opt in to running `make check` before each commit (per-clone, run once)
+make hooks          # Opt in to the pre-commit icon check (per-clone, run once)
 
 npx convex dev      # Run Convex backend (required for terminal auth features)
 ```

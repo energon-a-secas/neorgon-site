@@ -4,12 +4,48 @@
 #
 # Only runs when the commit actually touches the icon system. A hook that fires
 # on every commit regardless of content is a hook people disable.
-if git diff --cached --name-only | grep -Eq '^(assets/icons/|index\.html$|css/style\.css$|scripts/icon-)'; then
-  echo "pre-commit: checking the icon standard..."
-  make check || {
-    echo
-    echo "pre-commit: icon check failed. Fix it, or run 'python3 scripts/icon-lint.py --fix'."
-    echo "To commit anyway: git commit --no-verify"
-    exit 1
-  }
+if ! git diff --cached --name-only | grep -Eq '^(assets/icons/|index\.html$|css/style\.css$|scripts/icon-)'; then
+  exit 0
 fi
+
+echo "pre-commit: checking the icon standard..."
+
+# Check the *staged snapshot*, not the working tree. Two reasons, and the second
+# is the one that matters:
+#
+#   1. A broken file you have not staged is not part of this commit. Linting the
+#      whole tree let a single untracked icon block every unrelated commit in the
+#      repo, and the way out people find is --no-verify — which turns the check
+#      off completely, including for the commit that needed it.
+#   2. A tree lint cannot see the defect that actually ships. An index.html
+#      referencing an icon nobody ran `git add` on passes a tree lint — the file
+#      is sitting right there on disk — and then 404s on the deployed site.
+#      Against the index that same commit fails with MISSING, which is the point.
+#      neokeys.svg shipped exactly that way.
+tmp=$(mktemp -d) || exit 1
+trap 'rm -rf "$tmp"' EXIT INT TERM
+git checkout-index -a -f --prefix="$tmp/" || exit 1
+
+fail() {
+  echo
+  echo "pre-commit: icon check failed on what you are about to commit."
+  echo "Fix it, run 'python3 scripts/icon-lint.py --fix', or 'git add' the missing file."
+  echo "To commit anyway: git commit --no-verify"
+  exit 1
+}
+
+python3 "$tmp/scripts/icon-lint.py" || fail
+
+# Sheet freshness, also judged against the index: regenerate from the staged
+# icons and compare with the staged sheet. `make check` does this with
+# `git diff`, which reads the working tree and so cannot be reused here.
+python3 "$tmp/scripts/icon-sheet.py" >/dev/null || fail
+if git ls-files --error-unmatch docs/icon-sheet.html >/dev/null 2>&1; then
+  if ! git show :docs/icon-sheet.html | diff -q - "$tmp/docs/icon-sheet.html" >/dev/null 2>&1; then
+    echo "docs/icon-sheet.html is stale in this commit."
+    echo "Run 'python3 scripts/icon-sheet.py' and stage docs/icon-sheet.html."
+    fail
+  fi
+fi
+
+echo "icons: standard held, sheet current"

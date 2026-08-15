@@ -10,9 +10,19 @@ The standard is **machine-checked**:
 
 ```bash
 make check                            # lint + regenerate the sheet; non-zero if either is off
-make hooks                            # opt in to running that on every commit
+make hooks                            # opt in to the pre-commit check (per-clone, run once)
 python3 scripts/icon-lint.py --fix    # rewrite the offenders in place
 ```
+
+> **`make check` and the hook judge different things, on purpose.** `make check` reads your
+> working tree — the right answer while you are drawing. `.githooks/pre-commit` reads the
+> **staged snapshot**, because that is what the commit ships. The two disagree in exactly the
+> cases that matter: a half-finished icon you have not staged blocks `make check` but not the
+> commit, and an `index.html` referencing an icon nobody ran `git add` on passes `make check`
+> — the file is right there on disk — while the hook fails it with `MISSING`. `neokeys.svg`
+> shipped that way: the card was committed, the icon never was, and neorgon.com served a 404
+> for it with the card rendering no mark at all. A tree lint cannot see that; an index lint
+> cannot miss it.
 
 > **Why a linter and not just this document.** This file already said 24×24 / stroke 2 /
 > `#E326E4` / no fixed `width`/`height`. By August 2026 the set had drifted off all four
