@@ -132,6 +132,28 @@ separate, boring, reliable surface.
 
 - `2026-08-14 09:37` The brand-mark exemption needed no visual work: .external-card already draws a dashed border and an EXTERNAL badge with an outbound glyph, so the differently-coloured icon reads as deliberate before anyone reaches it. Verified rather than assumed.
 
+- `2026-08-15 21:56` Header report reproduced only as a mechanism, not a symptom: in the Chrome pane the bar sits at rectTop 0 at scrollY 900, so it IS sticky here. But css/style.css:35 sets 'body { overflow-x: hidden }', which is the exact hazard the root CLAUDE.md documents against the footer kit ('a dozen sites set overflow-x:hidden on body, which breaks sticky'). hidden makes body a scroll container in engines that do not propagate body overflow to the viewport; the header then sticks to a box that never scrolls. Fixing the mechanism rather than arguing with the report.
+
+- `2026-08-15 21:56` Search 'parla' measured on the running page: '6 of 47 tools', order [Vibe Check, Hiring Pack, Character Sheet, Parla, Playbook, TubeStack]. Cause is two-part and both parts are needed: (1) doFilter adds EVERY id of any category whose keyword blob contains the substring — 'parla' is inside Social's keywords, so all 6 Social cards become matches; (2) the merged grid is filled in catalogCardsOrdered (DOM) order, so there is no ranking at all. Fixing only the ranking would still show 6 results for a 1-tool query.
+
+- `2026-08-15 22:02` stream **search ranking** done — Two defects, both fixed: scoreCard/rank() gives every match a score (name-exact 1000 down to loose 120) and syncCatalogMerge appends in that order; and the keyword blob is demoted to a fallback vocabulary that only expands a group when the query matched no card directly. Category labels still expand unconditionally because that is the pill-click path.
+
+- ~~`2026-08-15 22:18` stream **sticky header** done — css/style.css:35 'body { overflow-x: hidden }' -> 'hidden' then 'clip'. clip cuts the horizontal overflow without making body a scroll container, so .header-bar and .cat-rail stick to the viewport in every engine, not only ones that propagate body overflow upward. Verified: computed overflow-x 'clip', overflow-y back to 'visible' (was 'auto' — that was the scroll container), header rectTop 0 at scrollY 1600, no horizontal overflow at 1280 or 375. HONEST LIMIT: could not reproduce the drifting header in this Chrome pane, where it was already sticky. What is fixed is the documented mechanism, not an observed symptom.~~ · superseded 2026-08-15 22:29, see correction below
+
+- `2026-08-15 22:18` stream **space + scroll cue** done — Both shelves are one horizontal row at every width (were a 3-col grid, so 6 cards = 2 rows). Measured at 1280x800: Recently shipped 609px -> 379px, category rail y=1297 -> y=1132 (165px higher), and with favorites also showing the saving is ~340px. Recently shipped itself sits 74px LOWER (664 -> 738) because the hero grew, which is the other half of what was asked. Scroll cue is a chevron pair in the hero that retires on the first scroll and is also a button that jumps to the first live section below.
+
+- `2026-08-15 22:18` stream **pill navigation** done — Constellation no longer collapses during a search. Matched pills travel to the middle (spring 0.003 -> 0.014 — at 0.003 they crept a third of the way in the second a reader looks, so it read as a dim, not a move), unmatched take a peripheral ring (0.008 -> 0.02, radius 0.38W -> 0.46W) at 16% opacity, hover back to full. The connection web became a proximity route map: k=2 nearest neighbours re-derived every 40 frames, quadratic-bezier bows, and a tapered signal head that takes the colour of the pill it travels toward. Chips now render only when the pill cloud never booted — verified in exactly that state (hidden pane, rAF frozen, pills 0, chips 'Social').
+
+- `2026-08-15 22:18` stream **hero copy** done — Tailor-made lead. Badge 'Free · Local · No account' with an 8-phrase rotation; H1 'Made to fit' + one of four typed completions; sub 'N tools, each cut for one job. Nothing to sign up for, nothing phoning home — and none of them are finished.' The page title, meta description, OG/Twitter pairs and the JSON-LD description carried the retired heading and the paywall joke, so all seven moved together. Nothing else in the fleet quoted them (grepped PROJECTS.md, HUB_REGISTRY.md, llms.txt, README).
+
+- `2026-08-15 22:18` Measured after the fact, worth recording because it contradicts the estimate the layout option was chosen on: the predicted rail position was y~890 and the actual is y=1132. Two things I did not price — a shelf card is ~285px tall, not ~200, and the hero grew 74px (the scroll cue, plus the new sub-line wrapping to two lines). The direction is right and both asks are satisfied; the number is not the one on the option card.
+
+- `2026-08-15 22:29` CORRECTION of the struck note above: The header report was literal and I mis-read it. The user does not want the bar pinned at all — they want it to LEAVE on the way down. The overflow-x fix stands on its own merit (body was a scroll container, which is a real defect), but it was not the ask. What they asked for is auto-hide.
+
+- `2026-08-15 22:29` stream **header auto-hide** done — Auto-hide was welded to data-header-mode='app' in both the kit CSS and JS, so wanting the behaviour meant taking the slim 56px gradient bar with it. Added data-header-autohide='on' as an opt-in any mode can take, in the canonical packages/neorgon-ui/header/ (README documented), vendored to neorgon-site only via sync-header.sh --to. The hub keeps its transparent glass and now leaves on the way down. The docked category rail closes the 68px hole with one sibling rule, .header-bar.header-hidden ~ .cat-rail { top: 0 }, matched to the bar's own .26s — no JS and no second source of truth for the offset. Verified by driving the kit's own rAF-throttled listener with a synchronous rAF shim: visible at 60px (under its 80px threshold), hidden at 500/1500/2500 with the rail docked at 0, returns on a 200px scroll up, hides again on the next scroll down.
+
+- `2026-08-15 22:29` Em dashes are out of the hero sub-line and the two meta/JSON-LD descriptions that mirror it. The rest of the page's em dashes are pre-existing card copy and comments, deliberately left alone — the note was about the subtitle.
+
 ## Measured
 
 All figures below were read out of a live page via `browser_evaluate` against
@@ -185,3 +207,13 @@ and no query now shows a card while denying it.
 _Closed 2026-08-14 09:31._
 
 _Closed 2026-08-14 09:37._
+
+---
+
+## Run — 2026-08-15 21:56
+
+**Problem.** The hub reads as a flat page, not a space console: search ranks a category blanket above the tool you named, the pill constellation unmounts exactly when it should be navigating, Recently shipped eats two screens, and the hero copy sells 'no paywall' instead of tailor-made
+
+_Closed 2026-08-15 22:18._
+
+_Closed 2026-08-15 22:29._

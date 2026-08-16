@@ -207,3 +207,37 @@
     };
   });
 })();
+
+
+/* ── Shelf overflow ───────────────────────────────────────────────────────────
+   Both shelves are one horizontal row now, and the trailing mask fade is what
+   says so. A fade over a row that already fits reads as a rendering bug, not as
+   an invitation, so the fade is conditional on there actually being something
+   off to the right.
+
+   Kept here rather than in either shelf's own module because both shelves need
+   it and neither owns the other: recent.js renders once at load, favorites.js
+   re-renders on every star, drag and prune. One observer over both grids cannot
+   fall out of step with either.  */
+(function () {
+  var grids = ['recentRailGrid', 'favShelfGrid']
+    .map(function (id) { return document.getElementById(id); })
+    .filter(Boolean);
+  if (!grids.length) return;
+
+  function measure() {
+    grids.forEach(function (g) {
+      g.classList.toggle('is-scrollable', g.scrollWidth - g.clientWidth > 4);
+    });
+  }
+
+  measure();
+  window.addEventListener('resize', measure);
+  if ('ResizeObserver' in window) {
+    var ro = new ResizeObserver(measure);
+    grids.forEach(function (g) { ro.observe(g); });
+  }
+  /* Cards arriving or leaving changes the answer, and favorites does both. */
+  var mo = new MutationObserver(measure);
+  grids.forEach(function (g) { mo.observe(g, { childList: true }); });
+})();

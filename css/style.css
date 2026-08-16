@@ -32,7 +32,15 @@ body {
   background: var(--bg);
   color: var(--text-primary);
   min-height: 100vh;
+  /* `clip`, not `hidden`. `hidden` makes body a scroll container in every
+     engine that does not propagate body overflow up to the viewport, and a
+     sticky child then sticks to a box that never scrolls — which is why the
+     header rode down the page instead of staying at the top. `clip` cuts the
+     horizontal overflow without creating a scroll container, so `.header-bar`
+     and `.cat-rail` keep sticking to the viewport. The `hidden` line stays
+     first as the fallback for anything that does not know `clip`. */
   overflow-x: hidden;
+  overflow-x: clip;
   touch-action: manipulation;
 }
 
@@ -320,19 +328,89 @@ body {
   box-shadow: 0 0 14px var(--pill-color, rgba(192,132,252,.35));
   filter: brightness(1.15);
 }
+/* Matched: arrived. The pill is what the query hit, and it has travelled to
+   the middle of the chart to say so. */
 .tag-pill.matched {
-  box-shadow: 0 0 12px var(--pill-color, rgba(192,132,252,.5));
+  box-shadow:
+    0 0 14px var(--pill-color, rgba(192,132,252,.5)),
+    0 0 42px color-mix(in srgb, var(--pill-color, #c084fc) 45%, transparent);
+  filter: brightness(1.22);
+  z-index: 3;
 }
+
+/* Unmatched: still out there, just not where you are looking. Held at a
+   readable trace rather than removed — the cloud is the navigation, and a
+   destination you cannot see is a destination you cannot pick. Hovering one
+   brings it back to full, so "show me that one instead" costs no typing. */
 .tag-pill.repelled {
-  opacity: .3;
+  opacity: .16;
+  filter: saturate(.55);
 }
 .tag-pill.repelled:hover {
-  opacity: .7;
+  opacity: 1;
+  filter: none;
 }
 .tag-pill.planet-zoom {
   z-index: 10;
   filter: brightness(1.4);
   box-shadow: 0 0 24px var(--pill-color, rgba(192,132,252,.5)), 0 0 60px var(--pill-color, rgba(192,132,252,.25));
+}
+
+/* ── Scroll cue ───────────────────────────────────────────────────────
+   Two chevrons on the same loop, a beat apart, so the pair reads as one thing
+   moving down rather than as two arrows blinking. It goes for good on the
+   first scroll — a cue that keeps asking after you have complied is nagging,
+   and it is in the way of the catalog it was pointing at. */
+.scroll-cue {
+  display: block;
+  margin: 14px auto 0;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: none;
+  color: color-mix(in srgb, #c084fc 62%, transparent);
+  cursor: pointer;
+  transition: opacity .45s ease, transform .45s ease, color .2s ease;
+}
+.scroll-cue:hover { color: #c084fc; }
+.scroll-cue:focus-visible {
+  outline: 2px solid rgba(192,132,252,.6);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+.scroll-cue svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+  margin: 0 auto;
+  opacity: 0;
+  animation: scroll-cue-drift 2.8s var(--ease-out, ease) infinite;
+}
+.scroll-cue svg + svg {
+  margin-top: -14px;
+  animation-delay: .3s;
+}
+@keyframes scroll-cue-drift {
+  0%   { opacity: 0; transform: translateY(-5px); }
+  30%  { opacity: .95; transform: translateY(0); }
+  62%  { opacity: 0; transform: translateY(9px); }
+  100% { opacity: 0; transform: translateY(9px); }
+}
+
+/* Taken the hint, or asking for something specific — either way it is done. */
+.scroll-cue.is-gone,
+body.search-active .scroll-cue {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue svg { animation: none; opacity: .7; }
+  .scroll-cue svg + svg { opacity: .35; }
+  .scroll-cue { transition: opacity .2s ease; }
+  .scroll-cue.is-gone { transform: none; }
 }
 
 /* ── Card filter: hide non-matches ─────────────────────────────────── */
@@ -1265,6 +1343,12 @@ body.warp-active .orb {
     padding: 6px 14px;
   }
 
+  /* There is no chart to recede into here — the row is static and the canvas
+     is off — so "not matched" means leave the row. What is left is the answer
+     to "which categories did this hit", one glance wide, which is the same
+     thing the physics says on a desktop by moving. */
+  body.search-active .tag-pill.repelled { display: none; }
+
   /* Settings panel — full width on mobile */
   .settings-panel { left: 12px; right: 12px; width: auto; }
 
@@ -2145,17 +2229,17 @@ body.search-active .cat-rail {
   display: none !important;
 }
 
-/* The constellation collapses instead of unmounting: the pill physics keeps
-   its coordinates, so clearing the query does not re-scatter the cloud. */
+/* The constellation stays up during a search. It used to collapse to height 0
+   and hand its one signal — which categories the query hit — to a chip row,
+   which bought back ~200px of fold and gave away the reason the cloud exists.
+   It is the navigation: matched categories pull to the middle and light their
+   routes, the rest recede to a trace. You steer by it, so it has to be on
+   screen exactly when you are steering.
+
+   The fold is paid for elsewhere now: Recently shipped is one row instead of
+   two, and revealResults() parks the field under the header on entry. */
 .constellation-box {
   transition: height .3s var(--ease-out), margin-top .3s var(--ease-out), opacity .22s ease;
-}
-body.search-active .constellation-box {
-  height: 0;
-  margin-top: 0;
-  opacity: 0;
-  overflow: hidden;
-  pointer-events: none;
 }
 
 /* With everything above it gone, the catalog would butt straight into the hero. */
@@ -2402,15 +2486,45 @@ body.search-active #tools {
     transparent);
 }
 
-/* The rail is a single scrollable row on wide screens, so it stays one glance
-   rather than becoming a second full grid competing with the catalog. */
+/* One row, at every width. The comment here used to claim "a single scrollable
+   row on wide screens" while the rule underneath it laid out three columns —
+   six cards became two rows, 609px of shelf, and the category rail landed at
+   y=1297 with the catalog behind it. A shelf is a glance; a grid is a
+   destination, and there is already a grid directly below.
+
+   Four cards fit at 1160px and the fifth peeks, which is the affordance: the
+   cut card says there is more sideways, the mask fade says where it goes. */
 .recent-rail-grid,
 .fav-shelf-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  grid-template-columns: none;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 2px;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* Fade only the trailing edge — the leading one is flush with the heading
+     above it, and fading it would read as clipped rather than as scrollable. */
+  mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent);
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent);
+}
+.recent-rail-grid::-webkit-scrollbar,
+.fav-shelf-grid::-webkit-scrollbar { display: none; }
+.recent-rail-grid > *,
+.fav-shelf-grid > * {
+  flex: 0 0 268px;
+  scroll-snap-align: start;
+}
+/* Nothing to scroll to means nothing to advertise. */
+.recent-rail-grid:not(.is-scrollable),
+.fav-shelf-grid:not(.is-scrollable) {
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 @media (max-width: 1100px) {
-  .recent-rail-grid,
-  .fav-shelf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .recent-rail-grid > *,
+  .fav-shelf-grid > * { flex: 0 0 252px; }
 }
 /* On a phone, one column of six 248px cards is 1670px — two full screens of
    "recently shipped" before the catalog even starts, which buries the thing the
@@ -2420,28 +2534,20 @@ body.search-active #tools {
 @media (max-width: 600px) {
   .recent-rail-grid,
   .fav-shelf-grid {
-    display: flex;
-    grid-template-columns: none;
-    overflow-x: auto;
     scroll-snap-type: x mandatory;
     /* Cancel the section padding for the scroll container only, so cards can
        run to the screen edge while still starting flush with the heading. */
     margin-inline: calc(-1 * var(--layout-gutter));
     padding-inline: var(--layout-gutter);
-    padding-bottom: 6px;
-    scrollbar-width: none;
     /* Snapping aligns against the scroll *padding*, not the box padding, so
        without this the first card snaps flush to the screen edge and sits 18px
        out of line with the heading above it. */
     scroll-padding-inline: var(--layout-gutter);
+    mask-image: none;
+    -webkit-mask-image: none;
   }
-  .recent-rail-grid::-webkit-scrollbar,
-  .fav-shelf-grid::-webkit-scrollbar { display: none; }
   .recent-rail-grid > *,
-  .fav-shelf-grid > * {
-    flex: 0 0 78%;
-    scroll-snap-align: start;
-  }
+  .fav-shelf-grid > * { flex: 0 0 78%; }
 }
 
 /* ── Favorites shelf ───────────────────────────────────────────────────────
@@ -2719,8 +2825,17 @@ body.search-active #tools {
   padding: 8px var(--layout-gutter);
   max-width: var(--catalog-max-width);
   width: 100%;
-  transition: opacity .25s ease, transform .25s ease;
+  transition: opacity .25s ease, transform .25s ease, top .26s var(--ease-out);
 }
+
+/* The header hides on the way down (data-header-autohide). The rail docks
+   against it, so if it stayed at --cat-rail-top it would float with a 68px
+   hole above it and the catalog scrolling through the hole. Both are body
+   children and the bar comes first, so the sibling combinator closes it with
+   no JS and no second source of truth for the offset. The `top` transition
+   above is matched to the bar's own .26s so the two move as one piece. */
+.header-bar.header-hidden ~ .cat-rail { top: 0; }
+
 .cat-rail[hidden] { display: none; }
 
 .cat-rail-inner {

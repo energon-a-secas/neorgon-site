@@ -252,9 +252,15 @@
     state.overflow.hidden = state.menu.children.length === 0;
   }
 
-  /* ── Auto-hide (app mode): hide on scroll down past threshold,
-     reveal on scroll up. Never hides while a menu is open. Mode is
-     checked per-scroll so it can be toggled live. ───────────────── */
+  /* ── Auto-hide: hide on scroll down past threshold, reveal on scroll
+     up. Never hides while a menu is open. Both conditions are read
+     per-scroll so either can be toggled live.
+
+     `app` mode gets this by definition. Any other mode opts in with
+     `data-header-autohide="on"` — a hub or content bar that wants its own
+     look while still handing the viewport back on the way down. The two
+     were fused before, so wanting the behaviour meant taking the slim
+     56px bar and its gradient with it. ───────────────────────────── */
   function initAutoHide(header) {
     var lastY = window.scrollY;
     var ticking = false;
@@ -263,7 +269,9 @@
       ticking = true;
       requestAnimationFrame(function () {
         var y = window.scrollY;
-        if (header.getAttribute('data-header-mode') !== 'app') {
+        var hides = header.getAttribute('data-header-mode') === 'app' ||
+                    header.getAttribute('data-header-autohide') === 'on';
+        if (!hides) {
           header.classList.remove('header-hidden');
         } else if (y > lastY && y > 80 && !openMenu) {
           header.classList.add('header-hidden');

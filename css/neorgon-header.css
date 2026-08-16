@@ -337,10 +337,17 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
 .header-bar[data-header-mode="app"] {
   height: var(--header-h-app);
   --header-h-cur: var(--header-h-app);
+}
+
+/* Auto-hide. `app` mode has it by definition; every other mode opts in with
+   data-header-autohide="on" and keeps its own height and background. */
+.header-bar[data-header-mode="app"],
+.header-bar[data-header-autohide="on"] {
   transition: transform .26s var(--header-ease, ease);
 }
 /* Leaving accelerates away; returning decelerates in. Same budget. */
-.header-bar[data-header-mode="app"].header-hidden {
+.header-bar[data-header-mode="app"].header-hidden,
+.header-bar[data-header-autohide="on"].header-hidden {
   transform: translateY(-100%);
   transition-duration: .2s;
   transition-timing-function: var(--header-ease-in, ease);
@@ -778,7 +785,9 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
 /* ── Reduced motion ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .header-bar[data-header-mode="app"],
-  .header-bar[data-header-mode="app"].header-hidden { transition: none; }
+  .header-bar[data-header-mode="app"].header-hidden,
+  .header-bar[data-header-autohide="on"],
+  .header-bar[data-header-autohide="on"].header-hidden { transition: none; }
   .header-logo-img { transition: none; }
   .header-logo-img:hover { transform: none; }
   .header-menu.open { animation: none; }

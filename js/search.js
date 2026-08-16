@@ -43,6 +43,14 @@
       return {
         el: card,
         id: card.dataset.cardId,
+        /* Per-field, not one blob: the blob cannot tell "the card is called
+           Parla" from "the card mentions Parla", and that distinction is the
+           whole of the ranking below. */
+        name: name.trim().toLowerCase(),
+        desc: desc.toLowerCase(),
+        domain: domain.trim().toLowerCase(),
+        tagText: tags.join(' ').toLowerCase(),
+        added: card.dataset.added || '',
         text: [name, desc, domain, ...tags].join(' ').toLowerCase(),
         tags: tags
       };
@@ -73,6 +81,114 @@
     { label: 'Growth',        color: '#fcd34d', ids: ['mettle','primer','proctor'], keywords: 'growth mettle reasoning maturity self assessment introspection virtues courage wisdom tolerance eloquence imagination rank probe character moral compass private primer machine learning ml llm ai data science insights training embeddings rag pytorch scikit-learn ollama tutorial learn beginner hands-on pet projects fortune 500 proctor exam test quiz simulator json yaml questions answers study certification' },
     { label: 'Platforms',     color: '#64748b', ids: ['github','gitlab','dockerhub'], keywords: 'platforms github gitlab docker hub containers images repos code open source private ci cd pipelines' },
   ];
+
+  /* ── Relevance ───────────────────────────────────────────────────
+     There was no ranking at all: matches were emitted in catalog DOM order, so
+     "parla" returned six cards with Parla fourth. Two separate defects produced
+     that one symptom, and fixing either alone leaves the other visible.
+
+     1. ORDER. Every match now carries a score and the merged grid is filled in
+        score order, ship date breaking ties (newest first — the same tie-break
+        palette.js already uses).
+
+     2. MEMBERSHIP. A category's `keywords` blob is a *fallback vocabulary*, not
+        an amplifier. It used to be enough that the query appeared anywhere in
+        the blob for every card in that category to be declared a match — which
+        is how one tool's name dragged in the five other Social tools. Now the
+        blob only opens a group when the query named nothing at all ("cheatsheet"
+        matches no card, so it is allowed to mean DevOps). A category's own
+        *label* still expands unconditionally, because that is the pill-click
+        path and showing the whole group is the entire point of clicking it.
+  ─────────────────────────────────────────────────────────────────── */
+  function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  /* Matches at the start of a word, so "par" finds Parla and "box" finds Glass
+     Box, while "art" does not find "smart". Prefixes have to keep working —
+     this fires on every keystroke, and half a word is the normal state. */
+  function wordStart(hay, q) {
+    if (!hay) return false;
+    return new RegExp('(^|[^a-z0-9])' + escRe(q)).test(hay);
+  }
+
+  var SCORE = {
+    nameExact:  1000,
+    nameWord:    700,
+    nameLoose:   560,
+    catExact:    520,  /* the query IS a category label — a pill click */
+    domain:      460,
+    tag:         380,
+    desc:        220,
+    loose:       120,  /* matched somewhere, mid-word */
+    catLabel:     90,  /* part of a label: "dev" → DevOps */
+    catKeyword:   80   /* fallback vocabulary; only when nothing matched */
+  };
+
+  function scoreCard(item, q) {
+    if (item.name === q) return SCORE.nameExact;
+    if (wordStart(item.name, q)) return SCORE.nameWord;
+    if (item.name.indexOf(q) >= 0) return SCORE.nameLoose;
+    if (wordStart(item.domain, q) || wordStart(item.id, q)) return SCORE.domain;
+    if (wordStart(item.tagText, q)) return SCORE.tag;
+    if (wordStart(item.desc, q)) return SCORE.desc;
+    if (item.text.indexOf(q) >= 0) return SCORE.loose;
+    return 0;
+  }
+
+  /* Returns the matches in the order they should be shown, plus which
+     categories the query lit up (the pills read that, not the card list). */
+  function rank(q, list) {
+    var score = Object.create(null);
+    var byId = Object.create(null);
+    var hits = [];
+
+    list.forEach(function (item) { byId[item.id] = item; });
+    list.forEach(function (item) {
+      var s = scoreCard(item, q);
+      if (s > 0) { score[item.id] = s; hits.push(item); }
+    });
+
+    var labelCats = CATEGORIES.filter(function (c) {
+      return c.label.toLowerCase().indexOf(q) >= 0;
+    });
+    var keywordCats = CATEGORIES.filter(function (c) {
+      return labelCats.indexOf(c) < 0 && wordStart(c.keywords, q);
+    });
+
+    var expanding = labelCats.concat(hits.length ? [] : keywordCats);
+
+    expanding.forEach(function (cat) {
+      var base = cat.label.toLowerCase() === q ? SCORE.catExact
+               : labelCats.indexOf(cat) >= 0 ? SCORE.catLabel
+               : SCORE.catKeyword;
+      cat.ids.forEach(function (id) {
+        var item = byId[id];
+        if (!item) return;
+        if (score[id] === undefined) { score[id] = base; hits.push(item); }
+        else if (score[id] < base) { score[id] = base; }
+      });
+    });
+
+    hits.sort(function (a, b) {
+      if (score[b.id] !== score[a.id]) return score[b.id] - score[a.id];
+      if (a.added !== b.added) return a.added < b.added ? 1 : -1;
+      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    });
+
+    var matchedIds = new Set(hits.map(function (h) { return h.id; }));
+
+    /* A category is lit if the query names it, if its fallback vocabulary
+       carries the query, or if it owns something that matched. The third case
+       is what makes the pills a readout of the result set rather than of the
+       query string. */
+    var lit = CATEGORIES.filter(function (c) {
+      return labelCats.indexOf(c) >= 0 ||
+             wordStart(c.keywords, q) ||
+             c.ids.some(function (id) { return matchedIds.has(id); });
+    });
+
+    return { hits: hits, order: hits.map(function (h) { return h.id; }),
+             matchedIds: matchedIds, lit: lit };
+  }
 
   /* ── Floating pills (physics) ───────────────────────────────── */
   var W = 0, H = 0;
@@ -185,37 +301,175 @@
     });
   }
 
-  /* ── Connections between pills sharing cards ────────────────── */
+  /* ── Route map ───────────────────────────────────────────────────
+     The old graph connected any two categories whose keyword blobs happened to
+     share a word, then added every neighbouring pair, then wrapped last to
+     first: forty-odd chords across twelve moving points, which renders as a
+     hairball. It was also unreadable in principle — "Data and Fun share the
+     word 'cards'" is not a relationship anyone can see in a line, so the ink
+     bought nothing.
+
+     What replaces it is geometric. Each pill links to its two nearest
+     neighbours, deduped; the graph is re-derived as the pills drift so a link
+     always joins things that are actually close. That is why a star chart
+     connects what is near rather than what is thematically alike, and it is
+     the difference between a web and a route.
+
+     Per-edge state (phase, speed, bow) is keyed by the pair and survives a
+     rebuild, so a signal in flight is not teleported back to the start every
+     time the graph is re-derived.
+  ─────────────────────────────────────────────────────────────────── */
   var connections = [];
+  var edgeState = Object.create(null);
+  var LINK_K = 2;
+
   function buildConnections() {
+    var seen = Object.create(null);
     connections = [];
-    for (var i = 0; i < CATEGORIES.length; i++) {
-      for (var j = i + 1; j < CATEGORIES.length; j++) {
-        /* Connect if they share keywords in common card descriptions */
-        var shared = CATEGORIES[i].ids.some(function (id) {
-          var card = index.find(function (c) { return c.id === id; });
-          if (!card) return false;
-          return CATEGORIES[j].keywords.split(' ').some(function (kw) {
-            return card.text.includes(kw);
-          });
+    for (var i = 0; i < pills.length; i++) {
+      var near = [];
+      for (var j = 0; j < pills.length; j++) {
+        if (i === j) continue;
+        var dx = pills[i].x - pills[j].x;
+        var dy = pills[i].y - pills[j].y;
+        near.push([j, dx * dx + dy * dy]);
+      }
+      near.sort(function (a, b) { return a[1] - b[1]; });
+      for (var k = 0; k < Math.min(LINK_K, near.length); k++) {
+        var a = Math.min(i, near[k][0]);
+        var b = Math.max(i, near[k][0]);
+        var key = a + ':' + b;
+        if (seen[key]) continue;
+        seen[key] = true;
+        if (!edgeState[key]) {
+          edgeState[key] = {
+            phase: Math.random(),
+            speed: 0.0022 + Math.random() * 0.0026,
+            /* Perpendicular bow. A straight chord between two drifting points
+               reads as a constraint; a bowed one reads as a path. */
+            bow: (Math.random() < 0.5 ? -1 : 1) * (0.06 + Math.random() * 0.13),
+            dir: Math.random() < 0.5 ? -1 : 1
+          };
+        }
+        connections.push({ a: a, b: b, st: edgeState[key] });
+      }
+    }
+  }
+
+  /* ── Drawing ─────────────────────────────────────────────────────
+     A quadratic bezier whose control point is offset perpendicular to the
+     chord. Both the base path and the travelling highlight sample the same
+     curve, so the highlight rides the line instead of near it.
+  ─────────────────────────────────────────────────────────────────── */
+  function control(ax, ay, bx, by, bow) {
+    var dx = bx - ax, dy = by - ay;
+    return [(ax + bx) / 2 - dy * bow, (ay + by) / 2 + dx * bow];
+  }
+
+  function bezier(ax, ay, cx, cy, bx, by, t) {
+    var it = 1 - t;
+    return [it * it * ax + 2 * it * t * cx + t * t * bx,
+            it * it * ay + 2 * it * t * cy + t * t * by];
+  }
+
+  /* Pill colours are authored as #rrggbb. */
+  function rgba(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+
+  var SIGNAL_LEN = 0.17;   /* fraction of the path the highlight occupies */
+  var SIGNAL_SEGS = 7;     /* tail resolution — enough to taper, cheap to draw */
+
+  function drawRoutes() {
+    ctx.clearRect(-canvasPad, -canvasPad, W + canvasPad * 2, H + canvasPad * 2);
+    ctx.lineCap = 'round';
+
+    connections.forEach(function (link) {
+      var a = pills[link.a], b = pills[link.b];
+      if (!a || !b) return;
+
+      var st = link.st;
+      var live = isFiltering ? (a.matched && b.matched) : true;
+      var dim = isFiltering && !live;
+
+      var c = control(a.x, a.y, b.x, b.y, st.bow);
+
+      /* Base path — a gradient between the two pill colours, so a route is
+         visibly a route *between these two* rather than generic wiring. */
+      var grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+      var baseA = dim ? 0.025 : (isFiltering ? 0.34 : 0.19);
+      grad.addColorStop(0, rgba(a.cat.color, baseA));
+      grad.addColorStop(0.5, rgba('#ffffff', baseA * 0.45));
+      grad.addColorStop(1, rgba(b.cat.color, baseA));
+
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.quadraticCurveTo(c[0], c[1], b.x, b.y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = live && isFiltering ? 1.3 : 0.7;
+      ctx.stroke();
+
+      if (dim) return;
+
+      /* Travelling highlight. It advances every frame and wraps, and it takes
+         the colour of the pill it is heading toward — which is the whole read:
+         something is moving from this category to that one. */
+      st.phase += st.speed * (isFiltering ? 2.4 : 1);
+      if (st.phase > 1 + SIGNAL_LEN) st.phase = -SIGNAL_LEN;
+
+      var toward = st.dir > 0 ? b : a;
+      var head = st.dir > 0 ? st.phase : 1 - st.phase;
+      var peak = isFiltering ? 0.9 : 0.62;
+
+      for (var i = 0; i < SIGNAL_SEGS; i++) {
+        var t0 = head - st.dir * (SIGNAL_LEN * i / SIGNAL_SEGS);
+        var t1 = head - st.dir * (SIGNAL_LEN * (i + 1) / SIGNAL_SEGS);
+        if (Math.min(t0, t1) < 0 || Math.max(t0, t1) > 1) continue;
+        var p0 = bezier(a.x, a.y, c[0], c[1], b.x, b.y, t0);
+        var p1 = bezier(a.x, a.y, c[0], c[1], b.x, b.y, t1);
+        /* Tail: alpha and width both fall away from the head, which is what
+           makes it read as travelling rather than as a lit segment. */
+        var fall = 1 - i / SIGNAL_SEGS;
+        ctx.beginPath();
+        ctx.moveTo(p0[0], p0[1]);
+        ctx.lineTo(p1[0], p1[1]);
+        ctx.strokeStyle = rgba(toward.cat.color, peak * fall * fall);
+        ctx.lineWidth = (isFiltering ? 2.1 : 1.5) * fall;
+        ctx.stroke();
+      }
+
+      /* One soft bloom at the head, drawn as two wide low-alpha dots rather
+         than shadowBlur — same look, and it does not cost a blur pass per
+         edge per frame. */
+      if (head >= 0 && head <= 1) {
+        var hp = bezier(a.x, a.y, c[0], c[1], b.x, b.y, head);
+        [[6, 0.10], [3, 0.22]].forEach(function (ring) {
+          ctx.beginPath();
+          ctx.arc(hp[0], hp[1], ring[0] * (isFiltering ? 1.25 : 1), 0, Math.PI * 2);
+          ctx.fillStyle = rgba(toward.cat.color, ring[1] * (isFiltering ? 1.4 : 1));
+          ctx.fill();
         });
-        if (shared) connections.push([i, j]);
       }
-    }
-    /* Also connect neighbors for visual density */
-    for (var i = 0; i < CATEGORIES.length - 1; i++) {
-      var pair = [i, i + 1];
-      if (!connections.some(function (c) { return c[0] === pair[0] && c[1] === pair[1]; })) {
-        connections.push(pair);
-      }
-    }
-    /* Wrap last to first */
-    connections.push([0, CATEGORIES.length - 1]);
+    });
   }
 
   /* ── Physics tick ───────────────────────────────────────────── */
   var centerX = 0, centerY = 0;
   var isFiltering = false;
+  var frame = 0;
+
+  /* Lifted out of the tick loop so a filter still repaints the cloud when the
+     loop is not running. Under prefers-reduced-motion `tick` draws one frame
+     and stops, which used to mean the pills never dimmed and never lit — the
+     one readout the cloud owes a reader was the one thing motion preference
+     switched off. */
+  function paintPillStates() {
+    pills.forEach(function (p) {
+      p.el.classList.toggle('matched', p.matched && isFiltering);
+      p.el.classList.toggle('repelled', !p.matched && isFiltering);
+    });
+  }
 
   function tick() {
     centerX = W / 2;
@@ -224,24 +478,41 @@
     pills.forEach(function (p, i) {
       if (isFiltering) {
         if (p.matched) {
-          /* Attract to center */
-          var dx = centerX - p.x;
-          var dy = centerY - p.y;
-          p.vx += dx * 0.003;
-          p.vy += dy * 0.003;
+          /* Travel to the middle. The spring used to be 0.003, which over the
+             second a reader spends looking moved a pill perhaps a third of the
+             way — the cloud appeared to have merely dimmed. It has to arrive
+             for the arrival to be the message.
+
+             Matched pills land on a small rosette rather than all on the same
+             point: three categories converging on one pixel is three labels
+             fighting the repulsion for the same spot, and the middle one is
+             unreadable while they settle. One match still lands dead centre. */
+          var n = p._slotN || 1;
+          var ring = n < 2 ? 0 : Math.min(W, H) * (n < 4 ? 0.17 : 0.24);
+          var ang = (p._slot / n) * Math.PI * 2 - Math.PI / 2;
+          var tx = centerX + Math.cos(ang) * ring * 1.6;
+          var ty = centerY + Math.sin(ang) * ring;
+          var dx = tx - p.x;
+          var dy = ty - p.y;
+          p.vx += dx * 0.014;
+          p.vy += dy * 0.014;
         } else {
           /* Drift to assigned peripheral orbit position, not the wall */
+          /* Vacate the middle. Assigned once per filter so the ring is stable
+             while the query stands, and spread by index rather than by where
+             the pill happened to be — otherwise two pills that started close
+             stay close and the ring has a gap opposite a clump. */
           if (!p._orbitX) {
-            var angle = (i / pills.length) * Math.PI * 2 + Math.random() * 0.5;
-            var rx = W * 0.38 + Math.random() * W * 0.08;
-            var ry = H * 0.35 + Math.random() * H * 0.08;
+            var angle = (i / pills.length) * Math.PI * 2 + Math.random() * 0.4;
+            var rx = W * 0.46 + Math.random() * W * 0.05;
+            var ry = H * 0.44 + Math.random() * H * 0.06;
             p._orbitX = centerX + Math.cos(angle) * rx;
             p._orbitY = centerY + Math.sin(angle) * ry;
           }
           var dx = p._orbitX - p.x;
           var dy = p._orbitY - p.y;
-          p.vx += dx * 0.008;
-          p.vy += dy * 0.008;
+          p.vx += dx * 0.02;
+          p.vy += dy * 0.02;
           /* Keep a gentle drift even while filtered out */
           if (!p._wobblePhase) p._wobblePhase = Math.random() * Math.PI * 2;
           p._wobblePhase += 0.01;
@@ -306,50 +577,45 @@
       var s = p._zoomScale || 1;
       p.el.style.transform = 'translate(' + (p.x - pw) + 'px,' + (p.y - ph) + 'px)' + (s !== 1 ? ' scale(' + s + ')' : '');
 
-      /* Visual state */
-      p.el.classList.toggle('matched', p.matched && isFiltering);
-      p.el.classList.toggle('repelled', !p.matched && isFiltering);
     });
 
-    /* Draw connection lines */
-    ctx.clearRect(-canvasPad, -canvasPad, W + canvasPad * 2, H + canvasPad * 2);
-    connections.forEach(function (pair) {
-      var a = pills[pair[0]], b = pills[pair[1]];
-      if (!a || !b) return;
-      var bothMatch = a.matched && b.matched && isFiltering;
-      var opacity = isFiltering ? (bothMatch ? 0.25 : 0.03) : 0.08;
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y);
-      ctx.lineTo(b.x, b.y);
-      ctx.strokeStyle = 'rgba(255,255,255,' + opacity + ')';
-      ctx.lineWidth = bothMatch ? 1.5 : 0.8;
-      ctx.stroke();
-    });
+    paintPillStates();
+
+    /* The graph is proximity-based and the pills drift, so it has to be
+       re-derived — but not every frame. Twelve pills move a few px per frame;
+       every 40 is often enough that no link is ever visibly wrong, and it keeps
+       the 66-pair sort off the hot path. */
+    if ((frame++ % 40) === 0) buildConnections();
+    drawRoutes();
 
     if (!reducedMotion.matches) requestAnimationFrame(tick);
   }
 
   /* ── Search / filter ────────────────────────────────────────── */
-  function syncCatalogMerge(matchedIds) {
+  /* `order` is the ranked id list. Appending in that order is what puts the
+     best match first — the grid renders in DOM order, so ranking that is not
+     applied here is ranking nobody sees. */
+  function syncCatalogMerge(matchedIds, order) {
     if (!mergedGroup || !mergedGrid || catalogCardsOrdered.length === 0) return;
 
     nativeGroups.forEach(function (g) {
       g.classList.add('catalog-native-suppressed');
     });
 
+    var cardById = new Map();
     catalogCardsOrdered.forEach(function (card) {
-      var id = card.dataset.cardId;
-      var match = matchedIds.has(id);
+      cardById.set(card.dataset.cardId, card);
+      if (matchedIds.has(card.dataset.cardId)) return;
+      card.classList.add('search-hidden');
       var home = nativeGridByCard.get(card);
-      if (match) {
-        card.classList.remove('search-hidden');
-        mergedGrid.appendChild(card);
-      } else {
-        card.classList.add('search-hidden');
-        if (home && card.parentElement !== home) {
-          home.appendChild(card);
-        }
-      }
+      if (home && card.parentElement !== home) home.appendChild(card);
+    });
+
+    (order || []).forEach(function (id) {
+      var card = cardById.get(id);
+      if (!card) return;
+      card.classList.remove('search-hidden');
+      mergedGrid.appendChild(card);
     });
 
     var visibleTools = catalogCardsOrdered.filter(function (c) {
@@ -472,13 +738,14 @@
      disappear silently wherever that never happens — a throttled background
      tab, a headless pane. The chip row is information, not decoration; it must
      not depend on whether the decoration booted. */
-  function renderCategoryChips(q, matchedIds) {
+  function renderCategoryChips(q, matched) {
     if (!catsEl) return;
-    var matched = CATEGORIES.filter(function (cat) {
-      return cat.label.toLowerCase().includes(q) ||
-             cat.keywords.includes(q) ||
-             cat.ids.some(function (id) { return matchedIds.has(id); });
-    });
+    /* The pills say this better, and they are back on screen during a search
+       now — two readouts of the same fact is one too many. The chips remain as
+       the fallback for the case the comment above describes: a pill cloud that
+       never booted (throttled background tab, headless pane, zero-size box) has
+       to degrade to information, not to nothing. */
+    if (pills.length) { catsEl.textContent = ''; return; }
     if (!matched.length) { catsEl.textContent = ''; return; }
     var frag = document.createDocumentFragment();
     matched.forEach(function (cat) {
@@ -529,6 +796,7 @@
         p._returning = 1;
       });
       document.body.classList.remove('search-active');
+      paintPillStates();
       noResults.classList.remove('show');
       countEl.textContent = '';
       if (catsEl) catsEl.textContent = '';
@@ -555,19 +823,19 @@
       revealResults();
     }
 
-    pills.forEach(function (p) {
-      var catMatch = p.cat.label.toLowerCase().includes(q) ||
-                     p.cat.keywords.includes(q);
-      p.matched = catMatch;
-    });
+    var ranked = rank(q, currentIndex);
+    var matchedIds = ranked.matchedIds;
 
-    var matchedIds = new Set();
     pills.forEach(function (p) {
-      if (p.matched) p.cat.ids.forEach(function (id) { matchedIds.add(id); });
+      p.matched = ranked.lit.indexOf(p.cat) >= 0;
     });
-    currentIndex.forEach(function (item) {
-      if (item.text.includes(q)) matchedIds.add(item.id);
-    });
+    /* Slots for the rosette, assigned per filter so they stay put while the
+       query stands. Order is CATEGORIES order, which is the order the pills
+       were laid out in — neighbours on the chart stay neighbours in the ring
+       instead of crossing each other on the way in. */
+    var hit = pills.filter(function (p) { return p.matched; });
+    hit.forEach(function (p, k) { p._slot = k; p._slotN = hit.length; });
+    paintPillStates();
 
     var flipPairs = [];
     var riseEls = [];
@@ -589,7 +857,7 @@
       }
     });
 
-    syncCatalogMerge(matchedIds);
+    syncCatalogMerge(matchedIds, ranked.order);
 
     /* "N of M tools" has to agree with the count the hero claims, so the
        denominator excludes the same things that count does: locked ghosts, the
@@ -631,13 +899,7 @@
              !!i.el.closest('#tools');
     }).length;
 
-    pills.forEach(function (p) {
-      if (!p.matched) {
-        p.matched = p.cat.ids.some(function (id) { return matchedIds.has(id); });
-      }
-    });
-
-    renderCategoryChips(q, matchedIds);
+    renderCategoryChips(q, ranked.lit);
 
     if (visible === 0 && soonVisible === 0 && externalVisible === 0) {
       noResults.classList.add('show');

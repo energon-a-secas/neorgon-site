@@ -31,8 +31,8 @@ Single-page hub at `neorgon.com` listing all Neorgon tools. The page is a single
 | `matrix.js` | Matrix rain canvas — alternate background mode |
 | `intervention.js` | "Death Note L" CRT broadcast takeover — third background mode |
 | `settings.js` | Settings panel: toggles for sound/glow/previews, background picker. Persists to `localStorage` under key `neorgon-prefs` |
-| `search.js` | Hero search bar with floating category pills (physics simulation on canvas), card filtering, and constellation drawing connecting matched cards. Also arrow-key walking + Enter-to-open over the results. `CATEGORIES` must stay 1:1 with the `.card-group` sections in `index.html` — a pill whose `ids` name no group silently filters to zero results |
-| `recent.js` | "Recently shipped" rail above the catalog. Reads `data-added="YYYY-MM-DD"` off each card, renders the newest 6 as clones, and stamps a self-expiring `New` badge (30 days) on the canonical card. Exposes `window._neoRecent` for the terminal's `new`, and **`window._neoMakeEcho(card)`** — the one definition of a safe clone (retag `data-card-id` → `data-echo-id`, clear entrance.js's inline delay, convert a multi-tool card to a link). Any shelf that clones catalog cards must use it |
+| `search.js` | Hero search bar with floating category pills (physics simulation on canvas), **ranked** card filtering, and the route map drawn between pills. Also arrow-key walking + Enter-to-open over the results. `CATEGORIES` must stay 1:1 with the `.card-group` sections in `index.html` — a pill whose `ids` name no group silently filters to zero results. **Ranking:** `scoreCard`/`rank` give every match a score (name-exact 1000 → loose 120) and `syncCatalogMerge` appends in that order, so the merged grid *is* the ranking; ship date breaks ties, newest first. A category's `keywords` blob is a **fallback vocabulary**, not an amplifier — it only expands a group when the query matched no card directly (`cheatsheet` may mean DevOps; `parla` may not mean all of Social). A category *label* always expands, because that is the pill-click path. **Pills stay up during a search:** matched ones travel to the middle and light their routes, the rest recede to 16% and hover back to full. `paintPillStates()` is called from `doFilter`, not only from the rAF loop, so the states still read under `prefers-reduced-motion` where the loop stops after one frame |
+| `recent.js` | "Recently shipped" rail above the catalog. Reads `data-added="YYYY-MM-DD"` off each card, renders the newest 6 as clones, and stamps a self-expiring `New` badge (30 days) on the canonical card. Also owns the shelf-overflow observer that toggles `.is-scrollable` on **both** shelf grids — the trailing mask fade must not appear over a row that already fits. Exposes `window._neoRecent` for the terminal's `new`, and **`window._neoMakeEcho(card)`** — the one definition of a safe clone (retag `data-card-id` → `data-echo-id`, clear entrance.js's inline delay, convert a multi-tool card to a link). Any shelf that clones catalog cards must use it |
 | `favorites.js` | "Your favorites" shelf above the rail, from `localStorage` key `neorgon-favorites` (`[{ id, pinned }]`; a bare id array is the v1 shape and still loads). Injects the control strip into every catalog card and every echo, prunes saved ids whose card no longer exists (and persists the prune), and renders the shelf with `_neoMakeEcho`. Pin holds the front; drag and ArrowLeft/ArrowRight reorder within a band. Exposes `window._neoFavorites` for the terminal's `fav` / `favs` / `pin`. **Never touches the catalog** — the categories below are byte-for-byte what a first-time visitor sees |
 | `catnav.js` | Sticky category rail with live counts and scroll-spy. Owns the sticky-chrome offset for the whole page: sets `--cat-rail-top` and every group's `scroll-margin-top` from one measurement, which `terminal.js` `open <cat>` relies on |
 | `palette.js` | ⌘K / Ctrl+K command palette over every tool (fuzzy match, recency tie-break) |
@@ -43,7 +43,7 @@ Single-page hub at `neorgon.com` listing all Neorgon tools. The page is a single
 | `sound.js` | UI sound effects — exposes `window._neoSound` with `.dragStart()`, `.dropCard()`, `.unlock()`, and `window._neoSoundPing(freq, vol)`, `window._neoSoundDiscover()` |
 | `cursor.js` | Custom cursor glow element |
 | `entrance.js` | Card entrance stagger. Delays are **per group and capped** (8 × 55ms), not a global `index × 110ms` timeline — the old form grew with the catalog (5.4s at 50 cards) and leaked into the rail, because recent.js clones these cards and `cloneNode` copies the inline `animation-delay`. recent.js now clears that on every echo; do not reintroduce a global counter here |
-| `hero.js` | Hero section typewriter / tagline animation |
+| `hero.js` | Hero typewriter (one of four completions for "Made to fit ___", picked per load), the rotating badge, and the scroll cue — the chevron pair under the constellation. The cue retires permanently on the first scroll of any size and never returns |
 | `terminal.js` | Hidden terminal (keyboard shortcut) with Convex auth for admin commands. Navigation/discovery commands (`tools`, `goto`, `open`, `whois`, `new`, `stats`, `random`, `search`) build their catalog from the DOM, so a new card needs no terminal edit. `theme` sets the *visitor's* cookie via `NeoHeader.setTheme` only — changing the fleet-wide CDN default belongs in an ops console, not a page anyone can open |
 | `codes.js` | Easter eggs: Konami code (warp drive), other sequences |
 | `secret.js` | Proximity sonar scanner revealing a hidden section |
@@ -91,6 +91,14 @@ something to show, both built from **clones** via `_neoMakeEcho`:
 |---|---|---|
 | Your favorites | `localStorage` → `neorgon-favorites` | the visitor |
 | Recently shipped | each card's `data-added` | us |
+
+**Both are one horizontal row, at every width.** They used to lay out as a
+3-column grid, so six cards became two rows and 609px of shelf — which pushed
+the category rail to y=1297, two screens down, with the catalog behind it. A
+shelf is a glance; the grid directly below it is the destination. Four cards
+fit at 1160px and the fifth peeks, which is the affordance; the trailing mask
+fade only appears when there is actually something off to the right
+(`.is-scrollable`, set by the observer at the end of `recent.js`).
 
 Clones carry `data-echo-id`, never `data-card-id`, which is what keeps them out
 of the search index, the "N of M tools" count, the drag-reorder, the command
