@@ -1,0 +1,278 @@
+presentation:
+  title: "The hub was a page, not a console"
+  subtitle: "Five things the space theme was promising and not doing"
+  author: "Neorgon"
+  date: "2026-08"
+  theme: "neorgon"
+  pattern: "orbs"
+
+  slides:
+    - type: title
+      heading: "The hub was a page, not a console"
+      subtitle: "Five things the space theme promised and did not do"
+
+    - type: quote
+      text: "The search matches are bad. Searching for parla returns 6 results, and in fourth place, Parla."
+      source: "Change request, 2026-08-15"
+
+    - type: bullets
+      heading: "One complaint, five separate causes"
+      bullets:
+        - "Search answered with a category, not a tool"
+        - "The pill cloud left exactly when you navigated"
+        - "Recently shipped ate two screens"
+        - "The bar would not get out of the way"
+        - "The copy sold a missing paywall"
+      note: >
+        Each of these was reported separately and each turned out to have its own cause.
+        Nothing here shared a root. The deck follows them in that order.
+
+    - type: divider
+      heading: "Search"
+      subtitle: "Ranked by nothing at all"
+
+    - type: bullets
+      heading: "There was no ranking. At all."
+      bullets:
+        - "Matches were emitted in catalog DOM order"
+        - "Parla sat fourth because Social sits fourth"
+        - "Not a bad score. No score."
+      note: >
+        syncCatalogMerge walked catalogCardsOrdered and appended anything in the matched
+        set. Position in the results was position in index.html, nothing more.
+
+    - type: bullets
+      heading: "And the keyword blob was an amplifier"
+      bullets:
+        - "Each pill carries a long synonym string"
+        - "Query anywhere in it promoted every card"
+        - "parla lives inside Social's keywords"
+        - "So all six Social tools became matches"
+      note: >
+        This is the half that produced "6 results". Fixing only the ordering would still
+        have shown six cards for a query that names exactly one.
+
+    - type: code
+      heading: "The blob is a vocabulary, not an amplifier"
+      language: js
+      code: |
+        // before: any hit in the blob promoted the whole group
+        if (cat.keywords.includes(q))
+          cat.ids.forEach(id => matchedIds.add(id));
+
+        // after: the blob only opens a group when nothing
+        // matched directly. A label still always expands,
+        // because that is the pill-click path.
+        var expanding = labelCats.concat(
+          hits.length ? [] : keywordCats
+        );
+      note: >
+        "cheatsheet" names no card, so it is allowed to mean DevOps. "parla" names a card,
+        so it is not allowed to mean all of Social. The label case stays unconditional
+        because clicking the Social pill must show the Social group.
+
+    - type: split
+      heading: "Searching parla"
+      left:
+        heading: "Before"
+        bullets:
+          - "6 of 47 tools"
+          - "Vibe Check, Hiring Pack, Character Sheet"
+          - "Parla, fourth"
+      right:
+        heading: "After"
+        bullets:
+          - "1 of 47 tools"
+          - "Parla"
+      note: >
+        Also verified: json puts JSON Studio first of 8, snip puts Snippets first,
+        clicking Social still shows the whole group, and github still reports
+        "1 external" instead of the empty state.
+
+    - type: divider
+      heading: "The pills"
+      subtitle: "Navigation that unmounted when you navigated"
+
+    - type: bullets
+      heading: "The cloud collapsed on the first keystroke"
+      bullets:
+        - "height 0, replaced by a small chip row"
+        - "It bought back 200px of fold"
+        - "It gave away the reason the cloud exists"
+      note: >
+        An earlier pass made this trade deliberately, to get matches above the fold. The
+        fold is now paid for elsewhere: one-row shelves, plus the reveal scroll that parks
+        the field under the header.
+
+    - type: bullets
+      heading: "The route web drew a relationship nobody can see"
+      bullets:
+        - "It linked categories whose blobs shared a word"
+        - "Plus every neighbour, plus a wrap"
+        - "Twelve moving points, forty-odd chords"
+        - "Data and Fun share the word cards. So what."
+      note: >
+        The old graph was semantically motivated and visually meaningless. A line between
+        two labels cannot carry "these share a keyword", so the ink bought nothing.
+
+    - type: bullets
+      heading: "Replaced with geometry, because geometry reads"
+      bullets:
+        - "Each pill links its two nearest neighbours"
+        - "Re-derived every 40 frames as they drift"
+        - "Bowed beziers, not chords"
+        - "A signal head takes the colour it travels toward"
+      note: >
+        A star chart connects what is near, not what is thematically alike. Per-edge state
+        is keyed by the pair so a signal in flight survives the rebuild.
+
+    - type: bullets
+      heading: "Matched planets now arrive"
+      bullets:
+        - "Spring raised from 0.003 to 0.014"
+        - "At 0.003 they crept a third of the way"
+        - "It read as a dim, not a move"
+        - "Unmatched take a ring at 16%, hover back"
+      note: >
+        Several matches land on a small rosette rather than all on the same pixel, so four
+        lit labels do not fight the repulsion for one spot. One match still lands centre.
+
+    - type: divider
+      heading: "Space"
+      subtitle: "A shelf that was secretly a grid"
+
+    - type: split
+      heading: "Recently shipped"
+      left:
+        heading: "Before"
+        bullets:
+          - "Three columns, so six cards wrapped"
+          - "609px of shelf"
+          - "Category rail at y=1297"
+      right:
+        heading: "After"
+        bullets:
+          - "One scrollable row at every width"
+          - "379px"
+          - "Category rail at y=1132"
+      note: >
+        The comment above the rule already claimed "a single scrollable row on wide
+        screens" while the rule underneath laid out three columns. With favorites also
+        showing, the saving is about 340px. A trailing mask fade appears only when
+        something is actually off to the right.
+
+    - type: divider
+      heading: "The bar"
+      subtitle: "Pinned was the wrong reading"
+
+    - type: bullets
+      heading: "I fixed the wrong thing first"
+      bullets:
+        - "Report: the header does not stay at the top"
+        - "I read that as a broken sticky"
+        - "It wanted to leave, not to stay"
+      note: >
+        The overflow-x fix that came out of the misreading is kept on its own merit: body
+        had overflow-x hidden, which makes it a scroll container, and a sticky child then
+        sticks to a box that never scrolls. clip cuts the overflow without that. Real
+        defect, wrong ask.
+
+    - type: bullets
+      heading: "Auto-hide was welded to app mode"
+      bullets:
+        - "Gated on data-header-mode in the kit CSS and JS"
+        - "Wanting the behaviour meant taking the slim bar"
+        - "And its gradient, over the hub's glass"
+      note: >
+        Fixed in the canonical packages/neorgon-ui/header/, README documented, vendored to
+        neorgon-site only with sync-header.sh --to. Additive, so no other site changes
+        behaviour until it opts in.
+
+    - type: code
+      heading: "An opt-in, and one rule to close the gap"
+      language: css
+      code: |
+        <!-- any mode can now take it -->
+        <header class="header-bar" data-header-mode="hub"
+                data-header-autohide="on">
+
+        /* the docked rail would float above a 68px hole.
+           Both are body children, so no JS is involved. */
+        .header-bar.header-hidden ~ .cat-rail { top: 0; }
+      note: >
+        Verified by driving the kit's own rAF-throttled listener with a synchronous rAF
+        shim, because the preview pane freezes rAF when hidden: visible at 60px, under its
+        80px threshold; hidden at 500, 1500 and 2500 with the rail docked at 0; returns on
+        a 200px scroll up; hides again on the next scroll down.
+
+    - type: divider
+      heading: "Copy"
+      subtitle: "Selling the absence of a paywall"
+
+    - type: split
+      heading: "The hero"
+      left:
+        heading: "Before"
+        bullets:
+          - "Built different, shipped anyway"
+          - "Made for specific problems"
+          - "We made 47 tools and forgot a paywall"
+      right:
+        heading: "After"
+        bullets:
+          - "Free, local, no account"
+          - "Made to fit the exact problem"
+          - "47 tools, each cut for one job"
+      note: >
+        The sub-line closes on "and none of them are finished", which is the part the
+        tools are actually about. Title, meta description, both OG and Twitter pairs and
+        the JSON-LD all carried the retired heading, so seven strings moved together.
+
+    - type: qa
+      heading: "Before the numbers"
+      subtext: "Anything above worth arguing with?"
+
+    - type: stats
+      heading: "Measured, on a running page"
+      stats:
+        - value: "6 to 1"
+          label: "Results for parla, now correctly ranked"
+        - value: "609 to 379"
+          label: "Pixels of Recently shipped"
+        - value: "165px"
+          label: "Category rail moved up"
+        - value: "500px"
+          label: "Scroll at which the bar now leaves"
+      note: >
+        All four read out of the DOM at 1280x800 against a no-store local server, not
+        estimated. The caching on the default python http.server made half the earlier
+        readings stale, which is why a no-cache server was used for verification.
+
+    - type: bullets
+      heading: "What it cost"
+      bullets:
+        - "Results start 200px lower during a search"
+        - "The kit grew an attribute other sites must ignore"
+        - "The hero is 74px taller than before"
+      note: >
+        The 200px is the fold given back to the pill cloud, and it is why the shelf
+        compaction had to land in the same pass. The hero grew from the scroll cue plus
+        the new sub-line wrapping to two lines.
+
+    - type: bullets
+      heading: "Still open"
+      bullets:
+        - "Kit synced to neorgon-site only, not the fleet"
+        - "Predicted rail at y=890, actual y=1132"
+        - "Smooth-scroll motion never watched, only measured"
+        - "Nothing committed"
+      note: >
+        The rail estimate was wrong because a shelf card is 285px tall, not 200, and the
+        hero grew. Direction right, number wrong. The preview pane reports document.hidden,
+        which freezes rAF and CSS transitions, so animation was verified by geometry and
+        by driving the listener directly rather than by watching it.
+
+    - type: cta
+      heading: "Run sync-header.sh, then commit"
+      action: "Decide whether the fleet takes the kit update now"
+      subtext: "The change is additive. No site behaves differently until it opts in."

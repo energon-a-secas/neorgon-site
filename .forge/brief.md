@@ -154,6 +154,10 @@ separate, boring, reliable surface.
 
 - `2026-08-15 22:29` Em dashes are out of the hero sub-line and the two meta/JSON-LD descriptions that mirror it. The rest of the page's em dashes are pre-existing card copy and comments, deliberately left alone — the note was about the subtitle.
 
+- `2026-08-17 09:45` stream **debrief + writeup** done — Deck: docs/debrief-2026-08-17.yaml, 26 slides, eng audience, slides-site YAML. Dated filename because docs/debrief-2026-08.yaml already holds the Aug 13 pass and would have been clobbered. validate.mjs exit 0; geometry checked by walking all 26 slides in the player and measuring scrollHeight against clientHeight, zero overflow in either axis. Post: post/POST-planets.md (1768 words) plus blog/i-deleted-the-thing-i-defended.html, registered in blog/index.html, feed.xml and atom.xml, all three XML files re-parsed clean. Three diagrams from post/build-visuals-planets.mjs, which parses js/search.js for CATEGORIES membership, the SCORE table and the depth expression, so none of them can drift from the code. Two render defects caught and fixed in the generator rather than the SVG: overlapping pills in the depth field (added a separation pass) and a legend drawn through the last two rows of the score ladder (grew the canvas).
+
+- `2026-08-17 09:45` Found while writing the blog post, NOT fixed: blog/everything-on-the-page-was-correct.html loads <script src="js/starfield.js"> relative, which resolves to /blog/js/starfield.js and 404s — there is no blog/js directory. The new post uses /js/starfield.js. Left alone because it is a published post outside this change; flagged as a separate task.
+
 ## Measured
 
 All figures below were read out of a live page via `browser_evaluate` against
@@ -217,3 +221,5 @@ _Closed 2026-08-14 09:37._
 _Closed 2026-08-15 22:18._
 
 _Closed 2026-08-15 22:29._
+
+_Closed 2026-08-17 09:45._
