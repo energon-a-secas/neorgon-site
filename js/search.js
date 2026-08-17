@@ -246,13 +246,32 @@
       var cx = positions[i][0];
       var cy = positions[i][1];
 
+      /* Depth. Every pill used to render at the same size, which made the
+         cloud a flat scatter of labels — twelve things at exactly one distance
+         is a list that happens to be arranged in 2D. Giving each a standing
+         scale reads as some being nearer than others, which is the whole
+         difference between a scatter and a system you could travel through.
+
+         Derived from the index rather than random, so a category keeps its
+         distance across reloads and you can learn where things are. The stride
+         of 5 over a period of 7 spreads twelve pills across the range without
+         two neighbours landing on the same size. */
+      var depth = 0.82 + ((i * 5) % 7) / 7 * 0.38;
+
+      el.style.setProperty('--pill-depth', depth.toFixed(3));
+
       var pill = {
         el: el,
         cat: cat,
+        depth: depth,
         x: cx, y: cy,
         homeX: cx, homeY: cy,
         vx: (Math.random() - 0.5) * 0.1,
         vy: (Math.random() - 0.5) * 0.08,
+        /* Eased, not snapped: a pill that jumps to its selected size has
+           changed, a pill that grows into it has approached. */
+        _stateScale: 1,
+        _breathPhase: Math.random() * Math.PI * 2,
         matched: false,
         repelled: false
       };
@@ -407,7 +426,10 @@
       ctx.moveTo(a.x, a.y);
       ctx.quadraticCurveTo(c[0], c[1], b.x, b.y);
       ctx.strokeStyle = grad;
-      ctx.lineWidth = live && isFiltering ? 1.3 : 0.7;
+      /* Same depth cue as the pills, so a route between two near ones is not
+         hairlined into looking distant. */
+      var near = (a.depth + b.depth) / 2;
+      ctx.lineWidth = (live && isFiltering ? 1.3 : 0.7) * near;
       ctx.stroke();
 
       if (dim) return;
@@ -537,8 +559,13 @@
         if (!p._wobblePhase2) p._wobblePhase2 = Math.random() * Math.PI * 2;
         p._wobblePhase += 0.012 + (i % 3) * 0.003;
         p._wobblePhase2 += 0.007 + (i % 4) * 0.002;
-        p.vx += Math.sin(p._wobblePhase) * 0.04 + Math.cos(p._wobblePhase2) * 0.015;
-        p.vy += Math.cos(p._wobblePhase * 0.7) * 0.03 + Math.sin(p._wobblePhase2 * 1.3) * 0.012;
+        /* Parallax. A near thing sweeps further across your view than a far
+           thing moving at the same speed, so the drift is scaled by depth.
+           Without it the sizes say "nearer" and the motion says "all at the
+           same distance", and the motion wins. */
+        var par = p.depth * p.depth;
+        p.vx += (Math.sin(p._wobblePhase) * 0.04 + Math.cos(p._wobblePhase2) * 0.015) * par;
+        p.vy += (Math.cos(p._wobblePhase * 0.7) * 0.03 + Math.sin(p._wobblePhase2 * 1.3) * 0.012) * par;
       }
 
       /* Pill-to-pill repulsion — soft quadratic falloff */
@@ -573,9 +600,25 @@
       if (p.y < margin) p.vy += (margin - p.y) * 0.05;
       if (p.y > H - margin) p.vy += (H - margin - p.y) * 0.05;
 
-      /* Apply position — GPU-composited transform for smooth sub-pixel movement */
-      var s = p._zoomScale || 1;
-      p.el.style.transform = 'translate(' + (p.x - pw) + 'px,' + (p.y - ph) + 'px)' + (s !== 1 ? ' scale(' + s + ')' : '');
+      /* ── Scale, composed from four independent things ──────────────
+         depth      where the pill stands in the field, fixed per category
+         breath     a slow in-and-out so nothing is ever perfectly still
+         selection  matched pills come closer, unmatched fall back
+         click      the bell-curve pop from the tap handler
+
+         They multiply rather than override, so a far pill that gets selected
+         still reads as the far one having come forward. Four separate springs
+         all writing `transform` would fight; one product cannot. */
+      p._breathPhase += 0.0055 + (i % 5) * 0.0009;
+      var breath = 1 + 0.045 * Math.sin(p._breathPhase);
+
+      var want = isFiltering ? (p.matched ? 1.26 : 0.74) : 1;
+      p._stateScale += (want - p._stateScale) * 0.075;
+
+      var s = p.depth * breath * p._stateScale * (p._zoomScale || 1);
+      /* Round the position, not the scale: sub-pixel position is what keeps
+         the drift smooth, and a rounded scale visibly steps during the pop. */
+      p.el.style.transform = 'translate(' + (p.x - pw) + 'px,' + (p.y - ph) + 'px) scale(' + s.toFixed(4) + ')';
 
     });
 

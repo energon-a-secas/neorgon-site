@@ -323,18 +323,35 @@ body {
   z-index: 1;
   will-change: transform;
 }
+/* Depth, the half that is not scale. js/search.js sets --pill-depth (0.82 to
+   1.20) per pill and applies the scale itself; this is the atmosphere that
+   makes the size read as distance rather than as arbitrary type sizing. A near
+   pill sits on a soft halo and holds a firmer edge; a far one is thinner and
+   flatter, the way a far light is. */
+.tag-pill {
+  box-shadow: 0 0 calc(10px * var(--pill-depth, 1))
+              color-mix(in srgb, var(--pill-color, #c084fc)
+                        calc(14% * var(--pill-depth, 1)), transparent);
+  opacity: calc(0.62 + 0.38 * var(--pill-depth, 1));
+}
+
 .tag-pill:hover {
   z-index: 2;
   box-shadow: 0 0 14px var(--pill-color, rgba(192,132,252,.35));
   filter: brightness(1.15);
+  opacity: 1;
 }
 /* Matched: arrived. The pill is what the query hit, and it has travelled to
    the middle of the chart to say so. */
+/* Arrived. Depth opacity is overridden on purpose: a far category that your
+   query hit has come to the front, and it should not still be dimmed for
+   having started far away. */
 .tag-pill.matched {
   box-shadow:
     0 0 14px var(--pill-color, rgba(192,132,252,.5)),
     0 0 42px color-mix(in srgb, var(--pill-color, #c084fc) 45%, transparent);
   filter: brightness(1.22);
+  opacity: 1;
   z-index: 3;
 }
 
