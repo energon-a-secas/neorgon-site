@@ -343,13 +343,14 @@ body {
               box-shadow .4s ease, filter .4s ease;
   z-index: 1;
 
-  /* Arrival, staggered by the index the script stamps on each pill. It was a
-     rAF loop feeding a `_zoomScale` into the physics transform; with the
-     physics gone it is one keyframe. `backwards` supplies the pre-delay state
-     and then hands the pill back to the rules above, so the resting size stays
-     defined in exactly one place. */
-  animation: pillArrive .55s var(--ease-out) backwards;
-  animation-delay: calc(var(--pill-i, 0) * 60ms);
+  /* Arrival. The delay is written inline per pill by js/search.js, from the
+     radius of the orbit the pill sits on, so a body appears exactly as the
+     sonar front reaches it. An index-based stagger used to live here, which
+     animated CATEGORIES order — an order the chart does not draw.
+
+     `backwards` supplies the pre-delay state and then hands the pill back to
+     the rules above, so the resting size stays defined in exactly one place. */
+  animation: pillArrive .5s var(--ease-out) backwards;
 }
 @keyframes pillArrive {
   from {
@@ -452,17 +453,23 @@ body {
   height: 22px;
   margin: 0 auto;
   opacity: 0;
-  animation: scroll-cue-drift 1.7s var(--ease-out, ease) infinite;
+  animation: scroll-cue-drift 1.9s var(--ease-out, ease) infinite;
 }
 .scroll-cue svg + svg {
   margin-top: -14px;
   animation-delay: .18s;
 }
+/* The chevron holds its lit phase instead of only touching it in passing. It
+   used to reach full opacity at one instant (30%) and immediately start
+   fading, so the thing the reader is meant to notice was never actually
+   still. Now it lights by 18% and holds to 55%: sooner than before in
+   absolute time (342ms against 510ms) and lit for ~0.7s rather than none. */
 @keyframes scroll-cue-drift {
-  0%   { opacity: 0; transform: translateY(-5px); }
-  30%  { opacity: .95; transform: translateY(0); }
-  62%  { opacity: 0; transform: translateY(9px); }
-  100% { opacity: 0; transform: translateY(9px); }
+  0%   { opacity: 0;   transform: translateY(-5px); }
+  18%  { opacity: .95; transform: translateY(-1px); }
+  55%  { opacity: .95; transform: translateY(4px); }
+  78%  { opacity: 0;   transform: translateY(9px); }
+  100% { opacity: 0;   transform: translateY(9px); }
 }
 
 /* Taken the hint, or asking for something specific — either way it is done. */

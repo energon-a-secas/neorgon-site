@@ -188,6 +188,20 @@ separate, boring, reliable surface.
 
 - `2026-08-18 17:38` FPS could not be measured in this environment: the browser pane backgrounds itself intermittently, which pauses rAF and made every frame-timing sample garbage (10 frames in 8s). Per-frame operation counts are sound because every frame does identical work, but a real FPS before/after was NOT obtained.
 
+- `2026-08-18 18:11` THIRD PASS. Scroll cue: the chevron used to touch full opacity at one instant (30% of the cycle) and immediately start fading, so the thing meant to be noticed was never still. Added a lit plateau, 18% to 55%, and lengthened the cycle 1.7s to 1.9s. It now reaches full opacity at 342ms where it used to take 510ms, so it arrives sooner AND holds for ~0.7s.
+
+- `2026-08-18 18:11` Sonar arrival replaces the index stagger. The old entrance animated CATEGORIES order, which is an order the chart does not draw. Now one ping leaves the centre at constant rate and each pill appears as the front reaches it, delay = (ring rx / outer rx) * 820ms. Measured: the 4 inner-ring pills arrive at 362ms and the 8 outer at 820ms, which is the geometry exactly. Each contact returns its own expanding ring in the pill's colour, and the routes fade in with the front so no route is drawn to an endpoint that is not there yet.
+
+- `2026-08-18 18:11` The sonar front is elliptical, matching the orbit aspect, not circular. Consequence worth knowing: pills on one orbit are all reached simultaneously, so the entrance is 2 beats rather than a smooth 12-pill sweep. A circular front would give 12 distinct arrivals but would leave the box vertically almost immediately on a 680x200 band and would not align with the drawn orbits. Chose coherence with the orbits; the 2-beat read is a deliberate consequence, not an oversight.
+
+- `2026-08-18 18:11` Front is linear, not eased. A sonar pulse travels at one speed, and easing it would mean easing every pill's CSS delay to match or watching the two drift apart.
+
+- `2026-08-18 18:11` Sonar costs nothing after it finishes: measured steady state 184.6 canvas ops/frame with 0 ellipse calls and 0 static-layer redraws, against 182 measured before the sonar existed.
+
+- `2026-08-18 18:11` RESPONSIVENESS: two apparent bugs investigated and both were NOT bugs. (1) 'Horizontal overflow at 601px, document 671 wide in a 601 viewport.' The preview pane evaluates media queries at the requested width but lays out at the real window width, so documentElement.clientWidth reported 601 while innerWidth and visualViewport reported 671. Hiding every suspect overlay changed scrollWidth by 0. (2) 'The constellation canvas overflows the body by 8px at 601px.' Real geometry (the canvas bleeds 30px per side for the sonar front and route bows) but already handled: body carries overflow-x: clip, and scrolling to x=500 lands at 0. Reverted a .hero clip rule added before testing it. Lesson: measure the symptom, not the metric.
+
+- `2026-08-18 18:11` NAVIGATION measured: search filter across 58 cards, 17 keystrokes with a forced synchronous layout after each, median 4.3ms and worst 24.3ms (the search-mode transition that moves cards between grids). Full-page scroll of 10456px produced 0 long tasks over 50ms. No horizontal scroll at 375, 601, 768 or 1265.
+
 ## Measured
 
 All figures below were read out of a live page via `browser_evaluate` against
@@ -263,3 +277,5 @@ _Closed 2026-08-17 09:45._
 _Closed 2026-08-18 17:22._
 
 _Closed 2026-08-18 17:38._
+
+_Closed 2026-08-18 18:11._

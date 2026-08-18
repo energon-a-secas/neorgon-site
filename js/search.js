@@ -298,7 +298,6 @@
       el.textContent = cat.label;
       el.style.color = cat.color;
       el.style.setProperty('--pill-color', cat.color + '80');
-      el.style.setProperty('--pill-i', i);
       el.style.borderColor = 'color-mix(in srgb, ' + cat.color + ' 35%, transparent)';
       el.style.background = 'color-mix(in srgb, ' + cat.color + ' 8%, transparent)';
       box.appendChild(el);
@@ -311,6 +310,12 @@
       var depth = RINGS[s.ring].depth + ((s.k % 3) - 1) * 0.03;
       el.style.setProperty('--pill-depth', depth.toFixed(3));
 
+      /* Where this pill sits along the ping's travel, 0 at the centre and 1 at
+         the outermost orbit. It is the arrival time and the blip time both, so
+         the DOM animation and the canvas ring cannot drift apart. */
+      var wave = RINGS[s.ring].rx / RINGS[RINGS.length - 1].rx;
+      el.style.animationDelay = Math.round(wave * SONAR_MS) + 'ms';
+
       var pill = {
         el: el,
         cat: cat,
@@ -318,6 +323,7 @@
         ring: s.ring,
         slot: s.k,
         slotN: s.n,
+        wave: wave,
         x: 0, y: 0,
         matched: false,
         repelled: false
@@ -551,6 +557,67 @@
   var SIGNAL_LEN = 0.17;   /* fraction of the path the highlight occupies */
   var SIGNAL_SEGS = 5;     /* tail resolution — enough to taper, cheap to draw */
 
+  /* ── Sonar arrival ───────────────────────────────────────────────
+     The pills used to fade in on an index stagger: pill 0, then pill 1, in
+     CATEGORIES order. That is an order the chart does not draw, so the
+     entrance was animating a fact the reader cannot see.
+
+     On a chart that is now explicitly two orbits, the order that means
+     something is distance. One ping leaves the centre at a constant rate and
+     each body appears as the front reaches it, so the inner ring answers
+     first and the outer ring second because that is what the geometry says.
+     Each contact sends back a small ring of its own, which is the half that
+     makes it read as detection rather than as a wipe.
+
+     The front is linear, not eased. A sonar pulse travels at one speed, and
+     easing it would also mean easing every pill's delay to match or watching
+     the two drift apart.
+  ─────────────────────────────────────────────────────────────────── */
+  var SONAR_MS = 820;      /* centre to outermost orbit */
+  var SONAR_FADE = 1.3;    /* front keeps going past the last orbit, dimming */
+  var BLIP_MS = 420;       /* how long one contact's return ring lives */
+  var sonarStart = 0;
+  var sonarRunning = false;
+
+  function startSonar() {
+    if (reducedMotion.matches) return;
+    sonarStart = performance.now();
+    sonarRunning = true;
+  }
+
+  function drawSonar(now) {
+    var t = (now - sonarStart) / SONAR_MS;
+    if (t > SONAR_FADE && t > 1 + BLIP_MS / SONAR_MS) { sonarRunning = false; return; }
+
+    var cx = W / 2, cy = H / 2;
+    var outer = RINGS[RINGS.length - 1];
+
+    /* The front. It runs a little past the outer orbit and dies there, so the
+       chart is not left with a ring sitting on its own edge. */
+    if (t <= SONAR_FADE) {
+      var k = t / SONAR_FADE;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, t * outer.rx * W, t * outer.ry * H, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(192, 132, 252, ' + (0.45 * (1 - k) * (1 - k)) + ')';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    /* The returns. One expanding ring per pill the front has already passed,
+       in that pill's own colour, so a contact is identifiable and not just a
+       generic blip. */
+    pills.forEach(function (p) {
+      var age = now - sonarStart - p.wave * SONAR_MS;
+      if (age < 0 || age > BLIP_MS) return;
+      var a = age / BLIP_MS;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 5 + a * 30, 0, Math.PI * 2);
+      ctx.strokeStyle = rgba(p.cat.color, 0.5 * (1 - a) * (1 - a));
+      ctx.lineWidth = 1.6 * (1 - a) + 0.4;
+      ctx.stroke();
+    });
+  }
+
   /* ── The static layer ────────────────────────────────────────────
      The orbits and the base routes are identical from frame to frame: fixed
      pills, fixed curves, and a gradient per edge that only changes when the
@@ -611,9 +678,15 @@
     });
   }
 
-  function drawRoutes() {
+  function drawRoutes(now) {
     if (staticDirty) drawStatic();
     ctx.clearRect(-canvasPad, -canvasPad, W + canvasPad * 2, H + canvasPad * 2);
+
+    /* Routes arrive with the pills they join rather than waiting on the page
+       fully drawn while their endpoints are still invisible. */
+    var reveal = sonarRunning ? Math.max(0, Math.min(1, (now - sonarStart) / SONAR_MS)) : 1;
+    ctx.globalAlpha = reveal;
+
     ctx.drawImage(stat, -canvasPad, -canvasPad, W + canvasPad * 2, H + canvasPad * 2);
     ctx.lineCap = 'round';
 
@@ -666,6 +739,9 @@
         });
       }
     });
+
+    ctx.globalAlpha = 1;
+    if (sonarRunning) drawSonar(now);
   }
 
   /* ── Frame ──────────────────────────────────────────────────────
@@ -694,8 +770,8 @@
     staticDirty = true;
   }
 
-  function tick() {
-    drawRoutes();
+  function tick(now) {
+    drawRoutes(now || performance.now());
     if (!reducedMotion.matches) requestAnimationFrame(tick);
   }
 
@@ -1159,6 +1235,7 @@
     resizeCanvas();
     createPills();
     buildConnections();
+    startSonar();
     tick();
   }
 
