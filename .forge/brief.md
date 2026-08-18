@@ -158,6 +158,36 @@ separate, boring, reliable surface.
 
 - `2026-08-17 09:45` Found while writing the blog post, NOT fixed: blog/everything-on-the-page-was-correct.html loads <script src="js/starfield.js"> relative, which resolves to /blog/js/starfield.js and 404s — there is no blog/js directory. The new post uses /js/starfield.js. Left alone because it is a published post outside this change; flagged as a separate task.
 
+- `2026-08-18 17:22` Root cause was two defects, not one. The visible half: an idle physics tick (spring to a random home + two sine wobbles scaled by depth^2 + pill-to-pill repulsion + damping) ran every frame. The hidden half: randomPositions() was asked for 12 points >=80px apart inside a box 680 wide and 108-200 tall, which is unsatisfiable, so it gave up after 200 attempts, dropped pills on top of each other, and the repulsion spent every frame failing to separate a layout that could not be separated. Killing only the wobble would have left overlapping pills.
+
+- `2026-08-18 17:22` Chose fixed positions on two drawn concentric ellipses over freezing the existing random scatter. A frozen random scatter reads as an animation that stopped; a body parked on a visible orbit reads as placed. Drawing the orbits is what makes the stillness legible, so it is not decoration, it is the reason the change works.
+
+- `2026-08-18 17:22` Filter is now light-up-in-place: matched pills scale to 1.14 and go to full opacity, unmatched drop to a .16 trace, and only matched-to-matched routes stay lit. Rejected moving matched pills to a centre rosette (the old behaviour) because rearranging on every keystroke spends the positions the reader has just learned. Verified: 0 of 12 pills move on filter and 0 on clear.
+
+- `2026-08-18 17:22` Split the centring translate and the state scale onto the CSS translate and scale longhands instead of one transform. Found by measurement, not by design: with both in one transform, the mobile row's transform:none !important could not cancel the -50%/-50% centring without also flattening the depth scale, and the pills rendered offset by half their own size on a ragged baseline. The longhands answer to different owners (placement never changes, scale changes constantly) so they cannot collide.
+
+- `2026-08-18 17:22` Inner ring phase is 0.25, not 0.5. At phase 0 or 0.5 the inner ring's 4 slots (every 90deg) land on the outer ring's 8 slots (every 45deg), putting an outer pill directly behind each inner one. Measured at 609px: Productivity overlapped Board Games by 4.2px. Phase 0.25 sits the inner ring exactly between outer slots, the maximum offset available.
+
+- `2026-08-18 17:22` Swapped window.resize for a ResizeObserver on the box. The layout is a function of the box's own size and window.resize is only a proxy for it; measured on a 609px pane the window listener left H at 200 against a box that was 130, putting four pills outside their own container. The old code hid this because it re-scattered on resize, so a stale layout always looked freshly random.
+
+- `2026-08-18 17:22` COST, needs the user's call: raised .constellation-box height floor from 108px to 150px. Two orbits of ~28px pills need a minimum vertical span regardless of viewport width, and 16vw does not reach 150px until ~940px wide. This spends up to 42px of fold on viewports between 601px and ~940px, which commit a24cf97 had deliberately fought to reclaim. Above ~940px it costs nothing.
+
+- `2026-08-18 17:22` Measured clearances after the fix, worst pair over all 66 pairs: 9.8px at 565x150 (601px viewport, worst case), 20px at 680x200. No pill bleeds outside the box at any size. Signal speed halved (full traverse ~11s, was ~5s) and edge state is hashed from the pair rather than Math.random, so the same two categories get the same route on every load.
+
+- `2026-08-18 17:38` FOLLOW-UP PASS. Spacing: measured 12.4px between the search field and the top pill against 43.6px from the bottom pill down to the end of the scroll arrow. The top and bottom pills sit flush against the box edges, so the box margin IS the breathing room. Set margin-top to 44px (the cue's 14px margin plus its 30px of arrow), measured after: 44.4 above vs 43.6 below.
+
+- `2026-08-18 17:38` Scroll cue drift cycle 2.8s -> 1.7s, second chevron delay .3s -> .18s. It answers 'is there more below', and a 2.8s cycle made the reader wait most of a beat for the answer.
+
+- `2026-08-18 17:38` Signals now travel between pill borders, not pill centres. Trimming a quadratic bezier to [t0,t1] yields another quadratic bezier exactly, so the trimmed geometry is precomputed once per layout and both the base path and the signal sample the same curve. Gap is 7px, computed against the pill's WIDEST state (depth x 1.14, the matched scale), or a route that looked trimmed at rest would slide under the label the moment its category was the one searched.
+
+- `2026-08-18 17:38` Endpoint trimming alone was not enough, and only measurement caught it: 96 of 656 stroked coordinates still landed inside a pill, every one inside Productivity, the widest label and the one the inner ring's chords cross. A pill background is color-mix(... 8%, transparent), so those lines were drawn ACROSS the label, not hidden behind it. Routes that tunnel under a third pill are now dropped rather than clipped in two, because a route broken in the middle reads as two unrelated routes. Cost: the graph thinned from 14 routes to 8. An orphan-rescue pass gives any pill left with zero routes its shortest dropped edge back; measured after, 0 orphans and 0 of 654 coordinates inside a pill.
+
+- `2026-08-18 17:38` PERF, measured by patching CanvasRenderingContext2D and normalising by clearRect (exactly 1 per canvas per frame). Constellation before: 505 canvas ops/frame including ~14 createLinearGradient allocations (840/sec). After: 182 ops/frame, 0 gradients in steady state, a 64% cut. Won by rendering orbits and base routes once into an offscreen canvas and blitting them (1 drawImage), plus SIGNAL_SEGS 7->5 and dropping will-change:scale from 12 pills. Control: the starfield, untouched, measured 594 ops/frame before and 601 after, which is what validates the normalisation.
+
+- `2026-08-18 17:38` THE BIGGER REMAINING CONSUMER IS NOT THE CONSTELLATION. The starfield draws 200 stars as beginPath+arc+fill every frame, 601 ops/frame, now 3.3x the constellation's cost (they were roughly equal before this pass). If stutter persists, that is where to look. Untouched here because it was out of scope.
+
+- `2026-08-18 17:38` FPS could not be measured in this environment: the browser pane backgrounds itself intermittently, which pauses rAF and made every frame-timing sample garbage (10 frames in 8s). Per-frame operation counts are sound because every frame does identical work, but a real FPS before/after was NOT obtained.
+
 ## Measured
 
 All figures below were read out of a live page via `browser_evaluate` against
@@ -223,3 +253,13 @@ _Closed 2026-08-15 22:18._
 _Closed 2026-08-15 22:29._
 
 _Closed 2026-08-17 09:45._
+
+---
+
+## Run — 2026-08-18 17:03
+
+**Problem.** Hero constellation pills drift erratically and rearrange on filter; both read wrong for a planetary chart
+
+_Closed 2026-08-18 17:22._
+
+_Closed 2026-08-18 17:38._

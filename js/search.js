@@ -190,7 +190,28 @@
              matchedIds: matchedIds, lit: lit };
   }
 
-  /* ── Floating pills (physics) ───────────────────────────────── */
+  /* ── Constellation ──────────────────────────────────────────────
+     The pills were a particle system: a spring toward a random home, two
+     layered sine wobbles scaled by depth, pill-to-pill repulsion and damping,
+     all re-solved every frame. Two separate things were wrong with it.
+
+     The read. Planets do not jitter. A chart whose bodies wander says the
+     arrangement is provisional, so no position is worth learning, which is
+     the opposite of what a map is for.
+
+     The engine. `randomPositions` was asked for twelve points at least 80px
+     apart inside a box 680 wide and between 108 and 200 tall. No such
+     arrangement exists. Placement gave up after 200 attempts and dropped
+     pills on top of each other, and the repulsion then spent every frame
+     failing to separate a layout that could not be separated. The wandering
+     was a packing failure happening in public.
+
+     Positions are derived now rather than searched: two concentric ellipses,
+     fixed angles, scaled from the box, with the ellipses themselves drawn
+     faintly underneath. Drawing them is the part that makes stillness
+     legible. A body parked on a visible orbit reads as placed; the same body
+     frozen in a random scatter reads as an animation that stopped.
+  ─────────────────────────────────────────────────────────────── */
   var W = 0, H = 0;
   var pills = [];
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -204,33 +225,71 @@
     canvas.height = (H + canvasPad * 2) * devicePixelRatio;
     ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
     ctx.translate(canvasPad, canvasPad);
+
+    /* The static layer shares the visible canvas's size and transform, so the
+       two are drawn in one coordinate space and the blit is a straight copy. */
+    stat.width = canvas.width;
+    stat.height = canvas.height;
+    sctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    sctx.translate(canvasPad, canvasPad);
+    staticDirty = true;
   }
 
-  function randomPositions(count, w, h, minDist) {
-    var padX = 50, padY = 22;
-    var positions = [];
-    for (var i = 0; i < count; i++) {
-      var attempts = 0;
-      var cx, cy, ok;
-      do {
-        cx = padX + Math.random() * (w - padX * 2);
-        cy = padY + Math.random() * (h - padY * 2);
-        ok = true;
-        for (var j = 0; j < positions.length; j++) {
-          var dx = cx - positions[j][0], dy = cy - positions[j][1];
-          if (Math.sqrt(dx * dx + dy * dy) < minDist) { ok = false; break; }
-        }
-        attempts++;
-      } while (!ok && attempts < 200);
-      positions.push([cx, cy]);
-    }
-    return positions;
+  /* The two rings are phased against each other, and the quarter-step is the
+     whole point of it. The outer ring's eight slots sit every 45deg; the inner
+     ring's four sit every 90deg, so at phase 0 or 0.5 every inner pill has an
+     outer pill at the *same angle*, directly behind it. Radially that is only
+     `(rxOut - rxIn) * cos(angle)` apart, which at 135deg and 550px wide is 93px
+     between two labels needing 116px — Productivity sat 4px inside Board Games
+     before this was measured. Phase 0.25 puts the inner ring exactly between
+     outer slots, which is the maximum offset available.
+
+     Radii are fractions of the box rather than pixels, so the chart holds its
+     shape from 601px (below that the mobile row takes over) up to the 680px
+     cap. The binding constraint is vertical, not horizontal: what separates an
+     inner pill from its outer neighbour is `(ryOut - ryIn) * H`, and every pill
+     is ~28px tall no matter how small the box gets. Measured: at a 601px
+     viewport (box 565x150, the worst case) the tightest pair clears by 9.8px,
+     and at 680x200 by 20px. Check those before narrowing the gap between the
+     two `ry`, or before lowering the height floor in css/style.css. */
+  var RINGS = [
+    { rx: 0.19, ry: 0.20, phase: 0.25, depth: 1.14 },
+    { rx: 0.43, ry: 0.43, phase: 0,    depth: 0.84 }
+  ];
+
+  /* Every third category takes the inner orbit: for twelve that is four in
+     and eight out, drawn from across CATEGORIES order instead of seating the
+     first four together. */
+  function ringSlots() {
+    var counts = [0, 0];
+    var slots = CATEGORIES.map(function (_, i) {
+      var r = i % 3 === 0 ? 0 : 1;
+      return { ring: r, k: counts[r]++ };
+    });
+    slots.forEach(function (s) { s.n = counts[s.ring]; });
+    return slots;
+  }
+
+  /* Position goes on left/top, scale goes on a custom property. Splitting them
+     across two properties is what lets the stylesheet own every scale change
+     there is — hover, matched, unmatched, the click ping — without a script
+     re-deriving a combined transform sixty times a second. */
+  function layoutPills() {
+    var cx = W / 2, cy = H / 2;
+    pills.forEach(function (p) {
+      var ring = RINGS[p.ring];
+      var ang = ((p.slot + ring.phase) / p.slotN) * Math.PI * 2;
+      p.x = cx + Math.cos(ang) * ring.rx * W;
+      p.y = cy + Math.sin(ang) * ring.ry * H;
+      p.el.style.left = p.x.toFixed(1) + 'px';
+      p.el.style.top = p.y.toFixed(1) + 'px';
+    });
   }
 
   function createPills() {
     pills.forEach(p => p.el.remove());
     pills = [];
-    var positions = randomPositions(CATEGORIES.length, W, H, 80);
+    var slots = ringSlots();
 
     CATEGORIES.forEach(function (cat, i) {
       var el = document.createElement('button');
@@ -239,39 +298,27 @@
       el.textContent = cat.label;
       el.style.color = cat.color;
       el.style.setProperty('--pill-color', cat.color + '80');
+      el.style.setProperty('--pill-i', i);
       el.style.borderColor = 'color-mix(in srgb, ' + cat.color + ' 35%, transparent)';
       el.style.background = 'color-mix(in srgb, ' + cat.color + ' 8%, transparent)';
       box.appendChild(el);
 
-      var cx = positions[i][0];
-      var cy = positions[i][1];
-
-      /* Depth. Every pill used to render at the same size, which made the
-         cloud a flat scatter of labels — twelve things at exactly one distance
-         is a list that happens to be arranged in 2D. Giving each a standing
-         scale reads as some being nearer than others, which is the whole
-         difference between a scatter and a system you could travel through.
-
-         Derived from the index rather than random, so a category keeps its
-         distance across reloads and you can learn where things are. The stride
-         of 5 over a period of 7 spreads twelve pills across the range without
-         two neighbours landing on the same size. */
-      var depth = 0.82 + ((i * 5) % 7) / 7 * 0.38;
-
+      /* Depth follows the ring, not the index. Size and position now assert the
+         same thing — inner is nearer — where a size derived from the index
+         asserted something the layout then contradicted. The ±0.03 by slot is
+         there so a ring does not render as one flat type size. */
+      var s = slots[i];
+      var depth = RINGS[s.ring].depth + ((s.k % 3) - 1) * 0.03;
       el.style.setProperty('--pill-depth', depth.toFixed(3));
 
       var pill = {
         el: el,
         cat: cat,
         depth: depth,
-        x: cx, y: cy,
-        homeX: cx, homeY: cy,
-        vx: (Math.random() - 0.5) * 0.1,
-        vy: (Math.random() - 0.5) * 0.08,
-        /* Eased, not snapped: a pill that jumps to its selected size has
-           changed, a pill that grows into it has approached. */
-        _stateScale: 1,
-        _breathPhase: Math.random() * Math.PI * 2,
+        ring: s.ring,
+        slot: s.k,
+        slotN: s.n,
+        x: 0, y: 0,
         matched: false,
         repelled: false
       };
@@ -280,37 +327,18 @@
         var current = input.value.trim();
         var toggling = current.toLowerCase() === cat.label.toLowerCase();
 
-        /* Planet zoom — animate scale via the physics-applied transform */
+        /* One ping, on the pill that was clicked. It used to also shove every
+           other pill outward, which is the erratic motion arriving by a second
+           route: clicking one label displaced eleven that had nothing to do
+           with the query. Restarting the animation needs the class off and a
+           forced reflow, or a second click inside 400ms does nothing. */
+        el.classList.remove('planet-zoom');
+        void el.offsetWidth;
         el.classList.add('planet-zoom');
-        pill._zoomScale = 1;
-        var zoomStart = performance.now();
-        var zoomDuration = 450;
-        function animateZoom(now) {
-          var t = Math.min(1, (now - zoomStart) / zoomDuration);
-          /* Bell curve: 0→1→0 via sin, peak scale 1.4 at t=0.5 */
-          pill._zoomScale = 1 + 0.4 * Math.sin(t * Math.PI);
-          if (t < 1) requestAnimationFrame(animateZoom);
-          else pill._zoomScale = 1;
-        }
-        requestAnimationFrame(animateZoom);
-
-        /* Push other pills away gently */
-        pills.forEach(function (other) {
-          if (other === pill) return;
-          var dx = other.x - pill.x;
-          var dy = other.y - pill.y;
-          var dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          other.vx += (dx / dist) * 2;
-          other.vy += (dy / dist) * 1.5;
-        });
 
         setTimeout(function () {
           el.classList.remove('planet-zoom');
-          if (toggling) {
-            input.value = '';
-          } else {
-            input.value = cat.label;
-          }
+          input.value = toggling ? '' : cat.label;
           doFilter();
           input.focus();
         }, 400);
@@ -318,6 +346,8 @@
 
       pills.push(pill);
     });
+
+    layoutPills();
   }
 
   /* ── Route map ───────────────────────────────────────────────────
@@ -329,18 +359,33 @@
      bought nothing.
 
      What replaces it is geometric. Each pill links to its two nearest
-     neighbours, deduped; the graph is re-derived as the pills drift so a link
-     always joins things that are actually close. That is why a star chart
-     connects what is near rather than what is thematically alike, and it is
-     the difference between a web and a route.
+     neighbours, deduped, so a link always joins things that are actually
+     close. That is why a star chart connects what is near rather than what is
+     thematically alike, and it is the difference between a web and a route.
 
-     Per-edge state (phase, speed, bow) is keyed by the pair and survives a
-     rebuild, so a signal in flight is not teleported back to the start every
-     time the graph is re-derived.
+     The graph used to be re-derived every fortieth frame because the pills
+     drifted out from under it. They do not drift now, so it is built once per
+     layout and rebuilt only on resize.
+
+     Per-edge state (phase, speed, bow) is hashed from the pair rather than
+     drawn from `Math.random`, so the same two categories get the same route
+     on every load. The chart is worth learning only if it is the same chart
+     twice, and that argument covers the routes as much as the positions.
   ─────────────────────────────────────────────────────────────────── */
   var connections = [];
   var edgeState = Object.create(null);
   var LINK_K = 2;
+
+  /* FNV-1a, folded to 0..1. Any stable string-to-fraction would do; what
+     matters is that it is a function of the pair and not of call order. */
+  function hash(str) {
+    var h = 2166136261;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0) / 4294967296;
+  }
 
   function buildConnections() {
     var seen = Object.create(null);
@@ -362,23 +407,34 @@
         seen[key] = true;
         if (!edgeState[key]) {
           edgeState[key] = {
-            phase: Math.random(),
-            speed: 0.0022 + Math.random() * 0.0026,
-            /* Perpendicular bow. A straight chord between two drifting points
-               reads as a constraint; a bowed one reads as a path. */
-            bow: (Math.random() < 0.5 ? -1 : 1) * (0.06 + Math.random() * 0.13),
-            dir: Math.random() < 0.5 ? -1 : 1
+            phase: hash(key),
+            /* Roughly half the old rate. With the pills still, the signals are
+               the only motion left, so they set the tempo of the whole hero:
+               a full traverse now takes ~11s instead of ~5s. */
+            speed: 0.0011 + hash(key + 's') * 0.0009,
+            /* Perpendicular bow. A straight chord between two points reads as
+               a constraint; a bowed one reads as a path. */
+            bow: (hash(key + 'b') < 0.5 ? -1 : 1) * (0.06 + hash(key + 'w') * 0.13),
+            dir: hash(key + 'd') < 0.5 ? -1 : 1
           };
         }
         connections.push({ a: a, b: b, st: edgeState[key] });
       }
     }
+    trimEdges();
   }
 
   /* ── Drawing ─────────────────────────────────────────────────────
      A quadratic bezier whose control point is offset perpendicular to the
      chord. Both the base path and the travelling highlight sample the same
      curve, so the highlight rides the line instead of near it.
+
+     The curve is trimmed to the gap between the two pills rather than run
+     centre to centre. A pill's background is `color-mix(... 8%, transparent)`,
+     so a route drawn under one shows straight through it, and a signal spent
+     its first and last beats crawling *behind* a label instead of arriving at
+     it. Trimming is what makes the signal read as travelling between two
+     things: it leaves an edge and reaches an edge.
   ─────────────────────────────────────────────────────────────────── */
   function control(ax, ay, bx, by, bow) {
     var dx = bx - ax, dy = by - ay;
@@ -397,47 +453,183 @@
     return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
   }
 
-  var SIGNAL_LEN = 0.17;   /* fraction of the path the highlight occupies */
-  var SIGNAL_SEGS = 7;     /* tail resolution — enough to taper, cheap to draw */
+  var EDGE_GAP = 7;      /* clear space between a pill's edge and its routes */
+  var TRIM_STEPS = 48;   /* sampling resolution for the border crossing */
 
-  function drawRoutes() {
-    ctx.clearRect(-canvasPad, -canvasPad, W + canvasPad * 2, H + canvasPad * 2);
-    ctx.lineCap = 'round';
+  /* Half-extents of a pill's painted box, in the same space the curve is in.
+     `matched` scales a pill to 1.14, so the widest state is what the gap has
+     to clear — otherwise a route that looked trimmed at rest slides under the
+     label the moment its category is the one you searched for. */
+  function halfBox(p, pad) {
+    var s = p.depth * 1.14;
+    return [p.el.offsetWidth * s / 2 + pad, p.el.offsetHeight * s / 2 + pad];
+  }
 
+  function inside(px, py, p, hb) {
+    return Math.abs(px - p.x) < hb[0] && Math.abs(py - p.y) < hb[1];
+  }
+
+  /* Restricting a quadratic bezier to [t0,t1] yields another quadratic bezier,
+     exactly — no polyline approximation, and the signal can keep sampling a
+     single curve. */
+  function subCurve(ax, ay, cx, cy, bx, by, t0, t1) {
+    var p0 = bezier(ax, ay, cx, cy, bx, by, t0);
+    var p1 = bezier(ax, ay, cx, cy, bx, by, t1);
+    var u0 = 1 - t0, u1 = 1 - t1;
+    return {
+      ax: p0[0], ay: p0[1], bx: p1[0], by: p1[1],
+      cx: u0 * u1 * ax + (u0 * t1 + u1 * t0) * cx + t0 * t1 * bx,
+      cy: u0 * u1 * ay + (u0 * t1 + u1 * t0) * cy + t0 * t1 * by
+    };
+  }
+
+  /* Positions are static, so every edge's trimmed geometry is derived once per
+     layout instead of per frame. */
+  function trimEdges() {
     connections.forEach(function (link) {
       var a = pills[link.a], b = pills[link.b];
-      if (!a || !b) return;
+      var c = control(a.x, a.y, b.x, b.y, link.st.bow);
+      var ha = halfBox(a, EDGE_GAP), hb = halfBox(b, EDGE_GAP);
+      var t0 = 0, t1 = 1, i, t, pt;
+      for (i = 0; i <= TRIM_STEPS; i++) {
+        t = i / TRIM_STEPS;
+        pt = bezier(a.x, a.y, c[0], c[1], b.x, b.y, t);
+        if (!inside(pt[0], pt[1], a, ha)) { t0 = t; break; }
+      }
+      for (i = TRIM_STEPS; i >= 0; i--) {
+        t = i / TRIM_STEPS;
+        pt = bezier(a.x, a.y, c[0], c[1], b.x, b.y, t);
+        if (!inside(pt[0], pt[1], b, hb)) { t1 = t; break; }
+      }
+      /* Two pills close enough that the gap swallows the whole route: there is
+         no line left to draw, and a zero-length one would render as a dot. */
+      link.visible = t1 - t0 > 0.04;
+      if (!link.visible) return;
+      link.g = subCurve(a.x, a.y, c[0], c[1], b.x, b.y, t0, t1);
 
-      var st = link.st;
+      /* Trimming the two ends is not enough on its own. Nearest-neighbour
+         edges also pass clean through *third* pills — measured, 96 of 656
+         stroked points landed inside a label, every one of them inside
+         Productivity, the widest one and the one the inner ring's chords cross.
+         A pill is `color-mix(... 8%, transparent)`, so that line is not hidden
+         behind the label, it is drawn across it.
+
+         An edge that has to tunnel under a third label is not a route anyone
+         could trace anyway, so it is dropped rather than clipped into two
+         pieces: a route broken in the middle reads as two unrelated routes. */
+      for (i = 0; i <= TRIM_STEPS; i++) {
+        t = i / TRIM_STEPS;
+        pt = bezier(link.g.ax, link.g.ay, link.g.cx, link.g.cy, link.g.bx, link.g.by, t);
+        for (var m = 0; m < pills.length; m++) {
+          var o = pills[m];
+          if (o === a || o === b) continue;
+          if (inside(pt[0], pt[1], o, halfBox(o, 2))) { link.visible = false; break; }
+        }
+        if (!link.visible) break;
+      }
+    });
+
+    /* Dropping edges can strand a pill with no route at all, which reads as a
+       category that is not part of the chart. Each stranded pill gets back its
+       shortest clean edge to a pill that still has one. */
+    var degree = pills.map(function () { return 0; });
+    connections.forEach(function (l) { if (l.visible) { degree[l.a]++; degree[l.b]++; } });
+    pills.forEach(function (_, i) {
+      if (degree[i] > 0) return;
+      var best = null, bestLen = Infinity;
+      connections.forEach(function (l) {
+        if (l.visible || (l.a !== i && l.b !== i) || !l.g) return;
+        var dx = l.g.bx - l.g.ax, dy = l.g.by - l.g.ay, len = dx * dx + dy * dy;
+        if (len < bestLen) { bestLen = len; best = l; }
+      });
+      if (best) { best.visible = true; degree[best.a]++; degree[best.b]++; }
+    });
+
+    staticDirty = true;
+  }
+
+  var SIGNAL_LEN = 0.17;   /* fraction of the path the highlight occupies */
+  var SIGNAL_SEGS = 5;     /* tail resolution — enough to taper, cheap to draw */
+
+  /* ── The static layer ────────────────────────────────────────────
+     The orbits and the base routes are identical from frame to frame: fixed
+     pills, fixed curves, and a gradient per edge that only changes when the
+     matched set does. Re-deriving them 60 times a second cost ~72 canvas
+     operations and 14 gradient allocations per frame for a picture that never
+     differed. They are rendered once into an offscreen canvas and blitted,
+     so a frame now pays one `drawImage` for all of it and spends the rest of
+     its budget on the only thing that actually moves.
+
+     Marked dirty by a re-layout and by any change to the matched set, which is
+     a few times per keystroke rather than sixty times a second.
+  ─────────────────────────────────────────────────────────────────── */
+  var stat = document.createElement('canvas');
+  var sctx = stat.getContext('2d');
+  var staticDirty = true;
+
+  function drawStatic() {
+    staticDirty = false;
+    sctx.clearRect(-canvasPad, -canvasPad, W + canvasPad * 2, H + canvasPad * 2);
+
+    /* The orbits, under everything else. They are the reason a motionless pill
+       reads as parked rather than as stuck, so they have to be visible — but
+       only just. This is the ruled paper, not the writing, and at any weight
+       where you notice it as a line it competes with the routes it carries. */
+    var cx = W / 2, cy = H / 2;
+    sctx.lineWidth = 1;
+    sctx.strokeStyle = 'rgba(226, 232, 240, ' + (isFiltering ? 0.05 : 0.08) + ')';
+    RINGS.forEach(function (ring) {
+      sctx.beginPath();
+      sctx.ellipse(cx, cy, ring.rx * W, ring.ry * H, 0, 0, Math.PI * 2);
+      sctx.stroke();
+    });
+
+    sctx.lineCap = 'round';
+    connections.forEach(function (link) {
+      if (!link.visible) return;
+      var a = pills[link.a], b = pills[link.b], g = link.g;
       var live = isFiltering ? (a.matched && b.matched) : true;
       var dim = isFiltering && !live;
 
-      var c = control(a.x, a.y, b.x, b.y, st.bow);
-
-      /* Base path — a gradient between the two pill colours, so a route is
-         visibly a route *between these two* rather than generic wiring. */
-      var grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+      /* A gradient between the two pill colours, so a route is visibly a route
+         *between these two* rather than generic wiring. */
+      var grad = sctx.createLinearGradient(g.ax, g.ay, g.bx, g.by);
       var baseA = dim ? 0.025 : (isFiltering ? 0.34 : 0.19);
       grad.addColorStop(0, rgba(a.cat.color, baseA));
       grad.addColorStop(0.5, rgba('#ffffff', baseA * 0.45));
       grad.addColorStop(1, rgba(b.cat.color, baseA));
 
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y);
-      ctx.quadraticCurveTo(c[0], c[1], b.x, b.y);
-      ctx.strokeStyle = grad;
+      sctx.beginPath();
+      sctx.moveTo(g.ax, g.ay);
+      sctx.quadraticCurveTo(g.cx, g.cy, g.bx, g.by);
+      sctx.strokeStyle = grad;
       /* Same depth cue as the pills, so a route between two near ones is not
          hairlined into looking distant. */
       var near = (a.depth + b.depth) / 2;
-      ctx.lineWidth = (live && isFiltering ? 1.3 : 0.7) * near;
-      ctx.stroke();
+      sctx.lineWidth = (live && isFiltering ? 1.3 : 0.7) * near;
+      sctx.stroke();
+    });
+  }
 
-      if (dim) return;
+  function drawRoutes() {
+    if (staticDirty) drawStatic();
+    ctx.clearRect(-canvasPad, -canvasPad, W + canvasPad * 2, H + canvasPad * 2);
+    ctx.drawImage(stat, -canvasPad, -canvasPad, W + canvasPad * 2, H + canvasPad * 2);
+    ctx.lineCap = 'round';
+
+    connections.forEach(function (link) {
+      if (!link.visible) return;
+      var a = pills[link.a], b = pills[link.b], g = link.g;
+      if (isFiltering && !(a.matched && b.matched)) return;
+
+      var st = link.st;
 
       /* Travelling highlight. It advances every frame and wraps, and it takes
          the colour of the pill it is heading toward — which is the whole read:
-         something is moving from this category to that one. */
-      st.phase += st.speed * (isFiltering ? 2.4 : 1);
+         something is moving from this category to that one. Because the curve
+         is trimmed, `t` 0 and 1 are now the two pill edges, so the signal is
+         born at one border and dies at the other. */
+      st.phase += st.speed * (isFiltering ? 1.8 : 1);
       if (st.phase > 1 + SIGNAL_LEN) st.phase = -SIGNAL_LEN;
 
       var toward = st.dir > 0 ? b : a;
@@ -448,8 +640,8 @@
         var t0 = head - st.dir * (SIGNAL_LEN * i / SIGNAL_SEGS);
         var t1 = head - st.dir * (SIGNAL_LEN * (i + 1) / SIGNAL_SEGS);
         if (Math.min(t0, t1) < 0 || Math.max(t0, t1) > 1) continue;
-        var p0 = bezier(a.x, a.y, c[0], c[1], b.x, b.y, t0);
-        var p1 = bezier(a.x, a.y, c[0], c[1], b.x, b.y, t1);
+        var p0 = bezier(g.ax, g.ay, g.cx, g.cy, g.bx, g.by, t0);
+        var p1 = bezier(g.ax, g.ay, g.cx, g.cy, g.bx, g.by, t1);
         /* Tail: alpha and width both fall away from the head, which is what
            makes it read as travelling rather than as a lit segment. */
         var fall = 1 - i / SIGNAL_SEGS;
@@ -465,7 +657,7 @@
          than shadowBlur — same look, and it does not cost a blur pass per
          edge per frame. */
       if (head >= 0 && head <= 1) {
-        var hp = bezier(a.x, a.y, c[0], c[1], b.x, b.y, head);
+        var hp = bezier(g.ax, g.ay, g.cx, g.cy, g.bx, g.by, head);
         [[6, 0.10], [3, 0.22]].forEach(function (ring) {
           ctx.beginPath();
           ctx.arc(hp[0], hp[1], ring[0] * (isFiltering ? 1.25 : 1), 0, Math.PI * 2);
@@ -476,161 +668,34 @@
     });
   }
 
-  /* ── Physics tick ───────────────────────────────────────────── */
-  var centerX = 0, centerY = 0;
+  /* ── Frame ──────────────────────────────────────────────────────
+     Nothing in here moves a pill. The pills are placed once by `layoutPills`
+     and re-scaled by the stylesheet; all this loop owns is the canvas: two
+     orbit ellipses, the routes between pills, and the signals riding them.
+     Bodies fixed, traffic between them not, which is the whole planetary
+     read. It also costs one canvas repaint per frame and zero DOM writes,
+     where the physics wrote a transform to twelve elements every frame and
+     re-sorted 66 pairs every fortieth.
+  ─────────────────────────────────────────────────────────────── */
   var isFiltering = false;
-  var frame = 0;
 
-  /* Lifted out of the tick loop so a filter still repaints the cloud when the
-     loop is not running. Under prefers-reduced-motion `tick` draws one frame
-     and stops, which used to mean the pills never dimmed and never lit — the
-     one readout the cloud owes a reader was the one thing motion preference
+  /* Lifted out of the loop so a filter still repaints the cloud when the loop
+     is not running. Under prefers-reduced-motion `tick` draws one frame and
+     stops, which used to mean the pills never dimmed and never lit — the one
+     readout the cloud owes a reader was the one thing motion preference
      switched off. */
   function paintPillStates() {
     pills.forEach(function (p) {
       p.el.classList.toggle('matched', p.matched && isFiltering);
       p.el.classList.toggle('repelled', !p.matched && isFiltering);
     });
+    /* Base-route alpha and orbit alpha both key off the matched set, and this
+       is the one function every path that changes it already calls. */
+    staticDirty = true;
   }
 
   function tick() {
-    centerX = W / 2;
-    centerY = H / 2;
-
-    pills.forEach(function (p, i) {
-      if (isFiltering) {
-        if (p.matched) {
-          /* Travel to the middle. The spring used to be 0.003, which over the
-             second a reader spends looking moved a pill perhaps a third of the
-             way — the cloud appeared to have merely dimmed. It has to arrive
-             for the arrival to be the message.
-
-             Matched pills land on a small rosette rather than all on the same
-             point: three categories converging on one pixel is three labels
-             fighting the repulsion for the same spot, and the middle one is
-             unreadable while they settle. One match still lands dead centre. */
-          var n = p._slotN || 1;
-          var ring = n < 2 ? 0 : Math.min(W, H) * (n < 4 ? 0.17 : 0.24);
-          var ang = (p._slot / n) * Math.PI * 2 - Math.PI / 2;
-          var tx = centerX + Math.cos(ang) * ring * 1.6;
-          var ty = centerY + Math.sin(ang) * ring;
-          var dx = tx - p.x;
-          var dy = ty - p.y;
-          p.vx += dx * 0.014;
-          p.vy += dy * 0.014;
-        } else {
-          /* Drift to assigned peripheral orbit position, not the wall */
-          /* Vacate the middle. Assigned once per filter so the ring is stable
-             while the query stands, and spread by index rather than by where
-             the pill happened to be — otherwise two pills that started close
-             stay close and the ring has a gap opposite a clump. */
-          if (!p._orbitX) {
-            var angle = (i / pills.length) * Math.PI * 2 + Math.random() * 0.4;
-            var rx = W * 0.46 + Math.random() * W * 0.05;
-            var ry = H * 0.44 + Math.random() * H * 0.06;
-            p._orbitX = centerX + Math.cos(angle) * rx;
-            p._orbitY = centerY + Math.sin(angle) * ry;
-          }
-          var dx = p._orbitX - p.x;
-          var dy = p._orbitY - p.y;
-          p.vx += dx * 0.02;
-          p.vy += dy * 0.02;
-          /* Keep a gentle drift even while filtered out */
-          if (!p._wobblePhase) p._wobblePhase = Math.random() * Math.PI * 2;
-          p._wobblePhase += 0.01;
-          p.vx += Math.sin(p._wobblePhase) * 0.015;
-          p.vy += Math.cos(p._wobblePhase * 0.7) * 0.01;
-        }
-      } else {
-        p._orbitX = 0; p._orbitY = 0; /* Reset orbit targets */
-        /* Drift toward home — stronger spring while returning, gentle at rest */
-        var dx = p.homeX - p.x;
-        var dy = p.homeY - p.y;
-        var k = 0.008;
-        if (p._returning > 0) {
-          k = 0.04; /* Smooth glide, no bounce */
-          p._returning -= 0.008;
-          if (p._returning <= 0) p._returning = 0;
-        }
-        p.vx += dx * k;
-        p.vy += dy * k;
-        /* Organic planetary drift — two layered sine waves for natural movement */
-        if (!p._wobblePhase) p._wobblePhase = Math.random() * Math.PI * 2;
-        if (!p._wobblePhase2) p._wobblePhase2 = Math.random() * Math.PI * 2;
-        p._wobblePhase += 0.012 + (i % 3) * 0.003;
-        p._wobblePhase2 += 0.007 + (i % 4) * 0.002;
-        /* Parallax. A near thing sweeps further across your view than a far
-           thing moving at the same speed, so the drift is scaled by depth.
-           Without it the sizes say "nearer" and the motion says "all at the
-           same distance", and the motion wins. */
-        var par = p.depth * p.depth;
-        p.vx += (Math.sin(p._wobblePhase) * 0.04 + Math.cos(p._wobblePhase2) * 0.015) * par;
-        p.vy += (Math.cos(p._wobblePhase * 0.7) * 0.03 + Math.sin(p._wobblePhase2 * 1.3) * 0.012) * par;
-      }
-
-      /* Pill-to-pill repulsion — soft quadratic falloff */
-      pills.forEach(function (other) {
-        if (other === p) return;
-        var dx = p.x - other.x;
-        var dy = p.y - other.y;
-        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        var minDist = 85;
-        if (dist < minDist) {
-          var t = (minDist - dist) / minDist;
-          var force = t * t * 0.2;
-          p.vx += (dx / dist) * force;
-          p.vy += (dy / dist) * force;
-        }
-      });
-
-      /* Damping — heavier while returning to prevent overshoot */
-      var damp = p._returning > 0 ? 0.88 : 0.96;
-      p.vx *= damp;
-      p.vy *= damp;
-
-      p.x += p.vx;
-      p.y += p.vy;
-
-      /* Soft bounds — gentle pull back instead of hard wall */
-      var pw = p.el.offsetWidth / 2 || 40;
-      var ph = p.el.offsetHeight / 2 || 12;
-      var margin = 20;
-      if (p.x < margin) p.vx += (margin - p.x) * 0.05;
-      if (p.x > W - margin) p.vx += (W - margin - p.x) * 0.05;
-      if (p.y < margin) p.vy += (margin - p.y) * 0.05;
-      if (p.y > H - margin) p.vy += (H - margin - p.y) * 0.05;
-
-      /* ── Scale, composed from four independent things ──────────────
-         depth      where the pill stands in the field, fixed per category
-         breath     a slow in-and-out so nothing is ever perfectly still
-         selection  matched pills come closer, unmatched fall back
-         click      the bell-curve pop from the tap handler
-
-         They multiply rather than override, so a far pill that gets selected
-         still reads as the far one having come forward. Four separate springs
-         all writing `transform` would fight; one product cannot. */
-      p._breathPhase += 0.0055 + (i % 5) * 0.0009;
-      var breath = 1 + 0.045 * Math.sin(p._breathPhase);
-
-      var want = isFiltering ? (p.matched ? 1.26 : 0.74) : 1;
-      p._stateScale += (want - p._stateScale) * 0.075;
-
-      var s = p.depth * breath * p._stateScale * (p._zoomScale || 1);
-      /* Round the position, not the scale: sub-pixel position is what keeps
-         the drift smooth, and a rounded scale visibly steps during the pop. */
-      p.el.style.transform = 'translate(' + (p.x - pw) + 'px,' + (p.y - ph) + 'px) scale(' + s.toFixed(4) + ')';
-
-    });
-
-    paintPillStates();
-
-    /* The graph is proximity-based and the pills drift, so it has to be
-       re-derived — but not every frame. Twelve pills move a few px per frame;
-       every 40 is often enough that no link is ever visibly wrong, and it keeps
-       the 66-pair sort off the hot path. */
-    if ((frame++ % 40) === 0) buildConnections();
     drawRoutes();
-
     if (!reducedMotion.matches) requestAnimationFrame(tick);
   }
 
@@ -833,10 +898,6 @@
 
       pills.forEach(function (p) {
         p.matched = false; p.repelled = false;
-        p._orbitX = 0; p._orbitY = 0;
-        p.vx *= 0.15;
-        p.vy *= 0.15;
-        p._returning = 1;
       });
       document.body.classList.remove('search-active');
       paintPillStates();
@@ -872,12 +933,6 @@
     pills.forEach(function (p) {
       p.matched = ranked.lit.indexOf(p.cat) >= 0;
     });
-    /* Slots for the rosette, assigned per filter so they stay put while the
-       query stands. Order is CATEGORIES order, which is the order the pills
-       were laid out in — neighbours on the chart stay neighbours in the ring
-       instead of crossing each other on the way in. */
-    var hit = pills.filter(function (p) { return p.matched; });
-    hit.forEach(function (p, k) { p._slot = k; p._slotN = hit.length; });
     paintPillStates();
 
     var flipPairs = [];
@@ -1105,45 +1160,6 @@
     createPills();
     buildConnections();
     tick();
-
-    if (reducedMotion.matches) {
-      pills.forEach(function (p) { p.el.style.opacity = ''; });
-      return;
-    }
-
-    /* Entrance: staggered fade + gentle scale-pop so the pills visibly
-       materialize into the constellation one by one. Scale rides the
-       physics-applied transform via _zoomScale so it never fights the
-       per-frame position updates. */
-    pills.forEach(function (p, i) {
-      var delay = i * 70;
-      p.el.style.opacity = '0';
-      p.el.style.transition = 'opacity .5s ease ' + delay + 'ms';
-      p._zoomScale = 0.55;
-
-      var start = null;
-      var duration = 480;
-      function pop(now) {
-        if (start === null) start = now;
-        var t = (now - start - delay) / duration;
-        if (t < 0) { requestAnimationFrame(pop); return; }
-        if (t >= 1) {
-          p._zoomScale = 1;
-          p.el.style.transition = '';
-          return;
-        }
-        p._zoomScale = 0.55 + 0.45 * (1 - Math.pow(1 - t, 3));
-        requestAnimationFrame(pop);
-      }
-      requestAnimationFrame(pop);
-    });
-
-    /* Double rAF ensures opacity:0 is painted before transitioning */
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        pills.forEach(function (p) { p.el.style.opacity = ''; });
-      });
-    });
   }
 
   /* Wait for box to have real dimensions — poll via rAF, no need to wait for full window.load */
@@ -1162,13 +1178,22 @@
     requestAnimationFrame(tryInit);
   }
 
-  window.addEventListener('resize', function () {
+  /* Re-derive the same layout at the new size. Two things changed here.
+
+     It observes the box, not the window. The layout is a function of the box's
+     own size, and `window.resize` is only a proxy for that — it misses a box
+     that changes height because its `clamp()` crossed a breakpoint late, or
+     because a font finished loading. Measured on a 609px pane, the window
+     listener left `H` at 200 against a box that was 130, which put four pills
+     outside their own container.
+
+     And it re-derives rather than re-scatters. The old handler drew a fresh
+     random layout here, so dragging a window edge shuffled the whole chart:
+     the interaction most likely to be an accident was also the one that threw
+     away everything the reader had learned about where things are. */
+  new ResizeObserver(function () {
     resizeCanvas();
-    /* Recalc home positions with random scatter */
-    var positions = randomPositions(pills.length, W, H, 80);
-    pills.forEach(function (p, i) {
-      p.homeX = positions[i][0];
-      p.homeY = positions[i][1];
-    });
-  });
+    layoutPills();
+    buildConnections();
+  }).observe(box);
 })();

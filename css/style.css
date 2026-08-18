@@ -293,8 +293,17 @@ body {
 .constellation-box {
   position: relative;
   max-width: min(680px, 100%);
-  height: clamp(108px, 16vw, 200px);
-  margin: 12px auto 0;
+  /* The floor is load-bearing. Two orbits of ~28px pills need a certain
+     vertical span between them no matter how narrow the viewport gets, and
+     16vw does not reach 150px until ~940px wide. Below this the rings stop
+     clearing each other and pills overlap. See RINGS in js/search.js. */
+  height: clamp(150px, 16vw, 200px);
+  /* The top pill sits flush against the box's top edge and the bottom pill
+     against its bottom, so these margins *are* the chart's breathing room.
+     44px matches what sits below it: the scroll cue's own 14px margin plus its
+     30px of arrow. Measured before this: 12.4px above against 43.6px below,
+     which read as the constellation being shoved up under the search field. */
+  margin: 44px auto 0;
   overflow: visible;
 }
 .constellation-canvas {
@@ -316,12 +325,37 @@ body {
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
-  /* Position via transform (GPU-accelerated, sub-pixel smooth).
-     Only animate visual properties for hover/zoom. */
+  /* js/search.js writes left/top once per layout and `--pill-depth` once per
+     pill; everything that changes after that is scale, and it all composes
+     here. Four springs used to write `transform` from script every frame and
+     fight each other over it — one product of two custom properties cannot.
+
+     Centring and sizing go on the `translate` and `scale` longhands rather
+     than into one `transform`, because they answer to different owners: the
+     translate belongs to the absolute placement and never changes, the scale
+     belongs to state and changes constantly. Sharing `transform` means the
+     mobile row cannot cancel the placement without also cancelling the sizing,
+     and the transition has to re-interpolate a translate that never moved. */
   left: 0; top: 0;
-  transition: opacity .4s ease, box-shadow .4s ease, filter .4s ease;
+  translate: -50% -50%;
+  scale: calc(var(--pill-depth, 1) * var(--pill-state, 1));
+  transition: scale .5s var(--ease-out), opacity .4s ease,
+              box-shadow .4s ease, filter .4s ease;
   z-index: 1;
-  will-change: transform;
+
+  /* Arrival, staggered by the index the script stamps on each pill. It was a
+     rAF loop feeding a `_zoomScale` into the physics transform; with the
+     physics gone it is one keyframe. `backwards` supplies the pre-delay state
+     and then hands the pill back to the rules above, so the resting size stays
+     defined in exactly one place. */
+  animation: pillArrive .55s var(--ease-out) backwards;
+  animation-delay: calc(var(--pill-i, 0) * 60ms);
+}
+@keyframes pillArrive {
+  from {
+    opacity: 0;
+    scale: calc(var(--pill-depth, 1) * .55);
+  }
 }
 /* Depth, the half that is not scale. js/search.js sets --pill-depth (0.82 to
    1.20) per pill and applies the scale itself; this is the atmosphere that
@@ -336,17 +370,25 @@ body {
 }
 
 .tag-pill:hover {
+  --pill-state: 1.06;
   z-index: 2;
   box-shadow: 0 0 14px var(--pill-color, rgba(192,132,252,.35));
   filter: brightness(1.15);
   opacity: 1;
 }
-/* Matched: arrived. The pill is what the query hit, and it has travelled to
-   the middle of the chart to say so. */
-/* Arrived. Depth opacity is overridden on purpose: a far category that your
-   query hit has come to the front, and it should not still be dimmed for
-   having started far away. */
+
+/* Matched: lit, not moved. It used to fly to a rosette in the middle while the
+   unmatched were thrown out to a peripheral ring, so every keystroke tore the
+   chart apart and rebuilt it — and the positions a reader had just learned
+   were the first thing spent. A constellation answers a query by lighting up.
+   Nothing here translates; the pill comes forward, brightens, and holds its
+   orbit, and the routes between two matched pills stay lit while the rest fall
+   to a trace (see drawRoutes in js/search.js).
+
+   Depth opacity is overridden on purpose: a far category your query hit should
+   not still be dimmed for sitting on the outer ring. */
 .tag-pill.matched {
+  --pill-state: 1.14;
   box-shadow:
     0 0 14px var(--pill-color, rgba(192,132,252,.5)),
     0 0 42px color-mix(in srgb, var(--pill-color, #c084fc) 45%, transparent);
@@ -360,6 +402,7 @@ body {
    destination you cannot see is a destination you cannot pick. Hovering one
    brings it back to full, so "show me that one instead" costs no typing. */
 .tag-pill.repelled {
+  --pill-state: .9;
   opacity: .16;
   filter: saturate(.55);
 }
@@ -371,6 +414,13 @@ body {
   z-index: 10;
   filter: brightness(1.4);
   box-shadow: 0 0 24px var(--pill-color, rgba(192,132,252,.5)), 0 0 60px var(--pill-color, rgba(192,132,252,.25));
+  /* Overrides the arrival shorthand above, which is why this stays a
+     shorthand too. Peak matches the old script bell curve at 1.4. */
+  animation: pillPing .45s ease-out;
+}
+@keyframes pillPing {
+  0%, 100% { scale: var(--pill-depth, 1); }
+  45%      { scale: calc(var(--pill-depth, 1) * 1.4); }
 }
 
 /* ── Scroll cue ───────────────────────────────────────────────────────
@@ -402,11 +452,11 @@ body {
   height: 22px;
   margin: 0 auto;
   opacity: 0;
-  animation: scroll-cue-drift 2.8s var(--ease-out, ease) infinite;
+  animation: scroll-cue-drift 1.7s var(--ease-out, ease) infinite;
 }
 .scroll-cue svg + svg {
   margin-top: -14px;
-  animation-delay: .3s;
+  animation-delay: .18s;
 }
 @keyframes scroll-cue-drift {
   0%   { opacity: 0; transform: translateY(-5px); }
@@ -1352,9 +1402,17 @@ body.warp-active .orb {
   }
   .constellation-box::-webkit-scrollbar { display: none; }
   .constellation-canvas { display: none; }
+  /* The row is normal flow, so every part of the absolute placement has to go:
+     the offsets, the centring translate, and the depth scale that only means
+     anything against a chart. Cancelling `translate` and `scale` by name is
+     what the longhand split above buys — one `transform: none` could not
+     remove the centring without also flattening the sizing it shared. */
   .tag-pill {
     position: static;
-    transform: none !important;
+    left: auto; top: auto;
+    translate: none;
+    scale: none;
+    animation: none;
     flex-shrink: 0;
     font-size: .65rem;
     padding: 6px 14px;
@@ -2178,10 +2236,12 @@ body.evangelion-bg .hero-search-icon { color: rgba(128,0,255,.3); }
   /* Disable matrix rain, intervention, and evangelion canvases */
   #matrixCanvas, #interventionCanvas, #evangelionCanvas { display: none !important; }
 
-  /* Disable physics-based pills animation - make them static */
+  /* The pills are static by construction now, so there is no physics left to
+     switch off. What this must NOT do is drop the centring `translate`: it is
+     half of where a pill sits, and killing it shunts all twelve down and right
+     by half their own size. */
   .tag-pill {
     animation: none !important;
-    transform: none !important;
     transition: none !important;
   }
 
