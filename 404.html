@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Not found | Neorgon</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/x-icon" href="https://cdn.neorgon.org/v1.0.0/favicon.ico" />
+  <link rel="stylesheet" href="https://cdn.neorgon.org/v1.0.0/styles/base.css">
+  <style>
+    /* Self-contained on purpose. A 404 that depends on the site's own CSS
+       bundle breaks exactly when something is already wrong with the paths. */
+    body {
+      margin: 0; min-height: 100dvh; display: grid; place-items: center;
+      background: #0a0a12; color: #f4f4f8; text-align: center;
+      font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+      padding: 2rem;
+    }
+    .code { font-size: clamp(4rem, 18vw, 9rem); font-weight: 800; line-height: 1;
+            margin: 0; color: #E326E4; letter-spacing: -.04em; }
+    h1 { font-size: clamp(1.1rem, 4vw, 1.5rem); font-weight: 600; margin: .75rem 0 .35rem; }
+    p  { color: rgba(255,255,255,.62); margin: 0 0 1.75rem; max-width: 34ch; }
+    a  { display: inline-block; padding: .7rem 1.4rem; border-radius: 8px;
+         background: #E326E4; color: #fff; text-decoration: none; font-weight: 600; }
+    a:hover { filter: brightness(1.1); }
+    a + a { margin-left: .6rem; background: transparent; color: rgba(255,255,255,.72);
+            border: 1px solid rgba(255,255,255,.18); }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="code">404</p>
+    <h1>That page is not here</h1>
+    <p>The link may be old, or the address may have a typo in it.</p>
+    <a href="/">Back to Neorgon</a>
+    <a href="https://neorgon.com">All tools</a>
+  </main>
+</body>
+</html>
