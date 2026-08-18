@@ -614,7 +614,7 @@
 
       try {
         const client = await getConvex();
-        const result = await client.mutation('auth:login', { username, password });
+        const result = await client.action('auth:login', { username, password });
 
         if (result.ok) {
           authedUser = result.username;

@@ -2,6 +2,7 @@
   "name": "neorgon-site",
   "private": true,
   "dependencies": {
-    "convex": "^1.21.0"
+    "convex": "^1.21.0",
+    "bcryptjs": "^3.0.3"
   }
 }
