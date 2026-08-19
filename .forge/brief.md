@@ -340,3 +340,38 @@ the entrance animations before reading opacity. One consequence worth carrying: 
 like an unfixed bug until a forced reload proved the fix had landed.
 
 _Closed 2026-08-19 10:01._
+
+## Addendum, same day, closing the open items
+
+Four of the five open items closed; the fifth was a false alarm about the
+environment that turned out to have a precise cause.
+
+- **The blank screenshots had a real explanation.** Not "the tab does not
+  render": the Browser pane was collapsed on the user's side, so the page
+  composited no frames, and the tool eventually said so outright ("the Browser
+  pane is not displayed"). Fronting the tab does not open the pane, and the
+  pane cannot be opened programmatically. Switched to the headless Playwright
+  browser, which rendered everything first try. Worth remembering: a blank
+  capture is a question about the surface, not about the page.
+- **The rendered view immediately found a design bug the DOM could not.**
+  `.group-chevron` had `margin-left: auto` inside a full-width toggle, which
+  parked the glyph ~1100px from the word it belonged to, reading as an
+  unrelated control floating in the gutter. Computed styles were all correct.
+  Only the picture showed it. Now sits beside the count; the button still
+  spans the row, so the click target is unchanged.
+- **The dead dim is fixed rather than documented.** `.soon-card { opacity: .78 }`
+  never rendered, because `cardEnter` fills `forwards` and its `to { opacity: 1 }`
+  outranks a normal declaration on the same element. Moved to `.card-content`,
+  which the animation does not target, keyed by `--card-rest-dim` (`.78` Soon,
+  `.72` archived). Verified by hover: content `.72` to `1`, icon grayscale `.85`
+  to `.4`, border `.12` to `.2`. This is a visible change to the two existing
+  Soon cards, which are now genuinely dimmer than a live tool, as the CSS
+  always intended.
+- **The stale server was killed.** A `python3 -m http.server 8800` with the
+  right cwd that answered 404 to its own `index.html`. Restarted from the
+  project's own launch config and healthy.
+- **Committed** on `main` as `LucianoAdonis`, matching every prior commit in
+  this repo. Two commits: the recency opt-out separately, since it stands
+  alone, and the archive plus collapse plus banner plus dim fix together,
+  because their HTML, CSS and JS interlock and an intermediate commit would
+  not have worked. Not pushed.
