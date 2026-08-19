@@ -84,13 +84,27 @@
      the rail. A Soon card should have no `data-added` in the first place — the
      check is here because getting that wrong would put an unreleased tool at
      the top of a shelf headed "Recently shipped", which is the one place the
-     page cannot afford to be wrong. */
+     page cannot afford to be wrong.
+
+     Archived tools are excluded for the same reason read the other way round:
+     they shipped, but they are no longer what we recommend, and a shelf that
+     leads with one is arguing against the catalog behind it.
+
+     A group carrying `data-recent="off"` opts out of both recency surfaces —
+     the rail *and* the badge below, since this list feeds both. UI Lab is the
+     case it was built for: those tools are reference material, and a visitor
+     scanning for what changed does not want a wireframe glossary handed to
+     them as news. Group-level rather than per-card so a future reference
+     category needs an attribute, not an edit here. */
   var candidates = Array.from(
     document.querySelectorAll('#tools .site-card[data-card-id][data-added]')
   ).filter(function (card) {
+    var group = card.closest('.card-group');
     return !card.classList.contains('external-card') &&
            !card.classList.contains('ghost-card') &&
-           card.dataset.status !== 'soon';
+           card.dataset.status !== 'soon' &&
+           card.dataset.status !== 'archived' &&
+           !(group && group.dataset.recent === 'off');
   }).map(function (card) {
     return { el: card, ts: parseDate(card.dataset.added) };
   }).filter(function (c) {
