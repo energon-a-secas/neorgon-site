@@ -552,6 +552,131 @@ body.search-active .scroll-cue {
   display: none !important;
 }
 
+/* ── Collapsible groups ───────────────────────────────────────────────────
+   Set by `data-collapsed` in the HTML (the shipped default) and rewritten by
+   js/collapse.js from the visitor's stored choice. Display, not height: the
+   grid is a `repeat(auto-fill, …)` whose row count changes with the viewport,
+   so there is no height to animate toward that is right at two widths. The
+   fade on expand carries the change instead. */
+.card-group[data-collapsed="true"] > .sites-grid {
+  display: none;
+}
+.card-group[data-collapsed="false"] > .sites-grid {
+  animation: group-expand .28s cubic-bezier(.2, .7, .3, 1) both;
+}
+@keyframes group-expand {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* The heading becomes the control, so it takes the whole row and stays a
+   heading: same type, same colour, no button chrome. */
+.group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 2px 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.group-toggle:focus-visible {
+  outline: 2px solid var(--group-color, var(--text-muted));
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+/* Generated content, never a text node: js/catnav.js reads this heading's
+   textContent to label the category chip. */
+.group-count::after {
+  content: attr(data-count);
+  font-size: .62rem;
+  letter-spacing: .08em;
+  opacity: .55;
+}
+.group-count:not([data-count=""]) {
+  margin-left: 2px;
+}
+/* Sits directly after the label and count, not pushed to the far edge.
+   `margin-left: auto` put it ~1100px from the word it belongs to on a desktop,
+   which reads as an unrelated control floating in the gutter. The button still
+   spans the full row, so the click target stays generous; only the glyph moves. */
+.group-chevron {
+  margin-left: 2px;
+  flex-shrink: 0;
+  opacity: .5;
+  transition: transform .28s cubic-bezier(.2, .7, .3, 1), opacity .2s;
+}
+.group-toggle:hover .group-chevron { opacity: .9; }
+.card-group[data-collapsed="true"] .group-chevron {
+  transform: rotate(-90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-group[data-collapsed="false"] > .sites-grid { animation: none; }
+  .group-chevron { transition: none; }
+}
+
+/* ── Archived card ────────────────────────────────────────────────────────
+   Selectors are `.site-card.archived-card`, not `.archived-card`: this block
+   sits above `.site-card` in the file, and at equal specificity the later rule
+   wins, so the single-class form lost its border to the base card and applied
+   nothing. (`.soon-card` gets away with one class only because it happens to
+   be declared 500 lines further down.)
+
+   The third card state, after live and Soon. It still opens — the domain is
+   up and the links are out there — so it keeps the arrow a link earns. What
+   it loses is the argument: no accent glow, a desaturated icon, and a line
+   naming what replaced it. It reads as a record, not an offer. */
+.site-card.archived-card {
+  /* Read by the shared `.card-content` dim above, not applied here: see the
+     note there for why `opacity` on the card itself is inert. A shade below
+     Soon, because "superseded" is a weaker invitation than "not yet". */
+  --card-rest-dim: .72;
+  border-style: dashed;
+  border-color: rgba(255,255,255,.12);
+}
+.site-card.archived-card:hover,
+.site-card.archived-card:focus-within {
+  border-color: rgba(255,255,255,.2);
+}
+.site-card.archived-card::before,
+.site-card.archived-card::after { opacity: 0 !important; }
+.site-card.archived-card .card-site-icon { filter: grayscale(.85) drop-shadow(0 1px 1.5px rgba(0, 0, 0, .55)); }
+.site-card.archived-card:hover .card-site-icon { filter: grayscale(.4) drop-shadow(0 1px 1.5px rgba(0, 0, 0, .55)); }
+
+/* Same badge family as .soon-badge and .card-new-badge, one step quieter than
+   either: no fill, muted border, no dot. Nothing here is an announcement. */
+.archived-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 8px;
+  flex-shrink: 0;
+  align-self: center;
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  border: 1px solid rgba(255,255,255,.14);
+}
+
+.card-superseded {
+  margin-top: 8px;
+  padding-left: 9px;
+  border-left: 2px solid rgba(255,255,255,.14);
+  font-size: .76rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
 /* While filtering: one merged grid; hide native category rows */
 body:not(.search-active) #catalogSearchMerged {
   display: none !important;
@@ -1044,7 +1169,6 @@ span.card-site-icon {
    the description loses its contrast against the card, which is why the dim
    stops there and the dashed border and badge carry the rest of the signal. */
 .soon-card {
-  opacity: .78;
   cursor: default;
   border-style: dashed;
   border-color: rgba(255,255,255,.14);
@@ -1053,9 +1177,31 @@ span.card-site-icon {
    the card answers "what is this" and stops, because there is nowhere to go. */
 .soon-card:hover,
 .soon-card:focus-within {
-  opacity: 1;
   border-color: rgba(255,255,255,.14);
   box-shadow: var(--shadow-card);
+}
+
+/* ── Resting dim, on the content rather than the card ─────────────────────
+   `opacity: .78` on `.soon-card` itself never rendered. Every catalog card
+   runs `cardEnter … forwards`, and a filling animation's `to { opacity: 1 }`
+   outranks a normal declaration on the same element, so the card sat at 1 and
+   the hover rule that "restored" it was restoring nothing. The dim shipped
+   dead for as long as Soon cards have existed.
+
+   `.card-content` is not a target of that animation, so dimming there is the
+   same intent expressed where nothing overrides it, and hover can genuinely
+   take it back. Both secondary states use it: Soon has not arrived, archived
+   has been superseded, and neither should out-read a live tool in the grid. */
+.soon-card .card-content,
+.site-card.archived-card .card-content {
+  opacity: var(--card-rest-dim, .78);
+  transition: opacity .3s;
+}
+.soon-card:hover .card-content,
+.soon-card:focus-within .card-content,
+.site-card.archived-card:hover .card-content,
+.site-card.archived-card:focus-within .card-content {
+  opacity: 1;
 }
 .soon-card:hover::before,
 .soon-card:hover::after { opacity: 0; }
@@ -1342,6 +1488,19 @@ body.warp-active .orb {
 .term-line.cmd { color: #22d3ee; }
 .term-line.err { color: #f43f5e; }
 .term-line.sys { color: rgba(255,255,255,.35); }
+/* The wordmark is drawn in box characters, so it needs its own line box: the
+   body's 1.7 line-height opens gaps between the rows and the letters come
+   apart. `pre` rather than `pre-wrap` for the same reason the banner is
+   width-switched at all: a wrapped row of block glyphs is not a smaller
+   wordmark, it is noise. */
+.term-line.banner {
+  white-space: pre;
+  overflow: hidden;
+  line-height: 1.05;
+  color: var(--card-accent, #22d3ee);
+  text-shadow: 0 0 12px rgba(34,211,238,.35);
+}
+.term-line.motd { color: rgba(255,255,255,.62); }
 .term-input-row {
   display: flex;
   align-items: center;
@@ -3130,6 +3289,18 @@ body.search-active #tools {
   border-radius: 6px;
   border: 1px solid rgba(251,191,36,.32);
   background: rgba(251,191,36,.1);
+  flex-shrink: 0;
+}
+/* Same chip, no fill and no colour: Soon is news, archived is a caveat. */
+.pal-item-archived {
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,.16);
   flex-shrink: 0;
 }
 .pal-item-domain {

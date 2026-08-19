@@ -32,10 +32,11 @@ Single-page hub at `neorgon.com` listing all Neorgon tools. The page is a single
 | `intervention.js` | "Death Note L" CRT broadcast takeover: third background mode |
 | `settings.js` | Settings panel: toggles for sound/glow/previews, background picker. Persists to `localStorage` under key `neorgon-prefs` |
 | `search.js` | Hero search bar with floating category pills (physics simulation on canvas), **ranked** card filtering, and the route map drawn between pills. Also arrow-key walking + Enter-to-open over the results. `CATEGORIES` must stay 1:1 with the `.card-group` sections in `index.html`. A pill whose `ids` name no group silently filters to zero results. **Ranking:** `scoreCard`/`rank` give every match a score (name-exact 1000 → loose 120) and `syncCatalogMerge` appends in that order, so the merged grid *is* the ranking; ship date breaks ties, newest first. A category's `keywords` blob is a **fallback vocabulary**, not an amplifier. It only expands a group when the query matched no card directly (`cheatsheet` may mean DevOps; `parla` may not mean all of Social). A category *label* always expands, because that is the pill-click path. **Pills stay up during a search:** matched ones travel to the middle and light their routes, the rest recede to 16% and hover back to full. `paintPillStates()` is called from `doFilter`, not only from the rAF loop, so the states still read under `prefers-reduced-motion` where the loop stops after one frame |
-| `recent.js` | "Recently shipped" rail above the catalog. Reads `data-added="YYYY-MM-DD"` off each card, renders the newest 6 as clones, and stamps a self-expiring `New` badge (30 days) on the canonical card. Also owns the shelf-overflow observer that toggles `.is-scrollable` on **both** shelf grids. The trailing mask fade must not appear over a row that already fits. Exposes `window._neoRecent` for the terminal's `new`, and **`window._neoMakeEcho(card)`**. The one definition of a safe clone (retag `data-card-id` → `data-echo-id`, clear entrance.js's inline delay, convert a multi-tool card to a link). Any shelf that clones catalog cards must use it |
+| `recent.js` | "Recently shipped" rail above the catalog. Reads `data-added="YYYY-MM-DD"` off each card, renders the newest 6 as clones, and stamps a self-expiring `New` badge (30 days) on the canonical card. A `.card-group` carrying **`data-recent="off"`** is skipped by **both** recency surfaces, the rail and the badge, because one candidate list feeds both. Applied to **UI Lab**: those are reference tools, and a visitor scanning for what changed should not be handed a wireframe glossary as news. Group-level rather than per-card so the next reference category needs an attribute, not an edit. Archived cards are skipped too. Also owns the shelf-overflow observer that toggles `.is-scrollable` on **both** shelf grids. The trailing mask fade must not appear over a row that already fits. Exposes `window._neoRecent` for the terminal's `new`, and **`window._neoMakeEcho(card)`**. The one definition of a safe clone (retag `data-card-id` → `data-echo-id`, clear entrance.js's inline delay, convert a multi-tool card to a link). Any shelf that clones catalog cards must use it |
 | `favorites.js` | "Your favorites" shelf above the rail, from `localStorage` key `neorgon-favorites` (`[{ id, pinned }]`; a bare id array is the v1 shape and still loads). Injects the control strip into every catalog card and every echo, prunes saved ids whose card no longer exists (and persists the prune), and renders the shelf with `_neoMakeEcho`. Pin holds the front; drag and ArrowLeft/ArrowRight reorder within a band. Exposes `window._neoFavorites` for the terminal's `fav` / `favs` / `pin`. **Never touches the catalog**. The categories below are byte-for-byte what a first-time visitor sees |
 | `catnav.js` | Sticky category rail with live counts and scroll-spy. Owns the sticky-chrome offset for the whole page: sets `--cat-rail-top` and every group's `scroll-margin-top` from one measurement, which `terminal.js` `open <cat>` relies on |
-| `palette.js` | ⌘K / Ctrl+K command palette over every tool (fuzzy match, recency tie-break) |
+| `collapse.js` | Collapsible `.card-group` sections. A group carrying `data-collapsed="true"` ships closed and grows a toggle on its own heading. Applied to **Archive** and **Platforms**. The shipped default lives in the HTML; the visitor's choice overrides it in `localStorage` key `neorgon-collapsed`, which stores **only deviations from the default**, so changing a group's shipped default later still reaches everyone who never touched it. Loads **after `catnav.js`** on purpose: catnav builds its chip labels from `.group-label` `textContent`, and this module reparents that heading into a `<button>`. For the same reason the card count is generated content off `data-count` and the chevron is an SVG, neither of which `textContent` can see. Put a text node in that heading and every category chip gains a stray "1 tool". Exposes `window._neoCollapse` |
+| `palette.js` | ⌘K / Ctrl+K command palette over every tool (fuzzy match, recency tie-break). Shows an `Archived` chip alongside the existing `Soon` chip |
 | `cards.js` | Multi-tool card popup (for cards with sub-tools) and ghost card unlock logic |
 | `previews.js` | GIF previews on card hover after 1.2s delay: enabled only when `window._neoPreviewsEnabled` is true |
 | `sortable.js` | Per-group card drag-reorder using SortableJS CDN. `window.exportCardOrder()` / `window.importCardOrder()` helpers available in console |
@@ -44,7 +45,7 @@ Single-page hub at `neorgon.com` listing all Neorgon tools. The page is a single
 | `cursor.js` | Custom cursor glow element |
 | `entrance.js` | Card entrance stagger. Delays are **per group and capped** (8 × 55ms), not a global `index × 110ms` timeline. The old form grew with the catalog (5.4s at 50 cards) and leaked into the rail, because recent.js clones these cards and `cloneNode` copies the inline `animation-delay`. recent.js now clears that on every echo; do not reintroduce a global counter here |
 | `hero.js` | Hero typewriter (one of four completions for "Made to fit ___", picked per load), the rotating badge, and the scroll cue. The chevron pair under the constellation. The cue retires permanently on the first scroll of any size and never returns |
-| `terminal.js` | Hidden terminal (keyboard shortcut) with Convex auth for admin commands. Navigation/discovery commands (`tools`, `goto`, `open`, `whois`, `new`, `stats`, `random`, `search`) build their catalog from the DOM, so a new card needs no terminal edit. `theme` sets the *visitor's* cookie via `NeoHeader.setTheme` only, changing the fleet-wide CDN default belongs in an ops console, not a page anyone can open |
+| `terminal.js` | Hidden terminal (keyboard shortcut) with Convex auth for admin commands. Opens on an **ASCII login banner** printed once per page load (`banner` / `motd` reprints it; `clear` is allowed to mean clear). The banner reports the live catalog, so it cannot be written into `index.html`. Two wordmarks: the block form is 66 columns and the body is `white-space: pre-wrap` inside a `min(640px, 90vw)` box, so `termColumns()` **measures** the body with a probe span in its own font rather than assuming a character width, and falls back to 80 columns when the body has no layout yet. Get that fallback wrong and a desktop silently gets the phone banner. Stat rows hang-indent to the value column, derived from the same leader width they are printed with. Navigation/discovery commands (`tools`, `goto`, `open`, `whois`, `new`, `stats`, `random`, `search`) build their catalog from the DOM, so a new card needs no terminal edit. `theme` sets the *visitor's* cookie via `NeoHeader.setTheme` only, changing the fleet-wide CDN default belongs in an ops console, not a page anyone can open |
 | `codes.js` | Easter eggs: Konami code (warp drive), other sequences |
 | `secret.js` | Proximity sonar scanner revealing a hidden section |
 
@@ -57,6 +58,7 @@ Single-page hub at `neorgon.com` listing all Neorgon tools. The page is a single
 - `window._neoSoundDiscover()`: from sound.js
 - `window._neoMakeEcho(card)`: from recent.js, the safe-clone helper both shelves use
 - `window._neoFavorites`: from favorites.js: `{ list(), has(id), isPinned(id), toggle(id), pin(id), clear() }`. `toggle` and `pin` return `true` on / `false` off / **`null` when the id names nothing in the catalog**, three outcomes, because `false` for both "removed" and "not a tool" is how a caller reports a removal that never happened. `pin` on an unsaved tool saves it in the same gesture
+- `window._neoCollapse`: from collapse.js: `{ expand(groupId), isOpen(groupId) }`. `expand` opens a collapsed group and returns whether it knew the id. Used by `terminal.js` `open <cat>` so a jump never lands on a heading with nothing under it. Chip clicks and fragment jumps are handled inside collapse.js itself
 - `window._neoMusicSwitch(mode)`: from music.js, called by settings.js when background changes
 - `window._neoBgSync(mode)`: from settings.js, called by terminal.js to sync picker state
 - `window.matrixOn/Off/Kill`, `window.interventionOn/Off/Kill`: canvas control from matrix.js / intervention.js
@@ -75,10 +77,22 @@ Each tool card in HTML has:
 - `data-card-id`: unique slug matching `PREVIEW_MAP` in previews.js and `CATEGORIES` in search.js
 - `data-added="YYYY-MM-DD"`: the day it shipped. Drives the Recently shipped rail and the self-expiring `New` badge (recent.js); no separate list to maintain
 - `data-status="soon"`: the tool's subdomain is reserved but serves nothing yet. The card is a `<div class="site-card soon-card">` with a `.soon-badge` where the arrow goes, **no `href`** (so it cannot navigate to a 404) and **no `data-added`** (nothing shipped). One attribute, read by every module that counts or navigates: the hero count and the search denominator skip it, the rail and the `New` badge skip it, palette.js shows a Soon chip and scrolls to the card instead of opening it, terminal.js keeps it out of `liveTools()` and has `goto` report the state. Search still finds it, and the search line reads `N of M tools · 1 coming soon`. To ship it: `<div>` → `<a href>`, badge → `.card-arrow`, drop `data-status`, add `data-added`
+- `data-status="archived"`: the tool still works and the domain is still up, but it is no longer what we would point someone at. The third card state, after live and Soon, and it fails the *opposite* way: a Soon card cannot be opened, an archived card can. It keeps its `href`, its arrow and its `data-added`, and gains an `.archived-badge`, a `.card-superseded` line naming what replaced it, a dashed border, a desaturated icon and a resting dim. It leaves every count that means a recommendation (the hero count, the search denominator, `stats`, `random`, `liveTools()`, the rail and the `New` badge) and stays fully findable: search scores it by name, `goto` and `whois` resolve it, the palette shows an `Archived` chip. The search line gets its own `N archived` segment for the same reason `soon` and `external` have one, a query that puts a card on screen must never report zero. Archived cards live in the **Archive** group at the foot of the catalog. Styling selectors are `.site-card.archived-card`, **not** `.archived-card`: that block sits above `.site-card` in `style.css` and at equal specificity the later rule wins. **The resting dim goes on `.card-content`, never on the card**, via `--card-rest-dim` (`.72` archived, `.78` Soon). Every catalog card runs `cardEnter` with `forwards`, and a filling animation's `to { opacity: 1 }` outranks a normal declaration on the same element, so `opacity` set on `.site-card` is inert. `.soon-card { opacity: .78 }` shipped dead for as long as Soon cards existed, and the hover rule that "restored" it was restoring nothing
 - `.card-name`, `.card-desc`, `.card-domain`, `.card-tag`: searchable text fields
 - `--card-glow` / `--card-accent` CSS custom properties: per-card neon colour
 
 `data-card-id` is the join key across search.js, previews.js, cards.js and sortable.js. The rail's clones therefore carry **`data-echo-id`** instead, same value, different attribute, which is what keeps a cloned card out of the search index, the drag-reorder, and the "N of M tools" count. Anything that walks cards should either scope itself to `#tools` or filter out `.site-card--echo`.
+
+### Group-level attributes
+
+Set on a `.card-group`, read by the modules named:
+
+| Attribute | Read by | Meaning |
+|---|---|---|
+| `data-collapsed="true"` | `collapse.js` | Ships closed behind a toggle. On **Archive** and **Platforms** |
+| `data-recent="off"` | `recent.js` | Out of the Recently shipped rail **and** the `New` badge. On **UI Lab** and **Archive** |
+
+**The Archive group is deliberately absent from `CATEGORIES` in `search.js`**, which breaks the 1:1 pill/group rule stated above. The rule exists to stop a pill filtering to zero results, and a group with no pill fails in the safe direction: an archived tool is still scored by name, it simply is not something the hero constellation offers. A pill would advertise the one shelf on the page the catalog argues against. `skillmap` was also removed from the Planning pill's `ids`, or clicking Planning would surface an archived tool as a current recommendation.
 
 Multi-tool cards (`.site-card.multi-tool`) show a `.card-subtool-popup` on click. Ghost cards (`.ghost-card`) are locked until clicked, then play an unlock sound.
 
@@ -145,6 +159,15 @@ Stored in `localStorage` key `neorgon-prefs`:
 ```
 `bg` values: `"stars"` | `"matrix"` | `"intervention"`
 
+Other keys the page owns:
+
+| Key | Owner | Shape |
+|---|---|---|
+| `neorgon-favorites` | favorites.js | `[{ id, pinned }]` |
+| `neorgon-collapsed` | collapse.js | `{ "group-archive": "open" }`, deviations from the shipped default only |
+| `neorgon-term-login` | terminal.js | ISO timestamp of the previous terminal open, for the banner's `Last login` |
+| `neorgon-ghost` | terminal.js / entrance.js | ids hidden by the admin `ghost` command |
+
 ### Adding a new tool card
 
 1. Add card HTML in `index.html` with a unique `data-card-id`, a `data-added="YYYY-MM-DD"` ship date, appropriate `--card-glow`/`--card-accent`, and an SVG icon in `assets/icons/`.
@@ -155,6 +178,17 @@ Stored in `localStorage` key `neorgon-prefs`:
 The rail, category chips, palette and terminal all read the DOM, so they pick the card up with no further edits. The hero tool count is computed too, don't hardcode it.
 
 If the subdomain is reserved but nothing is served there yet, add it as a **Soon card** instead (`data-status="soon"`, see the card data model above) and skip steps 3. A card that links to a domain we have not published sends visitors to a 404; a Soon card says so on its face and cannot.
+
+### Archiving a tool
+
+When a tool is superseded but the domain stays up (Skill Map, replaced by Pathfinder):
+
+1. Move the card into the **Archive** group at the foot of `index.html`. Keep the `href` and `data-added`, add `data-status="archived"` and the `archived-card` class, and recolour `--card-glow` / `--card-accent` to the archive grey `#8b8fa3`.
+2. Swap the tags row's neighbour: add an `.archived-badge` in `.card-top` before the arrow, and a `.card-superseded` line saying what replaced it and why. Name the replacement, "deprecated" on its own tells a visitor nothing about where to go instead.
+3. Remove the id from its old category's `ids` in `CATEGORIES` (`search.js`). Do **not** add it to a new one; see the Archive note under Group-level attributes.
+4. Run `make check` and stage the regenerated `docs/icon-sheet.html`, the sheet groups icons by section and accent, so moving a card changes it.
+
+Everything else follows from `data-status="archived"`: the counts, the rail, the badge, the palette chip and the terminal all read the attribute.
 
 ### Required scripts for all HTML pages
 

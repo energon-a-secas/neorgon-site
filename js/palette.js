@@ -52,6 +52,10 @@
              that serves nothing. A blank query sorts it last on its own, since
              the recency tie-break reads `added` and a Soon card has none. */
           soon: card.dataset.status === 'soon',
+          /* Opens normally — the domain is up. The chip is the whole
+             difference, and it is there so nobody picks it out of a ranked
+             list believing it is the current answer. */
+          archived: card.dataset.status === 'archived',
           el: card,
           href: href,
           haystack: (name + ' ' + desc + ' ' + domain + ' ' + tags.join(' ') + ' ' + groupLabel).toLowerCase()
@@ -147,6 +151,13 @@
         soon.className = 'pal-item-soon';
         soon.textContent = 'Soon';
         main.appendChild(soon);
+      }
+
+      if (it.archived) {
+        var arch = document.createElement('span');
+        arch.className = 'pal-item-archived';
+        arch.textContent = 'Archived';
+        main.appendChild(arch);
       }
 
       var dom = document.createElement('span');

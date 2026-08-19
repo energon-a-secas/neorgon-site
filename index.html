@@ -227,25 +227,6 @@
         </div>
       </a>
 
-      <!-- Skill Map -->
-      <a class="site-card" data-card-id="skillmap" data-added="2026-02-28"
-         href="https://skillmap.neorgon.com/"
-         style="--card-glow: rgba(167,139,250,.3); --card-glow-border: rgba(167,139,250,.35); --card-accent: #a78bfa;">
-        <div class="card-content">
-          <div class="card-top">
-            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/skill-roadmap.svg')"></span></div>
-            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-          </div>
-          <div class="card-domain">skillmap.neorgon.com</div>
-          <h3 class="card-name">Skill Map</h3>
-          <div class="card-desc">Plot your learning path on a visual grid. See what's blocked, what's done, and what to tackle next.</div>
-          <div class="card-tags">
-            <span class="card-tag">Planning</span>
-            <span class="card-tag">Learning</span>
-          </div>
-        </div>
-      </a>
-
       <!-- Doorman -->
       <a class="site-card" data-card-id="doorman" data-added="2026-07-28"
          href="https://doorman.neorgon.com/"
@@ -1420,7 +1401,7 @@
 
 
     <!-- ── Platforms ─────────────────────────────────────────────── -->
-    <div class="card-group" id="group-platforms" data-group="platforms" style="--group-color: #64748b">
+    <div class="card-group" id="group-platforms" data-group="platforms" data-collapsed="true" style="--group-color: #64748b">
       <h2 class="group-label"><span class="group-dot"></span> Platforms</h2>
       <div class="sites-grid">
 
@@ -1480,6 +1461,41 @@
             <span class="card-tag">Containers</span>
             <span class="card-tag">Images</span>
             <span class="card-tag">CI/CD</span>
+          </div>
+        </div>
+      </a>
+
+      </div>
+    </div>
+
+    <!-- ── Archive ─────────────────────────────────────────────────
+         Tools that still work and are still ours, but are no longer what we
+         would point someone at. Collapsed by default: the catalog above is a
+         recommendation, and an archived tool is the one thing on the page
+         arguing against it. Kept rather than deleted because the domain is
+         live, the links are out there, and a 404 is a worse answer than an
+         honest label. -->
+    <div class="card-group" id="group-archive" data-group="archive" data-collapsed="true" data-recent="off" style="--group-color: #8b8fa3">
+      <h2 class="group-label"><span class="group-dot"></span> Archive</h2>
+      <div class="sites-grid">
+
+      <!-- Skill Map — superseded by Pathfinder -->
+      <a class="site-card archived-card" data-card-id="skillmap" data-added="2026-02-28" data-status="archived"
+         href="https://skillmap.neorgon.com/"
+         style="--card-glow: rgba(139,143,163,.2); --card-glow-border: rgba(139,143,163,.25); --card-accent: #8b8fa3;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/skill-roadmap.svg')"></span></div>
+            <span class="archived-badge">Archived</span>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">skillmap.neorgon.com</div>
+          <h3 class="card-name">Skill Map</h3>
+          <div class="card-desc">Plot your learning path on a visual grid. See what's blocked, what's done, and what to tackle next.</div>
+          <div class="card-superseded">Superseded by Pathfinder, which maps the same ground with more room to work.</div>
+          <div class="card-tags">
+            <span class="card-tag">Planning</span>
+            <span class="card-tag">Learning</span>
           </div>
         </div>
       </a>
@@ -1665,7 +1681,8 @@
       <span class="term-title">neorgon · terminal</span>
     </div>
     <div class="term-body" id="termBody">
-      <div class="term-line sys">Welcome to Neorgon Terminal. Type "help" for commands.</div>
+      <!-- The login banner is printed by js/terminal.js on first open: it
+           reports the live catalog, so it cannot be written here. -->
       <div class="term-input-row">
         <span class="term-prompt">~ ❯ </span>
         <input class="term-input" id="termInput" type="text" aria-label="Terminal command" autocomplete="off" spellcheck="false">
@@ -1699,15 +1716,21 @@
 <!-- After recent.js: favorites.js uses the clone helper recent.js exports. -->
 <script defer src="js/favorites.js"></script>
 <script defer src="js/catnav.js"></script>
+<!-- After catnav.js: catnav builds its chip labels from .group-label textContent,
+     and collapse.js reparents that heading into a button. -->
+<script defer src="js/collapse.js"></script>
 <script defer src="js/palette.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     /* Scoped to #tools: the Recently shipped rail holds clones of these cards,
        and an unscoped selector would count every recent tool twice.
        Soon cards are excluded — "we made N tools" has to mean N things you can
-       actually open, or the number is a claim the page itself disproves. */
+       actually open, or the number is a claim the page itself disproves.
+       Archived cards are excluded for the mirror reason: they open, but the
+       sentence is a recommendation, and we are no longer making one. */
     var count = document.querySelectorAll(
-      '#tools .site-card:not(.external-card):not(.ghost-card):not([data-status="soon"])'
+      '#tools .site-card:not(.external-card):not(.ghost-card)' +
+      ':not([data-status="soon"]):not([data-status="archived"])'
     ).length;
     var el = document.getElementById('toolCount');
     if (el && count > 0) el.textContent = count;

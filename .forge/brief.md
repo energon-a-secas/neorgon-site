@@ -202,6 +202,10 @@ separate, boring, reliable surface.
 
 - `2026-08-18 18:11` NAVIGATION measured: search filter across 58 cards, 17 keystrokes with a forced synchronous layout after each, median 4.3ms and worst 24.3ms (the search-mode transition that moves cards between grids). Full-page scroll of 10456px produced 0 long tasks over 50ms. No horizontal scroll at 375, 601, 768 or 1265.
 
+- `2026-08-19 09:39` Archive is deliberately absent from search.js CATEGORIES, breaking the documented 1:1 pill/group rule. The rule exists to stop a pill filtering to zero; a group with no pill fails the safe way (still scored by name, just not offered by the constellation). A pill would advertise the one shelf on the page the catalog argues against.
+
+- `2026-08-19 09:53` Diagnosed 'expanding a collapsed group reveals invisible cards' and wrote a revealCards() fix for it. The diagnosis was wrong: the preview tab reported visibilityState hidden, which froze all 76 of the page's animations at currentTime 0, so every card on the page measured opacity 0, not just the ones in collapsed groups. Retested with revealCards disabled: expanding creates a FRESH cardEnter animation at time 0 which finishes at opacity 1, because the browser restarts animations when a subtree becomes rendered again. revealCards was removed. Lesson: opacity read from a hidden tab is not evidence.
+
 ## Measured
 
 All figures below were read out of a live page via `browser_evaluate` against
@@ -279,3 +283,60 @@ _Closed 2026-08-18 17:22._
 _Closed 2026-08-18 17:38._
 
 _Closed 2026-08-18 18:11._
+
+---
+
+## Run — 2026-08-19 09:35
+
+**Problem.** Hub surfaces treat reference tools as news, superseded tools as current, and the terminal opens on a bare one-line greeting
+
+**Approach.** Three surfaces, one shared idea: the hub currently has exactly one axis for a
+card, `data-added`, and it uses it to answer two different questions ("is this new?" and
+"should I lead with it?"). Split the axes.
+
+1. `data-recent="off"` on a `.card-group` opts the whole group out of *both* recency surfaces,
+   the Recently shipped rail and the self-expiring New badge. Applied to UI Lab, which is
+   reference material: a visitor scanning for what changed should not be handed a wireframe
+   glossary. Group-level, not per-card, so the next reference category needs no code change.
+2. `data-collapsed="true"` on a `.card-group` makes it a collapsible section, toggle built by
+   JS onto the existing `.group-label`, state persisted per group. Applied to a new Archive
+   group at the foot of the catalog and, at the user's request, to Platforms.
+3. `data-status="archived"` on a card is the third state next to `soon` and live: still
+   reachable, deliberately not recommended. Skill Map moves to Archive with a line naming
+   Pathfinder as what replaced it. Archived cards leave every count the way `soon` cards do
+   (hero, search denominator, `stats`, `random`, `liveTools`) but stay searchable and get
+   their own line in the search count, because a query that puts a card on screen must never
+   report zero.
+4. Terminal opens on an ASCII banner instead of one line of prose.
+
+**Rejected.** Marking Skill Map in place under Planning, next to Pathfinder, with only a badge.
+It is the smaller change and matches the `soon` precedent exactly, but the user asked for "a
+section to archive ideas", and leaving a superseded tool adjacent to its replacement keeps
+presenting a choice that has already been made.
+
+Also rejected: a per-card `data-recent="off"` on each UI Lab card. Six attributes to write now
+and one to remember forever on every future UI Lab addition, to buy a granularity nobody asked
+for.
+
+**Measured.**
+
+- The UI Lab opt-out is not cosmetic: `sortie` and `neokeys` (both shipped 2026-08-14, 5 days
+  old) held two of the six Recently shipped slots and carried `New` badges. Both are now out,
+  and `stash`, `runbook` and `hiringpack` took the slots back. Rail before: boardwright,
+  sortie, neokeys, proctor, stash, glassbox. After: boardwright, proctor, stash, glassbox,
+  runbook, hiringpack.
+- Hero count 47 to 46, matching `tools` in the terminal and the search denominator.
+- Search `skill map` reports `1 archived` rather than falling into the empty state. `planning`
+  reports `4 of 46 tools · 1 archived`, so the archived card is found, reported, and excluded
+  from the denominator at the same time.
+
+**Verification note.** The preview tab reported `visibilityState: hidden` for the whole
+session, which freezes every CSS animation at `currentTime: 0`. Catalog content therefore
+never painted, and screenshots of it are blank. The terminal banner was screenshotted (it is
+a fixed overlay with no entrance animation); everything else was verified through computed
+styles and the CSSOM, with `document.getAnimations().forEach(a => a.finish())` used to settle
+the entrance animations before reading opacity. One consequence worth carrying: a stale
+`css/style.css` was served from cache through a normal reload, and a specificity bug looked
+like an unfixed bug until a forced reload proved the fix had landed.
+
+_Closed 2026-08-19 10:01._

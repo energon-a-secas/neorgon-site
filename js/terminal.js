@@ -69,12 +69,160 @@
     setRateLimit({ attempts: 0, lockedUntil: 0 });
   }
 
+  /* ── Login banner ──────────────────────────────────────────────────────────
+     The terminal used to open on one line of prose baked into index.html. A
+     login banner is the shape this interface was already imitating, and it can
+     carry something the prose could not: the state of the catalog at the moment
+     you opened it, read from the same DOM every other command reads.
+
+     Two wordmarks, because `.term-body` is `white-space: pre-wrap` inside a box
+     that is `min(640px, 90vw)`. The block form is 66 columns and wraps into
+     confetti on a phone, so the width is measured rather than assumed. */
+  const BANNER_WIDE = [
+    '  ███╗   ██╗███████╗ ██████╗ ██████╗  ██████╗  ██████╗ ███╗   ██╗',
+    '  ████╗  ██║██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔═══██╗████╗  ██║',
+    '  ██╔██╗ ██║█████╗  ██║   ██║██████╔╝██║  ███╗██║   ██║██╔██╗ ██║',
+    '  ██║╚██╗██║██╔══╝  ██║   ██║██╔══██╗██║   ██║██║   ██║██║╚██╗██║',
+    '  ██║ ╚████║███████╗╚██████╔╝██║  ██║╚██████╔╝╚██████╔╝██║ ╚████║',
+    '  ╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝'
+  ];
+  const BANNER_NARROW = [
+    '  ┌┐┌┌─┐┌─┐┬─┐┌─┐┌─┐┌┐┌',
+    '  │││├┤ │ │├┬┘│ ┬│ ││││',
+    '  ┘└┘└─┘└─┘┴└─└─┘└─┘┘└┘'
+  ];
+
+  /* Columns the body can actually hold, measured off a probe in the body's own
+     font rather than guessed from a character-width constant that is wrong on
+     every machine without the first font in the stack. */
+  const FALLBACK_COLS = 80;
+
+  function termColumns() {
+    const probe = document.createElement('span');
+    probe.className = 'term-line';
+    probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;';
+    probe.textContent = 'M'.repeat(40);
+    body.appendChild(probe);
+    const per = probe.getBoundingClientRect().width / 40;
+    probe.remove();
+    if (!(per > 0)) return FALLBACK_COLS;
+
+    const style = getComputedStyle(body);
+    let inner = body.clientWidth -
+                parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+
+    /* An unlaid-out body measures 0 and this arithmetic goes negative, which
+       floors to a number below every threshold and silently serves the phone
+       banner to a desktop. Estimate from the box's own rule instead
+       (`min(640px, 90vw)` less the body padding), and only if that is also
+       unusable assume the 80 columns every terminal has had by default. */
+    if (!(inner > 0)) {
+      const vw = document.documentElement.clientWidth || window.innerWidth || 0;
+      inner = Math.min(640, vw * 0.9) - 32;
+    }
+    if (!(inner > 0)) return FALLBACK_COLS;
+
+    return Math.floor(inner / per);
+  }
+
+  const LOGIN_KEY = 'neorgon-term-login';
+
+  /* Real last-login, the way a real MOTD means it: the stored stamp is
+     overwritten on the way past, so the line always describes the previous
+     visit rather than this one. */
+  function lastLoginLine() {
+    let prev = null;
+    try { prev = localStorage.getItem(LOGIN_KEY); } catch (e) { /* private mode */ }
+    try { localStorage.setItem(LOGIN_KEY, new Date().toISOString()); } catch (e) { /* ditto */ }
+    if (!prev) return 'First login on this browser.';
+    const d = new Date(prev);
+    if (isNaN(d.getTime())) return 'First login on this browser.';
+    const stamp = d.toLocaleString(undefined, {
+      weekday: 'short', month: 'short', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+    return `Last login: ${stamp}`;
+  }
+
+  function relDaysLabel(iso) {
+    const d = relDays(iso);
+    if (d === null) return '';
+    if (d <= 0) return ' (today)';
+    return ` (${d}d ago)`;
+  }
+
+  /* `label ....... value`, the alignment every MOTD has used since before any
+     of these tools existed.
+
+     The leader narrows on a narrow terminal, and the wrapped remainder of a
+     long value hangs to the value column instead of returning to the margin.
+     Without it a phone renders "tools .......... 46 live · 1" and then
+     "archived · 4 external" hard against the left edge, which reads as a
+     second stat rather than the rest of the first one.
+
+     The indent is derived from the leader rather than typed into the
+     stylesheet: 3 spaces + label + space + dots (padded to `width`) + space
+     puts the value at column `width + 5`, and `ch` is exact in a monospace
+     face. One number, so the two cannot drift. */
+  function statLine(label, value, width) {
+    const dots = '.'.repeat(Math.max(1, width - label.length));
+    const line = addLine(`   ${label} ${dots} ${value}`, 'sys');
+    if (line) {
+      line.style.paddingLeft = (width + 5) + 'ch';
+      line.style.textIndent = '-' + (width + 5) + 'ch';
+    }
+  }
+
+  function printBanner() {
+    const cols = termColumns();
+    const narrow = cols < 68;
+    const art = narrow ? BANNER_NARROW : BANNER_WIDE;
+    art.forEach(row => addLine(row, 'banner'));
+    addLine('', 'sys');
+
+    const all = catalog();
+    const live = liveTools();
+    const archived = all.filter(t => t.archived).length;
+    const external = all.filter(t => t.external).length;
+    const groups = new Set(all.filter(t => !t.locked && t.group).map(t => t.group));
+    const dated = live.map(t => t.added).filter(Boolean).sort();
+    const last = dated.length ? dated[dated.length - 1] : '';
+    const fresh = live.filter(t => { const d = relDays(t.added); return d !== null && d <= 30; });
+
+    addLine('  NEORGON TOOLWORKS · web terminal', 'motd');
+    addLine(`  ${lastLoginLine()}`, 'sys');
+    addLine('', 'sys');
+
+    /* A 15-wide leader spends 20 of a phone's ~38 columns before the value
+       starts. Narrow the leader and shorten the one value that carries three
+       facts, rather than letting every line wrap. */
+    const w = narrow ? 9 : 15;
+    statLine('system', 'neorgon.com', w);
+    statLine('tools', narrow
+      ? `${live.length} live · ${archived} arch · ${external} ext`
+      : `${live.length} live · ${archived} archived · ${external} external`, w);
+    statLine('categories', groups.size, w);
+    if (last) statLine('last ship', last + relDaysLabel(last), w);
+    statLine('theme', (window.NeoHeader && window.NeoHeader.getTheme()) || 'default', w);
+    addLine('', 'sys');
+    if (fresh.length) {
+      addLine(`  * ${fresh.length} ${fresh.length === 1 ? 'tool' : 'tools'} shipped in the last 30 days. ` +
+              'Type "new" to see them.', 'motd');
+    }
+    addLine('  Type "help" for commands. Tab completes. Esc Esc closes.', 'sys');
+    addLine('', 'sys');
+  }
+
   /* ── Terminal open/close ── */
   function isOpen() { return overlay.classList.contains('open'); }
+
+  let bannerShown = false;
 
   function openTerm() {
     overlay.classList.add('open');
     if (window._neoSound) window._neoSound.termOpen();
+    /* Once per page load, like a login. Reprint on demand with "banner". */
+    if (!bannerShown) { bannerShown = true; printBanner(); }
     setTimeout(() => input.focus(), 50);
   }
 
@@ -106,6 +254,7 @@
     line.textContent = text;
     body.insertBefore(line, inputRow);
     body.scrollTop = body.scrollHeight;
+    return line;
   }
 
   function updatePrompt() {
@@ -148,6 +297,7 @@
           locked: el.classList.contains('ghost-card'),
           external: el.classList.contains('external-card'),
           soon: el.dataset.status === 'soon',
+          archived: el.dataset.status === 'archived',
           href: href,
           el: el
         };
@@ -157,10 +307,15 @@
   /* Live tools only — a locked ghost is not somewhere you can be sent, an
      external link is not one of ours, and a Soon tool has a reserved domain
      that serves nothing. Restricted to #tools so this matches the count the
-     hero claims; the ghosts sit outside it in the secret section. */
+     hero claims; the ghosts sit outside it in the secret section.
+
+     Archived tools are excluded too, which is what keeps `random` from
+     recommending the one tool the catalog has stopped recommending. `goto`
+     and `whois` still reach them: resolveTool works over the whole catalog,
+     so an archived tool is findable by name, just never volunteered. */
   function liveTools() {
     return catalog().filter(t =>
-      !t.locked && !t.external && !t.soon && t.el.closest('#tools'));
+      !t.locked && !t.external && !t.soon && !t.archived && t.el.closest('#tools'));
   }
 
   /* Resolve one argument to a tool: exact id, then name, then a unique prefix.
@@ -195,6 +350,11 @@
       addLine(`${tool.name} is not live yet — ${tool.domain} is reserved.`, 'err');
       addLine(`"whois ${tool.id}" for what it will be.`, 'sys');
       return;
+    }
+    /* Archived tools open normally — the domain is up and refusing would be a
+       lie about a working site. The line above the tab is the whole warning. */
+    if (tool.archived) {
+      addLine(`${tool.name} is archived — still up, no longer what we'd reach for.`, 'sys');
     }
     addLine(`Opening ${tool.name} — ${tool.domain}`, 'sys');
     window.open(tool.href, '_blank', 'noopener');
@@ -237,6 +397,7 @@
       addLine('Housekeeping:', 'sys');
       addLine('  help         — show this message', 'sys');
       addLine('  clear        — clear terminal', 'sys');
+      addLine('  banner       — reprint the login banner', 'sys');
       addLine('  whoami       — who are you?', 'sys');
       addLine('  fortune      — unsolicited advice', 'sys');
       addLine('  date         — current date', 'sys');
@@ -266,6 +427,14 @@
     },
     clear() {
       body.querySelectorAll('.term-line').forEach(l => l.remove());
+    },
+    /* `clear` is allowed to mean clear. This is how the login screen comes
+       back without reloading the page. */
+    banner() {
+      printBanner();
+    },
+    motd() {
+      printBanner();
     },
     warp() {
       addLine('Initiating warp sequence\u2026', 'sys');
@@ -334,6 +503,10 @@
          header + rail, so scrollIntoView lands correctly without repeating that
          arithmetic here — one owner for the offset, not two that can drift. */
       setTimeout(() => {
+        /* A collapsed group scrolled to is a heading with nothing under it,
+           which reads as a broken jump. collapse.js owns the state; ask it
+           rather than writing the attribute from here. */
+        if (window._neoCollapse) window._neoCollapse.expand(match.id);
         match.scrollIntoView({ block: 'start', behavior: 'smooth' });
       }, 220);
     },
@@ -459,6 +632,7 @@
       if (t.tags.length) addLine(`  tags      ${t.tags.join(', ')}`, 'sys');
       if (t.locked) addLine('  status    locked', 'sys');
       if (t.soon) addLine('  status    not shipped — domain reserved', 'sys');
+      if (t.archived) addLine('  status    archived — still up, no longer recommended', 'sys');
       addLine('', 'sys');
       if (!t.soon) addLine(`  goto ${t.id}`, 'sys');
     },
@@ -472,7 +646,8 @@
       const fresh = live.filter(t => { const d = relDays(t.added); return d !== null && d <= 30; });
       addLine('neorgon.com', 'sys');
       addLine(`  tools        ${live.length} live \u00b7 ${all.filter(t => t.locked).length} locked \u00b7 ` +
-              `${all.filter(t => t.external).length} external`, 'sys');
+              `${all.filter(t => t.external).length} external \u00b7 ` +
+              `${all.filter(t => t.archived).length} archived`, 'sys');
       addLine(`  categories   ${groups.size}`, 'sys');
       if (dated.length) {
         addLine(`  first ship   ${dated[0]}`, 'sys');

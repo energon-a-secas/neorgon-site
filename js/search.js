@@ -66,9 +66,15 @@
      only at a locked ghost card, so clicking it filtered the catalog to nothing.
      Keywords from those retired pills were folded into the groups that actually
      hold the cards, so no search term was lost. Keep `ids` in sync with the
-     group they name. */
+     group they name.
+
+     One group is deliberately absent: **Archive**. The 1:1 rule exists to stop
+     a pill filtering to nothing, and a group with no pill fails in the safe
+     direction — an archived tool is still scored by name, so `skillmap` is a
+     search away, it simply is not something the hero constellation offers.
+     A pill would advertise the one shelf on the page we are arguing against. */
   const CATEGORIES = [
-    { label: 'Planning',      color: '#4ade80', ids: ['pathfinder','skillmap','doorman','loadout'], keywords: 'planning visual canvas export learning roadmap pathfinder skill map strategy doorman build vs buy duplicate vendor deliverable cost estimate scope tokens engineers reverse engineer doorman fallacy loadout team meetings workload overload balance week manager distribution drag drop calendar bottle capacity' },
+    { label: 'Planning',      color: '#4ade80', ids: ['pathfinder','doorman','loadout'], keywords: 'planning visual canvas export learning roadmap pathfinder skill map strategy doorman build vs buy duplicate vendor deliverable cost estimate scope tokens engineers reverse engineer doorman fallacy loadout team meetings workload overload balance week manager distribution drag drop calendar bottle capacity' },
     { label: 'DevOps',        color: '#fbbf24', ids: ['infradrills','snippets','safeguard','lockdown','runbook'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell terminal commands bash powershell windows wsl macos git infra drills snippets lockdown security scanner endpoints headers incident runbook alert response on-call checklist cardforge card designer editor json export rush q game builder safeguard hardening guides accounts devices privacy' },
     { label: 'Data',          color: '#2dd4bf', ids: ['jsonstudio','references','sitrep'], keywords: 'data editor privacy api search json reference matrix scrambler viewer visualizer radar sitrep santiago chile earthquakes seismic weather forecast metro transit war room situation board dashboard usgs' },
     { label: 'Productivity',  color: '#a78bfa', ids: ['slides','promptforge','ogstudio','agentlore','glassbox','stash','resume-forge','stackrank','awesomesites','rigcheck','tickbox','mosaic'], keywords: 'productivity slides export audit presentation sage yaml pptx marp og preview design generator studio resume forge gaming pdf psn steam stack rank priority lists drag drop collaboration awesome sites curated bookmarks external api whiteboard prompt forge ai prompts context pathfinder agent lore glass box claude architect certification exam agent loop subagents coordinator mcp anti-patterns planning mode config claude.md under the hood simulation stash design assets inspiration icons ui kits pixel art music sprites itch.io submissions votes wishlist json api learning tutorials ai agent cursor commands skills path rigcheck camera settings review contradict sony a6700 video shooting picture profile tickbox todo to-do tasks checklist puter offline sync account boardwright board game design tabletop zones cards deck hand tableau discard rules phases actions win conditions spec brief blueprint prototype engine agent handoff export json png playtest mosaic photo collage grid masonry heart shape layout rearrange columns thumbnail meme caption impact text background remove cutout batch resize instagram story crop reframe' },
@@ -1043,6 +1049,7 @@
              !item.el.classList.contains('external-card') &&
              !item.el.classList.contains('site-card--echo') &&
              item.el.dataset.status !== 'soon' &&
+             item.el.dataset.status !== 'archived' &&
              !!item.el.closest('#tools');
     }
 
@@ -1073,9 +1080,19 @@
              !!i.el.closest('#tools');
     }).length;
 
+    /* Third occupant of the same trap. An archived tool is uncountable but
+       findable, so searching "skill map" would otherwise put a card on screen
+       under the words "No tools match your search." */
+    var archivedVisible = currentIndex.filter(function (i) {
+      return matchedIds.has(i.id) &&
+             i.el.dataset.status === 'archived' &&
+             !!i.el.closest('#tools');
+    }).length;
+
     renderCategoryChips(q, ranked.lit);
 
-    if (visible === 0 && soonVisible === 0 && externalVisible === 0) {
+    if (visible === 0 && soonVisible === 0 && externalVisible === 0 &&
+        archivedVisible === 0) {
       noResults.classList.add('show');
       countEl.textContent = '';
     } else {
@@ -1086,6 +1103,7 @@
       if (externalVisible > 0) {
         parts.push(externalVisible + ' external' + (externalVisible === 1 ? '' : 's'));
       }
+      if (archivedVisible > 0) parts.push(archivedVisible + ' archived');
       countEl.textContent = parts.join(' · ');
     }
 
