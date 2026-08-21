@@ -2,6 +2,7 @@
   const HOVER_DELAY = 1200;
   const PREVIEW_PATH = 'assets/previews/';
   const PREVIEW_MAP = {
+    floorplan: 'floorplan.gif',
     proctor: 'proctor.gif',
     primer: 'primer.gif',
     headmap: 'headmap.gif',
