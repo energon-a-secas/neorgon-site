@@ -284,6 +284,79 @@
     }, { passive: true });
   }
 
+  /* ── Analytics (fleet-wide, inert until configured) ──────────────────
+     Two beacons, one canonical switch: GoatCounter (pageviews + labelled
+     events, one site for the whole fleet, paths prefixed with the host)
+     and Cloudflare Web Analytics (zero-maintenance pageview baseline;
+     no events by design). Set the two constants HERE and re-run
+     sync-header.sh, never in a vendored copy. Empty string = that
+     beacon never loads, no network, no globals.
+
+     Guards, in order: only on *.neorgon.com (local dev and forks stay
+     silent); never for visitors sending Do Not Track or Global Privacy
+     Control; a site opts out entirely with
+     <meta name="neo-analytics" content="off">.
+
+     Share-link arrivals: a page opened with a payload in the URL
+     (#d= / #t= hash, ?src=, legacy ?yaml=) or an explicit ?via= marker
+     counts one GoatCounter event at share/<host>/<label>, which is the
+     number the 2026-08-20 platform plan's 30-day experiment reads. */
+  var GOATCOUNTER = 'https://neorgon.goatcounter.com/count';
+  var CF_TOKEN = '51ec560427e5479e8a06550a0f194b56';   // Cloudflare Web Analytics site token (public by design)
+
+  function shareArrivalLabel() {
+    var q = new URLSearchParams(location.search);
+    var via = q.get('via');
+    if (via) return (via.replace(/[^\w-]/g, '').slice(0, 32) || 'link');
+    if (/^#[dt]=./.test(location.hash)) return 'hash-payload';
+    if (q.get('src')) return 'src-url';
+    if (q.get('yaml')) return 'yaml-legacy';
+    return null;
+  }
+
+  (function initAnalytics() {
+    if (!GOATCOUNTER && !CF_TOKEN) return;
+    if (!/(^|\.)neorgon\.com$/.test(location.hostname)) return;
+    if (navigator.doNotTrack === '1' || navigator.globalPrivacyControl ||
+        window.globalPrivacyControl) return;
+    var meta = document.querySelector('meta[name="neo-analytics"]');
+    if (meta && meta.content === 'off') return;
+
+    if (CF_TOKEN) {
+      var cf = document.createElement('script');
+      cf.defer = true;
+      cf.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+      cf.setAttribute('data-cf-beacon', JSON.stringify({ token: CF_TOKEN }));
+      document.head.appendChild(cf);
+    }
+
+    if (GOATCOUNTER) {
+      /* Read the arrival label before any app code cleans the URL with
+         replaceState; this script evaluates first. */
+      var arrival = shareArrivalLabel();
+      window.goatcounter = {
+        endpoint: GOATCOUNTER,
+        path: function (p) { return location.host + p; }
+      };
+      var gc = document.createElement('script');
+      gc.async = true;
+      gc.src = 'https://gc.zgo.at/count.js';
+      gc.setAttribute('data-goatcounter', GOATCOUNTER);
+      if (arrival) {
+        gc.addEventListener('load', function () {
+          if (window.goatcounter && window.goatcounter.count) {
+            window.goatcounter.count({
+              path: 'share/' + location.host + '/' + arrival,
+              title: 'share arrival',
+              event: true
+            });
+          }
+        });
+      }
+      document.head.appendChild(gc);
+    }
+  })();
+
   /* ── Init ────────────────────────────────────────────────────────────── */
   function init() {
     applyTheme(currentTheme(), false);

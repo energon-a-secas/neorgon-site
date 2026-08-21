@@ -190,28 +190,15 @@ When a tool is superseded but the domain stays up (Skill Map, replaced by Pathfi
 
 Everything else follows from `data-status="archived"`: the counts, the rail, the badge, the palette chip and the terminal all read the attribute.
 
-### Required scripts for all HTML pages
+### Analytics (kit-owned, do not add per-page tags)
 
-Every HTML page must include these scripts immediately after the charset meta tag:
-
-1. **Plausible Analytics** (privacy-first):
-```html
-<!-- Privacy-first analytics -->
-<script defer data-domain="neorgon.com" src="https://plausible.io/js/script.js"></script>
-```
-
-2. **Google Analytics** (gtag.js):
-```html
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-HTF349S8R5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-HTF349S8R5');
-</script>
-```
-
-**Note:** When adding Google Analytics, update the Content Security Policy to include:
-- `https://www.googletagmanager.com` and `https://www.google-analytics.com` in `script-src`
-- `https://www.google-analytics.com` and `https://www.googletagmanager.com` in `img-src` and `connect-src`
+Removed 2026-08-20: the per-page Plausible and Google Analytics tags this section
+used to require. Analytics now lives in the vendored Header Kit
+(`js/neorgon-header.js`, canonical `packages/neorgon-ui/header/header.js`):
+GoatCounter (pageviews + share-arrival events) and Cloudflare Web Analytics
+(pageview baseline), both inert until the two constants at the top of the
+canonical kit file are set. Do not add analytics script tags to any page; when
+the beacons are enabled, the page's CSP needs `https://gc.zgo.at` and
+`https://static.cloudflareinsights.com` in `script-src` plus the GoatCounter
+endpoint and `https://cloudflareinsights.com` in `connect-src`. Rationale and
+rollout: `docs/plans/2026-08-20-agent-ready-platform-plan.md` (W0).
