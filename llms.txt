@@ -38,9 +38,9 @@ Neorgon tools cover planning and strategy, developer utilities, hiring and inter
 - [Primer](https://primer.neorgon.com/): Learn ML, LLMs, and data insights by building small local projects with tested copy-paste code, then scale to the pro stack
 - [Prompt Forge](https://promptforge.neorgon.com/): Prompt engineering workspace and reusable prompt library
 - [Questline](https://questline.neorgon.com/): Operating model as a NieR-style game console with command-palette search and chapter flowchart
-- [Radar](https://radar.neorgon.com/): Santiago de Chile situation board — live earthquakes, weather, air quality, Metro status, and official alerts on one tactical board
+- [Radar](https://radar.neorgon.com/): Santiago de Chile situation board, switchable to Bogotá, Lima, Mexico City and Buenos Aires: live earthquakes, weather, air quality, metro status and official alerts on one tactical board
 - [Reference Matrix](https://references.neorgon.com/): Enerbot Slack bot references, live regex, JSON API
-- [Resume Forge](https://resume.neorgon.com/): Gaming-inspired resume builder with PSN/Steam stats and PDF export
+- [Resume Forge](https://resume.neorgon.com/): CV builder, YAML in, PDF out: six templates, palettes and icon tiles, LinkedIn and JSON Resume import, local saves, vector PDF
 - [SafeGuard](https://safeguard.neorgon.com/): Security hardening guides for devices and accounts, bilingual EN/ES
 - [Skill Map](https://skillmap.neorgon.com/): Visual skill tree and learning path builder
 - [Snippets](https://snippets.neorgon.com/): 255 curated terminal commands for bash, git, macOS and Windows — search, pin and copy
