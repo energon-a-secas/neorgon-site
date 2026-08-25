@@ -308,7 +308,7 @@
     var q = new URLSearchParams(location.search);
     var via = q.get('via');
     if (via) return (via.replace(/[^\w-]/g, '').slice(0, 32) || 'link');
-    if (/^#[dt]=./.test(location.hash)) return 'hash-payload';
+    if (/^#[dts]=./.test(location.hash)) return 'hash-payload';
     if (q.get('src')) return 'src-url';
     if (q.get('yaml')) return 'yaml-legacy';
     return null;
