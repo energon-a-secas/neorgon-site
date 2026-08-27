@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#E326E4" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Stake: a life card standing (Ready) and one turned sideways (Spent), the bet -->
+  <!-- Enjeu: a life card standing (Ready) and one turned sideways (Spent), the bet -->
   <rect x="10" y="12" width="22" height="32" rx="4"/>
   <circle cx="21" cy="28" r="4" fill="#E326E4" stroke="none"/>
   <rect x="30" y="30" width="28" height="20" rx="4"/>

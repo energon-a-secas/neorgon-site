@@ -212,7 +212,7 @@ Three consequences worth knowing:
   not the HTML that declared it, so `assets/icons/x.svg` becomes `/css/assets/icons/x.svg`
   and every mask 404s silently, leaving invisible icons. Do not "tidy" these back.
 - **Only alpha survives.** A mask reads shape, not colour, so a part drawn at `opacity=".45"`
-  masks to 45% of the accent. That is how the de-emphasised halves of `tickbox.svg` and
+  masks to 45% of the accent. That is how the de-emphasised halves of `carnet.svg` and
   `minimap.svg` still read as secondary.
 - **Icons are `aria-hidden`.** They repeat the card's own name, so labelling them made a
   link announce "Pathfinder, pathfinder.neorgon.com, Pathfinder".
