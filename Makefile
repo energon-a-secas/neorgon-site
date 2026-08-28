@@ -4,7 +4,7 @@ PORT ?= 8800
 
 serve: ## Start local dev server
 	@echo "Serving on http://localhost:$(PORT)"
-	@python3 -m http.server $(PORT)
+	@if [ -f ../../scripts/serve.py ]; then python3 ../../scripts/serve.py $(PORT); else python3 -m http.server $(PORT); fi
 
 stop: ## Kill process using the dev server port
 	@pid=$$(lsof -ti:$(PORT)); \
