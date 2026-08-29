@@ -74,6 +74,54 @@
     document.querySelectorAll('.header-theme-menu [data-theme-id]').forEach(function (item) {
       item.setAttribute('aria-checked', String(item.getAttribute('data-theme-id') === name));
     });
+    tintFavicon(name);
+  }
+
+  /* ── Favicon tint: the tab icon joins the theme ──────────────────────
+     With a visitor theme active, the favicon becomes the site's own logo
+     silhouetted in that theme's swatch, so the tab matches the page
+     (sakura turns the icon pink too). Default restores the original.
+     Opt out per site with <meta name="neo-favicon" content="off">.
+     A cross-origin logo (CDN) is only canvas-readable with CORS; when it
+     is not, toDataURL throws and the original favicon simply stays. */
+  function tintFavicon(name) {
+    try {
+      var meta = document.querySelector('meta[name="neo-favicon"]');
+      if (meta && meta.content === 'off') return;
+      var link = document.querySelector('link[rel~="icon"]');
+      if (!link) return;
+      if (!link.getAttribute('data-neo-original')) {
+        link.setAttribute('data-neo-original', link.href);
+      }
+      if (name === 'default') {
+        link.href = link.getAttribute('data-neo-original');
+        return;
+      }
+      var theme = null;
+      for (var i = 0; i < THEMES.length; i++) {
+        if (THEMES[i].id === name) theme = THEMES[i];
+      }
+      var img = document.querySelector('.header-logo-img');
+      var src = img && (img.currentSrc || img.src);
+      if (!theme || !src) return;
+      var pic = new Image();
+      if (src.indexOf(location.origin) !== 0) pic.crossOrigin = 'anonymous';
+      pic.onload = function () {
+        try {
+          var c = document.createElement('canvas');
+          c.width = c.height = 64;
+          var ctx = c.getContext('2d');
+          var s = Math.min(64 / pic.width, 64 / pic.height);
+          var w = pic.width * s, h = pic.height * s;
+          ctx.drawImage(pic, (64 - w) / 2, (64 - h) / 2, w, h);
+          ctx.globalCompositeOperation = 'source-in';
+          ctx.fillStyle = theme.swatch;
+          ctx.fillRect(0, 0, 64, 64);
+          link.href = c.toDataURL('image/png');
+        } catch (e) { /* tainted canvas: keep the original favicon */ }
+      };
+      pic.src = src;
+    } catch (e) { /* the favicon must never break the header */ }
   }
 
   /* ── Dropdown controller: one open at a time, Esc / outside click,
