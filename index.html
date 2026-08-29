@@ -10,15 +10,15 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="preconnect" href="https://cdn.neorgon.org" crossorigin>
   <title>Neorgon | Made to Fit the Exact Problem</title>
-  <meta name="description" content="43 tools, each cut for one job. Free, local, no account, no subscription, and revised every time they fall short.">
+  <meta name="description" content="51 tools, each cut for one job. Free, local, no account, and the whole catalog is six months old.">
   <meta property="og:title" content="Neorgon: Made to Fit the Exact Problem">
-  <meta property="og:description" content="43 tools, each cut for one job. Free, local, no account.">
+  <meta property="og:description" content="51 tools, each cut for one job. Free, local, no account. Six months old.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://neorgon.com/">
   <meta property="og:site_name" content="Neorgon">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Neorgon: Made to Fit the Exact Problem">
-  <meta name="twitter:description" content="43 tools, each cut for one job. Free, local, no account.">
+  <meta name="twitter:description" content="51 tools, each cut for one job. Free, local, no account. Six months old.">
   <meta name="twitter:image" content="https://neorgon.com/og-preview.jpg">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://neorgon.com/">
@@ -34,7 +34,7 @@
     "@type": "WebSite",
     "name": "Neorgon",
     "url": "https://neorgon.com/",
-    "description": "43 tools, each cut for one job. Free, local, no account, no subscription, and revised every time they fall short.",
+    "description": "51 tools, each cut for one job. Free, local, no account, and the whole catalog is six months old.",
     "author": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" }
   }
   </script>
@@ -64,7 +64,7 @@
   <div class="nerv-warning-center">
     <div class="nerv-warning-label">警告</div>
     <div class="nerv-warning-sub">WARNING</div>
-    <div class="nerv-warning-type">PATTERN BLUE — ANGEL DETECTED</div>
+    <div class="nerv-warning-type">PATTERN BLUE · ANGEL DETECTED</div>
   </div>
   <div class="nerv-bar nerv-bar-bottom"></div>
 </div>
@@ -122,8 +122,8 @@
       <span class="neon-word" id="heroTyping"></span><span class="typing-cursor" id="typingCursor"></span>
     </h1>
     <p class="hero-sub">
-      <span id="toolCount">43</span> tools, each cut for one job. Nothing to sign up for,
-      nothing phoning home, and none of them are finished.
+      <span id="toolCount">51</span> tools, each cut for one job. Free, local,
+      no account. <span id="shipRecent">17</span> of them shipped in the last 30 days.
     </p>
     <div class="hero-search-wrap">
       <input class="hero-search" id="heroSearch" type="text" placeholder="Search tools, tags, or keywords…" aria-label="Search tools" autocomplete="off" spellcheck="false">
@@ -228,7 +228,7 @@
           </div>
           <div class="card-domain">doorman.neorgon.com</div>
           <h3 class="card-name">Doorman</h3>
-          <div class="card-desc">Scope the real cost of duplicating a vendor deliverable in-house — and price the invisible value you'd lose by firing the doorman.</div>
+          <div class="card-desc">Scope the real cost of duplicating a vendor deliverable in-house, and price the invisible value you'd lose by firing the doorman.</div>
           <div class="card-tags">
             <span class="card-tag">Build vs Buy</span>
             <span class="card-tag">Estimation</span>
@@ -1834,16 +1834,44 @@
   document.addEventListener('DOMContentLoaded', function() {
     /* Scoped to #tools: the Recently shipped rail holds clones of these cards,
        and an unscoped selector would count every recent tool twice.
-       Soon cards are excluded — "we made N tools" has to mean N things you can
+       Soon cards are excluded: "we made N tools" has to mean N things you can
        actually open, or the number is a claim the page itself disproves.
        Archived cards are excluded for the mirror reason: they open, but the
        sentence is a recommendation, and we are no longer making one. */
-    var count = document.querySelectorAll(
+    var cards = document.querySelectorAll(
       '#tools .site-card:not(.external-card):not(.ghost-card)' +
       ':not([data-status="soon"]):not([data-status="archived"])'
-    ).length;
+    );
+    var count = cards.length;
     var el = document.getElementById('toolCount');
     if (el && count > 0) el.textContent = count;
+
+    /* The tempo claim, from the same cards. 51 tools in six months with 17 in
+       the last month is the whole "fast iterations" position, and until
+       2026-08-28 the page stated it as "none of them are finished", which a
+       reader deciding whether to trust a tool reads as risk rather than pace.
+       Derived, because a hand-typed figure here would be stale within a week
+       and VOICE.md forbids a counter that claims more than the code verifies.
+       The static fallback in the HTML is allowed to understate, never to
+       overstate: smoke check 21 enforces that direction. */
+    var cut = new Date();
+    cut.setDate(cut.getDate() - 30);
+    /* Compare ISO date strings, not Date objects. data-added is date-only, so
+       new Date(d) is UTC midnight while a cutoff built from the clock carries
+       today's time: a card added exactly 30 days ago falls on the wrong side,
+       and the local timezone moves the boundary again. That is how this same
+       window returned 17 in smoke check 21 and 15 in the browser. Lexical
+       comparison on YYYY-MM-DD is exact and has no timezone. */
+    var cutoff = cut.getFullYear() + '-' +
+                 String(cut.getMonth() + 1).padStart(2, '0') + '-' +
+                 String(cut.getDate()).padStart(2, '0');
+    var recent = 0;
+    cards.forEach(function (c) {
+      var d = c.getAttribute('data-added');
+      if (d && d >= cutoff) recent++;
+    });
+    var rel = document.getElementById('shipRecent');
+    if (rel && recent > 0) rel.textContent = recent;
   });
 </script>
 

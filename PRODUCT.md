@@ -18,6 +18,12 @@ Neorgon.com is the **canonical hub** for a constellation of AI-assisted, open, p
 
 **Three words:** capable, generous, electric.
 
+**The position:** custom tailored tools for fast iterations and modern work. The
+tempo is the differentiator and it is measurable: 51 usable tools, the oldest six
+months old, 17 added in the last 30 days. State it as pace, never as
+incompleteness. See `docs/reviews/neorgon-site/2026-08-28-brand-perception-audit.md`
+in the private root repo.
+
 **Emotional goals:** relief (finally, one sane index), curiosity (what else is here?), and quiet pride in shipping useful things without a paywall or signup wall.
 
 ## Anti-references

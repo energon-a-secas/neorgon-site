@@ -38,18 +38,23 @@
 (function () {
   const el = document.getElementById('badgeText');
   if (!el) return;
-  /* What the badge is for: the terms of use, in four words, on rotation. Free,
-     local, one job each, never finished — the same four claims the hero makes,
-     said in turn so none of them has to crowd the heading. */
+  /* What the badge is for: the terms of use, in four words, on rotation, saying
+     in turn what the heading has no room for.
+
+     Rebalanced 2026-08-28. Five of the eight were negations and one of those
+     ("Still being improved") apologised for the thing that is actually the
+     point: 51 tools in six months, 17 of them in the last month. A refusal
+     earns its place when it is the differentiator, so "No account" and "Nothing
+     phones home" stay. The rest now say what the reader gets. */
   const phrases = [
     'Free \u00b7 Local \u00b7 No account',
     'One job each \u00b7 No suites',
     'Sharpened, then sharpened again',
     'Your data never leaves the tab',
-    'Replaces a subscription \u00b7 Costs nothing',
+    'Six months old \u00b7 Still shipping',
     'Nothing phones home',
-    'Cut to fit \u00b7 Not licensed',
-    'Still being improved',
+    'Cut to fit \u00b7 Yours to keep',
+    'Shipped this month \u00b7 Shipping next',
   ];
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   let idx = 0;
@@ -71,7 +76,7 @@
    way up, because by then the reader has seen what it was advertising.
 
    Clicking it jumps to the first section below the hero rather than to a fixed
-   offset — the favorites shelf, the rail and the catalog take turns being that
+   offset: the favorites shelf, the rail and the catalog take turns being that
    section depending on what the visitor has saved. */
 (function () {
   var cue = document.getElementById('scrollCue');
@@ -110,3 +115,4 @@
   /* A reload restores scroll position before this runs. */
   onScroll();
 })();
+
