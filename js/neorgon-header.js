@@ -278,13 +278,17 @@
 
     /* Movable = any direct child not marked data-keep-mobile. Covers plain
        buttons/links and grouped controls (.header-btn-group divs, navs) —
-       groups travel into the menu as a unit so their listeners survive. */
-    var movable = Array.prototype.filter.call(actions.children, function (el) {
-      return el !== overflow &&
-             !el.hasAttribute('data-keep-mobile') &&
-             !el.classList.contains('header-theme') &&
-             el.matches('button, a, div, nav');
-    });
+       groups travel into the menu as a unit so their listeners survive.
+       A live query, not an init-time snapshot: a control injected after
+       init (site JS, or the kit's own source link) still collapses. */
+    function movable() {
+      return Array.prototype.filter.call(actions.children, function (el) {
+        return el !== overflow &&
+               !el.hasAttribute('data-keep-mobile') &&
+               !el.classList.contains('header-theme') &&
+               el.matches('button, a, div, nav');
+      });
+    }
 
     return { actions: actions, overflow: overflow, menu: menu, movable: movable };
   }
@@ -292,9 +296,12 @@
   function syncOverflow(state) {
     if (!state) return;
     if (mq.matches) {
-      state.movable.forEach(function (el) { state.menu.appendChild(el); });
+      state.movable().forEach(function (el) { state.menu.appendChild(el); });
     } else {
-      state.movable.forEach(function (el) { state.actions.insertBefore(el, state.overflow); });
+      /* Restore everything the menu holds (copy first: the list is live). */
+      Array.prototype.slice.call(state.menu.children).forEach(function (el) {
+        state.actions.insertBefore(el, state.overflow);
+      });
       if (state.menu === openMenu) closeMenu();
     }
     state.overflow.hidden = state.menu.children.length === 0;
@@ -530,7 +537,38 @@
     });
   }
 
+  /* ── Source link (opt-in) ────────────────────────────────────────────── */
+  /* <meta name="neo-source-link" content="on"> renders a GitHub mark in
+     .header-actions linking the repo from the same neo-repo meta the
+     footer's Source line reads (full URL or org/repo shorthand, normalized
+     identically so the two links can never disagree). Always the repo,
+     never the org; no star counts (the fleet's CSPs block api.github.com). */
+  function buildSourceLink(header) {
+    var meta = document.querySelector('meta[name="neo-repo"]');
+    var repo = meta && meta.content ? meta.content.trim() : '';
+    if (!repo) return;
+    var right = header.querySelector('.header-right');
+    if (!right) return;
+    var actions = header.querySelector('.header-actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'header-actions';
+      right.insertBefore(actions, right.firstChild);
+    }
+    var a = document.createElement('a');
+    a.className = 'header-source';
+    a.href = /^https?:/.test(repo) ? repo : 'https://github.com/' + repo;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.title = 'Star on GitHub';
+    a.setAttribute('aria-label', 'Star on GitHub');
+    a.innerHTML = '<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>';
+    actions.appendChild(a);
+  }
+
   /* ── Init ────────────────────────────────────────────────────────────── */
+  var overflowState = null;
+
   function init() {
     applyTheme(currentTheme(), false);
 
@@ -545,7 +583,10 @@
     if (document.querySelector('meta[name="neo-theme-switcher"][content="on"]')) {
       buildThemeSwitcher(header);
     }
-    var overflowState = buildOverflow(header);
+    if (document.querySelector('meta[name="neo-source-link"][content="on"]')) {
+      buildSourceLink(header);
+    }
+    overflowState = buildOverflow(header);
     syncOverflow(overflowState);
     mq.addEventListener('change', function () { syncOverflow(overflowState); });
     initAutoHide(header);
@@ -562,6 +603,9 @@
     themes: THEMES.map(function (t) { return t.id; }),
     list: THEMES,
     getTheme: currentTheme,
-    setTheme: function (name) { applyTheme(name); }
+    setTheme: function (name) { applyTheme(name); },
+    /* For site JS that injects a header control after init: re-run the
+       overflow sync so the new control collapses on mobile immediately. */
+    syncOverflow: function () { syncOverflow(overflowState); }
   };
 })();
