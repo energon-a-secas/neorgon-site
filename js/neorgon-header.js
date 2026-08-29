@@ -411,6 +411,125 @@
     }
   })();
 
+  /* ── Epigraph: the subtitle rests in French, resolves to English ──────
+     Author the ENGLISH as the element's real text and put the French in
+     `data-fr`. That order matters: with JS off, or before this runs, the
+     visitor reads the honest description rather than an untranslated
+     ornament. The French is an enhancement layered on top.
+
+         <div class="header-subtitle" data-fr="Faites vos gammes.">
+           Game patterns, and the drills that prove them</div>
+
+     Hovering or focusing the title scrambles one into the other. The
+     animating span is aria-hidden and a visually hidden twin carries the
+     English, so assistive tech reads a stable sentence instead of a stream
+     of decoding glyphs. ──────────────────────────────────────────────── */
+  var GLYPHS = '#$%&*+<>?@[]^_{}~/|';          /* no em dash: smoke check 12 */
+  var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function scramble(span, to, toLang) {
+    if (span._raf) cancelAnimationFrame(span._raf);
+    if (REDUCED.matches) { span.textContent = to; span.lang = toLang; return; }
+
+    var from = span.textContent, len = Math.max(from.length, to.length), q = [], i;
+    for (i = 0; i < len; i++) {
+      q.push({
+        from: from.charAt(i), to: to.charAt(i), ch: '',
+        start: Math.floor(Math.random() * 16),
+        end: Math.floor(Math.random() * 16) + 16
+      });
+    }
+    var frame = 0;
+    (function tick() {
+      var out = '', settled = 0, j, it;
+      for (j = 0; j < q.length; j++) {
+        it = q[j];
+        if (frame >= it.end) { settled++; out += it.to; }
+        else if (frame >= it.start) {
+          /* Spaces hold their place, so the phrase keeps its word rhythm
+             while the letters churn. */
+          if (it.to === ' ') out += ' ';
+          else {
+            if (!it.ch || Math.random() < 0.28) it.ch = GLYPHS.charAt(Math.floor(Math.random() * GLYPHS.length));
+            out += it.ch;
+          }
+        } else out += it.from;
+      }
+      span.textContent = out;
+      if (settled === q.length) { span.lang = toLang; span._raf = 0; return; }
+      frame++;
+      span._raf = requestAnimationFrame(tick);
+    })();
+  }
+
+  function initEpigraph(header) {
+    var sub = header.querySelector('.header-subtitle[data-fr]');
+    if (!sub) return;
+    /* A subtitle owned by a runtime translation system is not ours to rewrite.
+       The i18n pass would either overwrite the epigraph or capture mid-scramble
+       glyphs as its source string, and both fail silently. Bilingual sites opt
+       out by construction rather than by remembering not to add data-fr. */
+    if (sub.hasAttribute('data-i18n')) return;
+    var fr = (sub.getAttribute('data-fr') || '').trim();
+    var en = sub.textContent.trim();
+    if (!fr || !en) return;
+
+    var span = document.createElement('span');
+    span.className = 'neo-epi';
+    span.setAttribute('aria-hidden', 'true');
+    span.lang = 'fr';
+    span.textContent = fr;
+
+    var sr = document.createElement('span');
+    sr.className = 'neo-epi-sr';
+    sr.textContent = en;
+
+    sub.textContent = '';
+    sub.appendChild(span);
+    sub.appendChild(sr);
+
+    /* Reserve the wider of the two so the header does not jitter when the
+       phrase changes length mid-animation. Skipped when the subtitle is
+       hidden (mobile), where offsetWidth is 0 and there is no hover anyway. */
+    if (span.offsetWidth) {
+      var wFr = span.offsetWidth;
+      span.textContent = en;
+      var wEn = span.offsetWidth;
+      span.textContent = fr;
+      sub.style.minWidth = Math.max(wFr, wEn) + 'px';
+    }
+
+    /* The title link is already focusable, so keyboard users get this for
+       free and no new tab stop is introduced inside the header. */
+    var trigger = sub.closest('.header-title-link') || sub;
+
+    /* Track the target language rather than a shown/hidden boolean. A boolean
+       desyncs whenever mouseenter fires without its mouseleave, which is what
+       happens when the tab is switched mid-hover: the flag stays true, and
+       every later hover is a no-op. Comparing against the target cannot drift. */
+    var target = 'fr';
+    function to(lang) {
+      if (target === lang) return;
+      target = lang;
+      scramble(span, lang === 'en' ? en : fr, lang);
+    }
+    trigger.addEventListener('mouseenter', function () { to('en'); });
+    trigger.addEventListener('mouseleave', function () { to('fr'); });
+    trigger.addEventListener('focus', function () { to('en'); });
+    trigger.addEventListener('blur', function () { to('fr'); });
+
+    /* requestAnimationFrame stops in a hidden tab, so a scramble caught by a
+       tab switch freezes with decoding glyphs on screen and the visitor sees
+       that garbage when they come back. Settle immediately instead. */
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden || !span._raf) return;
+      cancelAnimationFrame(span._raf);
+      span._raf = 0;
+      span.textContent = target === 'en' ? en : fr;
+      span.lang = target;
+    });
+  }
+
   /* ── Init ────────────────────────────────────────────────────────────── */
   function init() {
     applyTheme(currentTheme(), false);
@@ -430,6 +549,7 @@
     syncOverflow(overflowState);
     mq.addEventListener('change', function () { syncOverflow(overflowState); });
     initAutoHide(header);
+    initEpigraph(header);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

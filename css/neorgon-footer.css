@@ -161,6 +161,15 @@ body.neo-footer-root {
 .neo-footer-sep { opacity: .4; user-select: none; }
 
 /* Version / updated stamps — mono + tabular so they never jitter */
+/* The end mark. Ornament only: it states nothing the page needs, which is
+   why it is safe to render in a language most visitors do not read. */
+.neo-footer-fin {
+  font-style: italic;
+  letter-spacing: .08em;
+  color: var(--footer-text-dim, var(--header-text-dim));
+  opacity: .75;
+}
+
 .neo-footer-stamp {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
   font-variant-numeric: tabular-nums;

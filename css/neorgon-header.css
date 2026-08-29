@@ -440,6 +440,20 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   white-space: nowrap;
 }
 
+/* Epigraph: the animating half of a bilingual subtitle. The glyph churn is
+   decoration, so it is aria-hidden and .neo-epi-sr carries the real sentence
+   for assistive tech. Both live inside .header-subtitle, which keeps the
+   existing nowrap and mobile-hide behaviour unchanged. */
+.neo-epi { font-variant-ligatures: none; }
+.neo-epi-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* ── Right cluster: actions + theme toggle + home ────────────── */
 .header-right {
   margin-left: auto;

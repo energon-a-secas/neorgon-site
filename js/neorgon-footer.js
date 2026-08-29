@@ -207,6 +207,16 @@
 
     if (!items.length) return null;
 
+    /* The end mark leads the bar, so it reads as a colophon: "Fin. · Part of
+       Neorgon · Source". Added only when a bar already exists, so a site that
+       renders no bar today does not grow one (and its height budget holds).
+       lang="fr" or a screen reader says the English word for a fish's fin. */
+    if (footer.getAttribute('data-fin') !== 'off') {
+      var fin = el('span', 'neo-footer-fin', 'Fin.');
+      fin.lang = 'fr';
+      items.unshift(fin);
+    }
+
     var bar = el('div', 'neo-footer-bar');
     /* Content mode splits the bar: © on the left, everything else right. */
     var host = bar;
