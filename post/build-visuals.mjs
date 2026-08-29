@@ -39,7 +39,7 @@ const DAY = 86400000;
 function readCatalog() {
   const html = read('index.html');
   const chunks = html.split(/<div[^>]*class="card-group[^"]*"[^>]*id="(group-[a-z-]+)"/);
-  if (chunks.length < 3) throw new Error('index.html: no .card-group sections matched — did the markup change?');
+  if (chunks.length < 3) throw new Error('index.html: no .card-group sections matched, did the markup change?');
 
   const groups = [];
   for (let i = 1; i < chunks.length; i += 2) {
@@ -66,7 +66,7 @@ function readConstants() {
   const catnav = read('js/catnav.js');
   const one = (src, re, what) => {
     const m = src.match(re);
-    if (!m) throw new Error(`could not read ${what} — the constant moved`);
+    if (!m) throw new Error(`could not read ${what}: the constant moved`);
     return Number(m[1]);
   };
   return {
@@ -136,7 +136,7 @@ function recencyMap() {
     <text x="${x - 26}" y="${y + 25}" text-anchor="end" fill="${fresh ? INK : MUTE}" font-size="22" font-weight="${fresh ? 600 : 400}">${esc(g.label)}</text>
     <rect x="${x}" y="${y + 6}" width="${full.toFixed(1)}" height="28" rx="6" fill="rgba(255,255,255,.07)"/>
     ${fresh ? `<rect x="${x}" y="${y + 6}" width="${hot.toFixed(1)}" height="28" rx="6" fill="${ACCENT}" fill-opacity=".92"/>` : ''}
-    <text x="${x + full + 20}" y="${y + 27}" fill="${fresh ? ACCENT : MUTE}" font-size="20" font-weight="${fresh ? 700 : 400}">${fresh ? `${fresh} new` : '—'}</text>`;
+    <text x="${x + full + 20}" y="${y + 27}" fill="${fresh ? ACCENT : MUTE}" font-size="20" font-weight="${fresh ? 700 : 400}">${fresh ? `${fresh} new` : '-'}</text>`;
     y += 46;
     return row;
   }).join('');
@@ -176,7 +176,7 @@ function offsetChain() {
   const consumers = [
     {
       name: 'scroll-margin-top', on: 'on every .card-group',
-      was: `was a JS scroll fix, overwritten by Chrome's own re-jump — the heading sat at top: ${wasAt}`,
+      was: `was a JS scroll fix, overwritten by Chrome's own re-jump. The heading sat at top: ${wasAt}`,
     },
     {
       name: '--cat-rail-top', on: "the rail's own sticky top",
@@ -184,7 +184,7 @@ function offsetChain() {
     },
     {
       name: `readingLine()  (+${K.linePad})`, on: 'which chip lights up',
-      was: 'was computed apart and 8px adrift — lit the section above the one you jumped to',
+      was: 'was computed apart and 8px adrift: lit the section above the one you jumped to',
     },
   ];
 

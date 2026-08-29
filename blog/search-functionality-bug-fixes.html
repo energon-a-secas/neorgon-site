@@ -105,7 +105,7 @@
 
   <main class="article-content">
     <article>
-      <p>We built <a href="https://neorgon.com">neorgon.com</a> to showcase 31 open-source tools we've built over the past few years. The hub is deceptively simple: a searchable grid of cards, each linking to a tool. Under the hood, we've added physics simulations, draggable reordering, and animated search results. It's all vanilla JavaScript—no React, no Vue, no framework. Just plain old DOM manipulation.</p>
+      <p>We built <a href="https://neorgon.com">neorgon.com</a> to showcase 31 open-source tools we've built over the past few years. The hub is deceptively simple: a searchable grid of cards, each linking to a tool. Under the hood, we've added physics simulations, draggable reordering, and animated search results. It's all vanilla JavaScript-no React, no Vue, no framework. Just plain old DOM manipulation.</p>
 
       <p>And that's where things went wrong.</p>
 
@@ -117,7 +117,7 @@
 
       <h2>The Setup: How Search Works</h2>
 
-      <p>Before we dive into the bug, let's understand the architecture. Our hub is split into "groups"—Planning, DevOps, Data, Productivity, etc. Each group has a label and a <code>.sites-grid</code> container with cards. We use CSS Grid for layout:</p>
+      <p>Before we dive into the bug, let's understand the architecture. Our hub is split into "groups"-Planning, DevOps, Data, Productivity, etc. Each group has a label and a <code>.sites-grid</code> container with cards. We use CSS Grid for layout:</p>
 
       <div class="code-block">
         <span class="code-label">HTML Structure</span>
@@ -137,7 +137,7 @@
         <li><strong>Consolidation:</strong> Matching cards get moved from their groups into a special "search results grid" at the top of the page.</li>
       </ol>
 
-      <p>Why move cards? We wanted a clean, unified results view. No group labels, no empty sections—just the matching cards in one grid.</p>
+      <p>Why move cards? We wanted a clean, unified results view. No group labels, no empty sections-just the matching cards in one grid.</p>
 
       <p>When you clear the search, the code should:</p>
 
@@ -186,11 +186,11 @@
 
       <h4>Bug #1: DOM References vs. Live Collections</h4>
 
-      <p>Here's the first problem: <code>currentCards</code> is created at the start of the function. It captures all cards that exist in the DOM right now—including cards that are <em>already in the search grid</em>.</p>
+      <p>Here's the first problem: <code>currentCards</code> is created at the start of the function. It captures all cards that exist in the DOM right now-including cards that are <em>already in the search grid</em>.</p>
 
       <p>Then, we move cards from the search grid back to their groups. But <code>currentCards</code> still has references to those cards in their <em>old positions</em>.</p>
 
-      <p>When we try to make all cards visible by iterating through <code>currentCards</code>, we're operating on stale references. If a card has moved, we might be manipulating a node that's no longer where we think it is—or worse, manipulating the <em>same</em> card twice.</p>
+      <p>When we try to make all cards visible by iterating through <code>currentCards</code>, we're operating on stale references. If a card has moved, we might be manipulating a node that's no longer where we think it is-or worse, manipulating the <em>same</em> card twice.</p>
 
       <h4>Bug #2: Appending to the Wrong Container</h4>
 
@@ -215,11 +215,11 @@
         <li>The cards that were in the search grid are still in the grid, but now we reference them as if they're in their original groups</li>
       </ol>
 
-      <p>Result: some cards ended up in limbo—copied into the search grid during filtering, but never moved back during cleanup.</p>
+      <p>Result: some cards ended up in limbo-copied into the search grid during filtering, but never moved back during cleanup.</p>
 
       <div class="highlight-box">
         <h4>The Root Cause</h4>
-        <p>The real problem wasn't the code—it was <em>when</em> we ran the code. We were rebuilding the DOM while trying to filter based on the old DOM state.</p>
+        <p>The real problem wasn't the code-it was <em>when</em> we ran the code. We were rebuilding the DOM while trying to filter based on the old DOM state.</p>
       </div>
 
       <h2>The Fix: Clear, Build, Filter</h2>
@@ -371,7 +371,7 @@ console.log('Current cards array:', currentCards.length);</code></pre>
         <li>Explicit about cleanup before new operations</li>
       </ul>
 
-      <p>Sometimes the best code isn't clever—it's clear.</p>
+      <p>Sometimes the best code isn't clever-it's clear.</p>
 
       <p>And if you're wondering: yes, the search works now. Try it at <a href="https://neorgon.com">neorgon.com</a>. Type something, hit backspace, and watch the cards swarm back like starlings. It's beautiful when it works.</p>
 

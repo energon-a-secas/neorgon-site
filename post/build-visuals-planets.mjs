@@ -42,7 +42,7 @@ function categories() {
       ids: ids[1].split(',').map(s => s.trim().replace(/^'|'$/g, '')).filter(Boolean),
     });
   }
-  if (!out.length) throw new Error('CATEGORIES not parsed — did the array shape change?');
+  if (!out.length) throw new Error('CATEGORIES not parsed: did the array shape change?');
   return out;
 }
 
@@ -59,7 +59,7 @@ function scores() {
 /** The standing depth each pill gets, computed with the module's own formula. */
 function depths(n) {
   const m = /var depth = ([\d.]+) \+ \(\(i \* (\d+)\) % (\d+)\) \/ \3 \* ([\d.]+);/.exec(SRC);
-  if (!m) throw new Error('depth formula not parsed — it moved or changed shape');
+  if (!m) throw new Error('depth formula not parsed: it moved or changed shape');
   const [, base, stride, period, span] = m;
   return Array.from({ length: n }, (_, i) =>
     +base + ((i * +stride) % +period) / +period * +span);

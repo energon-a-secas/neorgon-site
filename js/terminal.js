@@ -347,16 +347,16 @@
        asking about — but opening one would land on a reserved domain that
        serves nothing, so it reports the state instead of proving it. */
     if (tool.soon) {
-      addLine(`${tool.name} is not live yet — ${tool.domain} is reserved.`, 'err');
+      addLine(`${tool.name} is not live yet: ${tool.domain} is reserved.`, 'err');
       addLine(`"whois ${tool.id}" for what it will be.`, 'sys');
       return;
     }
     /* Archived tools open normally — the domain is up and refusing would be a
        lie about a working site. The line above the tab is the whole warning. */
     if (tool.archived) {
-      addLine(`${tool.name} is archived — still up, no longer what we'd reach for.`, 'sys');
+      addLine(`${tool.name} is archived: still up, no longer what we'd reach for.`, 'sys');
     }
-    addLine(`Opening ${tool.name} — ${tool.domain}`, 'sys');
+    addLine(`Opening ${tool.name}: ${tool.domain}`, 'sys');
     window.open(tool.href, '_blank', 'noopener');
   }
 
@@ -370,59 +370,59 @@
   const publicCommands = {
     help() {
       addLine('Find things:', 'sys');
-      addLine('  tools [cat]  — list tools, optionally one category', 'sys');
-      addLine('  categories   — list categories with counts', 'sys');
-      addLine('  new          — what shipped recently', 'sys');
-      addLine('  search <q>   — filter the catalog', 'sys');
-      addLine('  whois <tool> — details on one tool', 'sys');
-      addLine('  stats        — numbers about this site', 'sys');
+      addLine('  tools [cat]: list tools, optionally one category', 'sys');
+      addLine('  categories: list categories with counts', 'sys');
+      addLine('  new: what shipped recently', 'sys');
+      addLine('  search <q>: filter the catalog', 'sys');
+      addLine('  whois <tool>: details on one tool', 'sys');
+      addLine('  stats: numbers about this site', 'sys');
       addLine('', 'sys');
       addLine('Go places:', 'sys');
-      addLine('  goto <tool>  — open a tool (id, name or prefix)', 'sys');
-      addLine('  open <cat>   — scroll to a category', 'sys');
-      addLine('  random       — open something at random', 'sys');
+      addLine('  goto <tool>: open a tool (id, name or prefix)', 'sys');
+      addLine('  open <cat>: scroll to a category', 'sys');
+      addLine('  random: open something at random', 'sys');
       addLine('', 'sys');
       addLine('Make it yours:', 'sys');
-      addLine('  favs         — your saved tools', 'sys');
-      addLine('  fav <tool>   — save or unsave one', 'sys');
-      addLine('  pin <tool>   — hold one at the front of the shelf', 'sys');
-      addLine('  theme [name] — set your theme (theme list to see them)', 'sys');
-      addLine('  matrix       — toggle matrix rain (stays in terminal)', 'sys');
-      addLine('  matrix background — toggle matrix & close terminal', 'sys');
-      addLine('  nerv [level] — trigger NERV warning (blue/red/orange)', 'sys');
-      addLine('  warp         — engage warp drive', 'sys');
-      addLine('  reset-layout — restore default card order', 'sys');
-      addLine('  export-layout— copy layout JSON to clipboard', 'sys');
+      addLine('  favs: your saved tools', 'sys');
+      addLine('  fav <tool>: save or unsave one', 'sys');
+      addLine('  pin <tool>: hold one at the front of the shelf', 'sys');
+      addLine('  theme [name]: set your theme (theme list to see them)', 'sys');
+      addLine('  matrix: toggle matrix rain (stays in terminal)', 'sys');
+      addLine('  matrix background: toggle matrix & close terminal', 'sys');
+      addLine('  nerv [level]: trigger NERV warning (blue/red/orange)', 'sys');
+      addLine('  warp: engage warp drive', 'sys');
+      addLine('  reset-layout: restore default card order', 'sys');
+      addLine('  export-layoutcopy layout JSON to clipboard', 'sys');
       addLine('', 'sys');
       addLine('Housekeeping:', 'sys');
-      addLine('  help         — show this message', 'sys');
-      addLine('  clear        — clear terminal', 'sys');
-      addLine('  banner       — reprint the login banner', 'sys');
-      addLine('  whoami       — who are you?', 'sys');
-      addLine('  fortune      — unsolicited advice', 'sys');
-      addLine('  date         — current date', 'sys');
-      addLine('  login <u> <p>— authenticate', 'sys');
-      addLine('  exit         — close terminal', 'sys');
+      addLine('  help: show this message', 'sys');
+      addLine('  clear: clear terminal', 'sys');
+      addLine('  banner: reprint the login banner', 'sys');
+      addLine('  whoami: who are you?', 'sys');
+      addLine('  fortune: unsolicited advice', 'sys');
+      addLine('  date: current date', 'sys');
+      addLine('  login <u> <p>authenticate', 'sys');
+      addLine('  exit: close terminal', 'sys');
       addLine('', 'sys');
       addLine('Tab completes commands and tool names. ↑ / ↓ walk history.', 'sys');
       addLine('', 'sys');
       addLine('Cheat codes (type anywhere):', 'sys');
-      addLine('  ↑↑↓↓←→←→BA  — Konami Code (warp drive)', 'sys');
-      addLine('  IDDQD        — Doom god mode', 'sys');
-      addLine('  ABACABB      — Mortal Kombat blood code', 'sys');
-      addLine('  JUSTINBAILEY — Metroid suit mode', 'sys');
-      addLine('  HESOYAM      — GTA San Andreas $$$', 'sys');
-      addLine('  SEGA         — you know the sound', 'sys');
+      addLine('  ↑↑↓↓←→←→BA: Konami Code (warp drive)', 'sys');
+      addLine('  IDDQD: Doom god mode', 'sys');
+      addLine('  ABACABB: Mortal Kombat blood code', 'sys');
+      addLine('  JUSTINBAILEY: Metroid suit mode', 'sys');
+      addLine('  HESOYAM: GTA San Andreas $$$', 'sys');
+      addLine('  SEGA: you know the sound', 'sys');
       if (authedUser) {
         addLine('', 'sys');
         addLine('Authenticated commands:', 'sys');
-        addLine('  status       — auth status', 'sys');
-        addLine('  unlock       — reveal secret section', 'sys');
-        addLine('  ghost <id>   — hide/show a card by ID', 'sys');
-        addLine('  ghost list   — show hidden cards', 'sys');
-        addLine('  ghost reset  — restore all hidden cards', 'sys');
-        addLine('  broadcast <m>— show toast on page', 'sys');
-        addLine('  logout       — end session', 'sys');
+        addLine('  status: auth status', 'sys');
+        addLine('  unlock: reveal secret section', 'sys');
+        addLine('  ghost <id>: hide/show a card by ID', 'sys');
+        addLine('  ghost list: show hidden cards', 'sys');
+        addLine('  ghost reset: restore all hidden cards', 'sys');
+        addLine('  broadcast <m>show toast on page', 'sys');
+        addLine('  logout: end session', 'sys');
       }
     },
     clear() {
@@ -631,8 +631,8 @@
       if (t.added) addLine(`  shipped   ${t.added}${d !== null ? ` (${d}d ago)` : ''}`, 'sys');
       if (t.tags.length) addLine(`  tags      ${t.tags.join(', ')}`, 'sys');
       if (t.locked) addLine('  status    locked', 'sys');
-      if (t.soon) addLine('  status    not shipped — domain reserved', 'sys');
-      if (t.archived) addLine('  status    archived — still up, no longer recommended', 'sys');
+      if (t.soon) addLine('  status    not shipped: domain reserved', 'sys');
+      if (t.archived) addLine('  status    archived: still up, no longer recommended', 'sys');
       addLine('', 'sys');
       if (!t.soon) addLine(`  goto ${t.id}`, 'sys');
     },
@@ -751,7 +751,7 @@
         const json = window.exportCardOrder();
         navigator.clipboard.writeText(json).then(
           () => addLine('Layout JSON copied to clipboard.', 'sys'),
-          () => { addLine(json, 'sys'); addLine('(Copy manually — clipboard blocked)', 'sys'); }
+          () => { addLine(json, 'sys'); addLine('(Copy manually: clipboard blocked)', 'sys'); }
         );
       } else {
         addLine('Layout system not loaded.', 'err');
@@ -844,9 +844,9 @@
     ghost(args) {
       const arg = (args || '').trim().toLowerCase();
       if (!arg) {
-        addLine('Usage: ghost <cardId> — toggle card visibility', 'err');
-        addLine('       ghost list    — show hidden cards', 'err');
-        addLine('       ghost reset   — restore all cards', 'err');
+        addLine('Usage: ghost <cardId>, toggle card visibility', 'err');
+        addLine('       ghost list: show hidden cards', 'err');
+        addLine('       ghost reset: restore all cards', 'err');
         return;
       }
       if (arg === 'list') {

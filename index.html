@@ -124,7 +124,7 @@
     </h1>
     <p class="hero-sub">
       <span id="toolCount">52</span> tools, each cut for one job. Free, local,
-      no account. <span id="shipRecent">17</span> of them shipped in the last 30 days.
+      no account. <span id="shipRecent">16</span> of them shipped in the last 30 days.
     </p>
     <div class="hero-search-wrap">
       <input class="hero-search" id="heroSearch" type="text" placeholder="Search tools, tags, or keywords…" aria-label="Search tools" autocomplete="off" spellcheck="false">
@@ -146,7 +146,7 @@
   </section>
   <script defer src="js/hero.js"></script>
 
-  <!-- Favorites — the visitor's own shelf, built by js/favorites.js from
+  <!-- Favorites: the visitor's own shelf, built by js/favorites.js from
        localStorage. Hidden until something is saved, so a first visit is
        byte-for-byte the page it always was. Sits above Recently shipped
        because "the tools I came back for" beats "the tools we just made". -->
@@ -163,7 +163,7 @@
     <div class="sites-grid fav-shelf-grid" id="favShelfGrid"></div>
   </section>
 
-  <!-- Recently shipped — populated by js/recent.js from each card's data-added.
+  <!-- Recently shipped: populated by js/recent.js from each card's data-added.
        Hidden until built so it never flashes an empty row. -->
   <section class="sites-section recent-rail" id="recentRail" aria-labelledby="recent-rail-heading" hidden>
     <div class="recent-rail-head">
@@ -175,7 +175,7 @@
     <div class="sites-grid recent-rail-grid" id="recentRailGrid"></div>
   </section>
 
-  <!-- Category rail — sticky jump nav, built by js/catnav.js from the groups below -->
+  <!-- Category rail: sticky jump nav, built by js/catnav.js from the groups below -->
   <nav class="cat-rail" id="catRail" aria-label="Tool categories" hidden>
     <div class="cat-rail-inner" id="catRailInner"></div>
   </nav>
@@ -743,7 +743,7 @@
       </a>
 
 
-      <!-- Carnet (soon — carnet.neorgon.com is reserved, nothing served yet) -->
+      <!-- Carnet (soon: carnet.neorgon.com is reserved, nothing served yet) -->
       <div class="site-card soon-card" data-card-id="carnet" data-status="soon"
            style="--card-glow: rgba(34,197,94,.3); --card-glow-border: rgba(34,197,94,.35); --card-accent: #22c55e;">
         <div class="card-content">
@@ -1222,7 +1222,7 @@
       <h2 class="group-label"><span class="group-dot"></span> Social</h2>
       <div class="sites-grid">
 
-      <!-- Dispatch -->
+      <!-- Antenne -->
       <a class="site-card" data-card-id="dispatch" data-added="2026-08-26"
          href="https://dispatch.neorgon.com/"
          style="--card-glow: rgba(59,130,246,.3); --card-glow-border: rgba(59,130,246,.35); --card-accent: #3b82f6;">
@@ -1232,7 +1232,7 @@
             <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">dispatch.neorgon.com</div>
-          <h3 class="card-name">Dispatch</h3>
+          <h3 class="card-name">Antenne</h3>
           <div class="card-desc">What shipped across the fleet. Launches, features, and fixes as short stories, each approved at the desk before it publishes.</div>
           <div class="card-tags">
             <span class="card-tag">News</span>
@@ -1590,7 +1590,7 @@
       <h2 class="group-label"><span class="group-dot"></span> Archive</h2>
       <div class="sites-grid">
 
-      <!-- Skill Map — superseded by Pathfinder -->
+      <!-- Skill Map: superseded by Pathfinder -->
       <a class="site-card archived-card" data-card-id="skillmap" data-added="2026-02-28" data-status="archived"
          href="https://skillmap.neorgon.com/"
          style="--card-glow: rgba(139,143,163,.2); --card-glow-border: rgba(139,143,163,.25); --card-accent: #8b8fa3;">
@@ -1631,7 +1631,7 @@
     <h2 class="section-label">Internal</h2>
     <div class="sites-grid">
 
-      <!-- Ghost card — Autopilot -->
+      <!-- Ghost card: Autopilot -->
       <div class="site-card ghost-card" data-card-id="autopilot" data-added="2026-03-04" role="button" tabindex="0" aria-disabled="true"
            style="--card-glow: rgba(251,191,36,.25); --card-glow-border: rgba(251,191,36,.3); --card-accent: #fbbf24;">
         <div class="ghost-locked">
@@ -1656,7 +1656,7 @@
       </div>
 
 
-      <!-- Ghost card — Energon HQ -->
+      <!-- Ghost card: Energon HQ -->
       <div class="site-card ghost-card" data-card-id="ehq" data-added="2026-02-21" role="button" tabindex="0" aria-disabled="true"
            style="--card-glow: rgba(99,102,241,.25); --card-glow-border: rgba(99,102,241,.3); --card-accent: #818cf8;">
         <div class="ghost-locked">
@@ -1699,7 +1699,7 @@
 </div>
 
 <!-- Ambient music toggle -->
-<button class="music-toggle" id="musicToggle" aria-label="Toggle ambient music" title="Ambient music">
+<button class="music-toggle" id="musicToggle" aria-label="Ambient music" aria-pressed="false" title="Ambient music">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M9 18V5l12-2v13"/>
     <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>

@@ -33,7 +33,7 @@ const BG = { r: 4, g: 7, b: 20, alpha: 1 };
 
 const files = readdirSync(OUT).filter((f) => f.endsWith('.svg')).sort();
 if (files.length === 0) {
-  console.error(`no .svg files in ${OUT} — run the generator first`);
+  console.error(`no .svg files in ${OUT}: run the generator first`);
   process.exit(1);
 }
 

@@ -146,7 +146,7 @@
       <p><strong>Key insight:</strong> Each tool is completely self-contained. They don't import from each other. They don't share node_modules. They're independent apps that happen to live in the same Git repo.</p>
 
       <h2>The Template System</h2>
-      <p>Everything flows from <code>_template/</code>. It's not a library—it's a living pattern:</p>
+      <p>Everything flows from <code>_template/</code>. It's not a library-it's a living pattern:</p>
 
       <div class="code-block">
         <div class="code-label">Template Rules</div>
@@ -354,13 +354,13 @@ git mv js/shared-utils.js js/shared/utils.js
       <h2>Lessons Learned</h2>
 
       <h3>1. Start Simple, Stay Simple</h3>
-      <p>We almost used Turborepo. Glad we didn't. We don't need caching or pipelines—<code>cp -r</code> is faster.</p>
+      <p>We almost used Turborepo. Glad we didn't. We don't need caching or pipelines-<code>cp -r</code> is faster.</p>
 
       <h3>2. Duplication is Sometimes Better</h3>
       <p>Those 50KB of duplicated libraries? Worth 100 hours of dependency management.</p>
 
       <h3>3. Documentation is the Real Dependency</h3>
-      <p>The template isn't the source of truth—<strong>CLAUDE.md is</strong>. It explains why we made each choice.</p>
+      <p>The template isn't the source of truth-<strong>CLAUDE.md is</strong>. It explains why we made each choice.</p>
 
       <h3>4. Extract Last, Not First</h3>
       <p>We waited until we had 12 tools before creating <code>_template/</code>. The pattern emerged from repetition.</p>

@@ -138,7 +138,7 @@
           currentVideoId = null;
           console.warn('[music] YouTube player error code:', e.data,
             e.data === 101 || e.data === 150
-              ? '— embedding disabled for this video'
+              ? 'embedding disabled for this video'
               : '');
         }
       }
@@ -178,11 +178,39 @@
       doStop();
       playing = false;
       btn.classList.remove('playing');
+      btn.setAttribute('aria-pressed', 'false');
     } else {
       playing = true;
       btn.classList.add('playing');
+      btn.setAttribute('aria-pressed', 'true');
       doPlay(resolveTrack());
     }
+  });
+
+  /* ── bfcache restore ────────────────────────────────────────────────
+     Back-forward cache thaws the JS heap and DOM (playing=true, .playing
+     class, the spin rAF), but audio inside the cross-origin iframe stays
+     paused. Attempt a resume through the same mute-then-unmute path a
+     click uses; if the player is not audibly going shortly after, drop
+     to an honest off state instead of a spinning lie. */
+  window.addEventListener('pageshow', (e) => {
+    if (!e.persisted || !playing) return;
+    spinLast = null; /* swallow the time-in-cache rAF delta */
+    doPlay(resolveTrack());
+    setTimeout(() => {
+      if (!playing) return; /* user toggled off in the meantime */
+      const st = (player && playerReady && typeof player.getPlayerState === 'function')
+        ? player.getPlayerState() : null;
+      const ok = typeof YT !== 'undefined' &&
+        (st === YT.PlayerState.PLAYING || st === YT.PlayerState.BUFFERING);
+      if (!ok) {
+        playing = false;
+        btn.classList.remove('playing');
+        btn.setAttribute('aria-pressed', 'false');
+        resetSpin();
+        if (player && playerReady) player.pauseVideo();
+      }
+    }, 1200);
   });
 
   /* ── Keyboard shortcut: M ───────────────────────────────────────── */

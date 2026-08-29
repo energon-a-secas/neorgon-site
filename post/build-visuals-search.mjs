@@ -78,7 +78,7 @@ const rows = icons.map((name) => {
 /* A diagram built from an empty set renders as NaN and still writes a file, which
    is worse than crashing: it looks like output. Fail loudly instead. */
 if (rows.length < 20) {
-  console.error(`only ${rows.length} icons resolved from index.html — this generator is not `
+  console.error(`only ${rows.length} icons resolved from index.html. This generator is not `
     + 'reading the right markup, so any chart it produces is meaningless.');
   process.exit(2);
 }

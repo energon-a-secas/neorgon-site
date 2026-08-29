@@ -15,11 +15,11 @@ python3 scripts/icon-lint.py --fix    # rewrite the offenders in place
 ```
 
 > **`make check` and the hook judge different things, on purpose.** `make check` reads your
-> working tree — the right answer while you are drawing. `.githooks/pre-commit` reads the
+> working tree: the right answer while you are drawing. `.githooks/pre-commit` reads the
 > **staged snapshot**, because that is what the commit ships. The two disagree in exactly the
 > cases that matter: a half-finished icon you have not staged blocks `make check` but not the
 > commit, and an `index.html` referencing an icon nobody ran `git add` on passes `make check`
-> — the file is right there on disk — while the hook fails it with `MISSING`. `neokeys.svg`
+>: the file is right there on disk, while the hook fails it with `MISSING`. `neokeys.svg`
 > shipped that way: the card was committed, the icon never was, and neorgon.com served a 404
 > for it with the card rendering no mark at all. A tree lint cannot see that; an index lint
 > cannot miss it.
@@ -27,7 +27,7 @@ python3 scripts/icon-lint.py --fix    # rewrite the offenders in place
 > **Why a linter and not just this document.** This file already said 24×24 / stroke 2 /
 > `#E326E4` / no fixed `width`/`height`. By August 2026 the set had drifted off all four
 > rules: fourteen icons were drawn on a 64-unit canvas, three carried
-> `stroke="currentColor"` (which resolves to **black** inside an `<img>` — those icons
+> `stroke="currentColor"` (which resolves to **black** inside an `<img>`. Those icons
 > were nearly invisible on a dark card), and several kept a `width="800px"` from
 > whichever icon site they were downloaded from. A rule nobody can run is a rule that
 > decays silently.
@@ -42,7 +42,7 @@ effective stroke = stroke-width / viewBox-size × 28
 ```
 
 Before the August 2026 sweep that ran from **0.88px** (64-unit canvas at stroke-width 2)
-to **2.33px** (the 24-unit majority at stroke-width 2) — a 2.7× spread with no visible
+to **2.33px** (the 24-unit majority at stroke-width 2). A 2.7× spread with no visible
 cause, which read as "some of these icons are faint".
 
 ## Current Icon Mapping
@@ -147,7 +147,7 @@ const CATEGORIES = [
 ];
 ```
 
-`ids` must match the `.card-group` the card actually sits in — a pill whose ids point at
+`ids` must match the `.card-group` the card actually sits in. A pill whose ids point at
 a section that does not hold them filters the catalog to nothing.
 
 ### 7. Add Preview GIF
@@ -218,7 +218,7 @@ Three consequences worth knowing:
   link announce "Pathfinder, pathfinder.neorgon.com, Pathfinder".
 
 **Primary icon color:** `#E326E4`, written literally into every file and enforced by the
-linter. Under a mask only alpha matters, so this looks like dead metadata — it is not. It is
+linter. Under a mask only alpha matters, so this looks like dead metadata. It is not. It is
 what the no-mask-support fallback paints (`@supports not (mask-image: …)` draws the same file
 as an ordinary `background-image`), and what you see opening the file on its own.
 
@@ -228,7 +228,7 @@ loads the file as its own document with no access to the host page's colour, so
 
 **Exceptions that stay `<img>`:** the four third-party brand marks, and `energon-logo.png`
 (a raster file has no shape to mask). Recolouring someone else's trademark to match a card is
-not consistency. `icon-lint.py` enforces this in both directions — an exempt mark rendered as
+not consistency. `icon-lint.py` enforces this in both directions. An exempt mark rendered as
 a masked `<span>`, or one of ours rendered as a plain `<img>`, both fail.
 
 ## Technical Details
@@ -240,7 +240,7 @@ a masked `<span>`, or one of ours rendered as a plain `<img>`, both fail.
 | stroke | `#E326E4` | `icon-lint.py` |
 | stroke-linecap / linejoin | `round` | `icon-lint.py` |
 | fill | `none` (stroke drawings) | convention |
-| root `width` / `height` | **absent** — CSS owns the box | `icon-lint.py` |
+| root `width` / `height` | **absent**: CSS owns the box | `icon-lint.py` |
 | rendered as | masked `<span>` taking `--card-accent` | `icon-lint.py` |
 | rendered size | 28×28 inside a 42×42 wrapper | `css/style.css` |
 

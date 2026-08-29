@@ -87,7 +87,7 @@ function readTiming() {
   const recent = read('js/recent.js');
   const one = (src, re, what) => {
     const m = src.match(re);
-    if (!m) throw new Error(`could not read ${what} — the constant moved`);
+    if (!m) throw new Error(`could not read ${what}: the constant moved`);
     return Number(m[1]);
   };
   return {

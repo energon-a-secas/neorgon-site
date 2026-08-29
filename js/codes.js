@@ -279,7 +279,7 @@
     document.body.classList.toggle('god-mode', godActive);
     if (godActive) {
       if (window._neoSound) window._neoSound.doomGodMode();
-      showCheat('God Mode<div class="cheat-sub">IDDQD — Degreelessness</div>', 'rgba(255,215,0,1)', 2500);
+      showCheat('God Mode<div class="cheat-sub">IDDQD: Degreelessness</div>', 'rgba(255,215,0,1)', 2500);
     } else {
       showCheat('Mortal Again', 'rgba(255,215,0,1)', 1500);
     }
@@ -288,7 +288,7 @@
   /* ── ABACABB — Mortal Kombat Blood Code ───────────────── */
   function activateBloodCode() {
     if (window._neoSound) window._neoSound.mkBloodCode();
-    showCheat('Blood Code<div class="cheat-sub">ABACABB — Mortal Kombat</div>', 'rgba(220,38,38,1)', 2500);
+    showCheat('Blood Code<div class="cheat-sub">ABACABB: Mortal Kombat</div>', 'rgba(220,38,38,1)', 2500);
 
     var starfield = document.getElementById('starfield');
     if (starfield) starfield.style.filter = 'hue-rotate(-40deg) saturate(3)';
@@ -350,7 +350,7 @@
 
     if (suitActive) {
       if (window._neoSound) window._neoSound.metroidSuit();
-      showCheat('Suit Activated<div class="cheat-sub">JUSTIN BAILEY — Metroid</div>', 'rgba(74,222,128,1)', 2500);
+      showCheat('Suit Activated<div class="cheat-sub">JUSTIN BAILEY, Metroid</div>', 'rgba(74,222,128,1)', 2500);
       originalDescs = [];
       altDescs.forEach(function (alt) {
         var card = document.querySelector('[data-card-id="' + alt.id + '"]');
@@ -376,7 +376,7 @@
   /* ── HESOYAM — GTA San Andreas ────────────────────────── */
   function activateHesoyam() {
     if (window._neoSound) window._neoSound.gtaHesoyam();
-    showCheat('$250,000<div class="cheat-sub">HESOYAM — Full Health · Armor</div>', 'rgba(251,191,36,1)', 3000);
+    showCheat('$250,000<div class="cheat-sub">HESOYAM: Full Health · Armor</div>', 'rgba(251,191,36,1)', 3000);
 
     var badge = document.getElementById('badgeText');
     var oldBadge = badge ? badge.textContent : '';

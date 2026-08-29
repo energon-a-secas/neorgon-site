@@ -32,7 +32,7 @@ Single-page hub at `neorgon.com` listing all Neorgon tools. The page is a single
 | `intervention.js` | "Death Note L" CRT broadcast takeover: third background mode |
 | `settings.js` | Settings panel: toggles for sound/glow/previews, background picker. Persists to `localStorage` under key `neorgon-prefs` |
 | `search.js` | Hero search bar with floating category pills (physics simulation on canvas), **ranked** card filtering, and the route map drawn between pills. Also arrow-key walking + Enter-to-open over the results. `CATEGORIES` must stay 1:1 with the `.card-group` sections in `index.html`. A pill whose `ids` name no group silently filters to zero results. **Ranking:** `scoreCard`/`rank` give every match a score (name-exact 1000 → loose 120) and `syncCatalogMerge` appends in that order, so the merged grid *is* the ranking; ship date breaks ties, newest first. A category's `keywords` blob is a **fallback vocabulary**, not an amplifier. It only expands a group when the query matched no card directly (`cheatsheet` may mean DevOps; `parla` may not mean all of Social). A category *label* always expands, because that is the pill-click path. **Pills stay up during a search:** matched ones travel to the middle and light their routes, the rest recede to 16% and hover back to full. `paintPillStates()` is called from `doFilter`, not only from the rAF loop, so the states still read under `prefers-reduced-motion` where the loop stops after one frame |
-| `recent.js` | "Recently shipped" rail above the catalog. Reads `data-added="YYYY-MM-DD"` off each card, renders the newest 6 as clones, and stamps a self-expiring `New` badge (30 days) on the canonical card. A `.card-group` carrying **`data-recent="off"`** is skipped by **both** recency surfaces, the rail and the badge, because one candidate list feeds both. Applied to **UI Lab**: those are reference tools, and a visitor scanning for what changed should not be handed a wireframe glossary as news. Group-level rather than per-card so the next reference category needs an attribute, not an edit. Archived cards are skipped too. Also owns the shelf-overflow observer that toggles `.is-scrollable` on **both** shelf grids. The trailing mask fade must not appear over a row that already fits. Exposes `window._neoRecent` for the terminal's `new`, and **`window._neoMakeEcho(card)`**. The one definition of a safe clone (retag `data-card-id` → `data-echo-id`, clear entrance.js's inline delay, convert a multi-tool card to a link). Any shelf that clones catalog cards must use it |
+| `recent.js` | "Recently shipped" rail above the catalog. Reads `data-added="YYYY-MM-DD"` off each card, renders the newest 6 as clones, and stamps a self-expiring `New` badge (30 days) on the canonical card. A `.card-group` carrying **`data-recent="off"`** is skipped by **both** recency surfaces, the rail and the badge, because one candidate list feeds both. Applied to **UI Lab**: those are reference tools, and a visitor scanning for what changed should not be handed a wireframe glossary as news. Group-level rather than per-card so the next reference category needs an attribute, not an edit. Archived cards are skipped too. Also owns the shelf-overflow observer that toggles `.is-scrollable` on **both** shelf grids, and the rAF-gated scroll listeners that toggle `.is-scrolled` (the desktop breakout's leading fade and lit column edge). The trailing mask fade must not appear over a row that already fits, and the leading fade must not appear at rest. Exposes `window._neoRecent` for the terminal's `new`, and **`window._neoMakeEcho(card)`**. The one definition of a safe clone (retag `data-card-id` → `data-echo-id`, clear entrance.js's inline delay, convert a multi-tool card to a link). Any shelf that clones catalog cards must use it |
 | `favorites.js` | "Your favorites" shelf above the rail, from `localStorage` key `neorgon-favorites` (`[{ id, pinned }]`; a bare id array is the v1 shape and still loads). Injects the control strip into every catalog card and every echo, prunes saved ids whose card no longer exists (and persists the prune), and renders the shelf with `_neoMakeEcho`. Pin holds the front; drag and ArrowLeft/ArrowRight reorder within a band. Exposes `window._neoFavorites` for the terminal's `fav` / `favs` / `pin`. **Never touches the catalog**. The categories below are byte-for-byte what a first-time visitor sees |
 | `catnav.js` | Sticky category rail with live counts and scroll-spy. Owns the sticky-chrome offset for the whole page: sets `--cat-rail-top` and every group's `scroll-margin-top` from one measurement, which `terminal.js` `open <cat>` relies on |
 | `collapse.js` | Collapsible `.card-group` sections. A group carrying `data-collapsed="true"` ships closed and grows a toggle on its own heading. Applied to **Archive** and **Platforms**. The shipped default lives in the HTML; the visitor's choice overrides it in `localStorage` key `neorgon-collapsed`, which stores **only deviations from the default**, so changing a group's shipped default later still reaches everyone who never touched it. Loads **after `catnav.js`** on purpose: catnav builds its chip labels from `.group-label` `textContent`, and this module reparents that heading into a `<button>`. For the same reason the card count is generated content off `data-count` and the chevron is an SVG, neither of which `textContent` can see. Put a text node in that heading and every category chip gains a stray "1 tool". Exposes `window._neoCollapse` |
@@ -40,7 +40,7 @@ Single-page hub at `neorgon.com` listing all Neorgon tools. The page is a single
 | `cards.js` | Multi-tool card popup (for cards with sub-tools) and ghost card unlock logic |
 | `previews.js` | GIF previews on card hover after 1.2s delay: enabled only when `window._neoPreviewsEnabled` is true |
 | `sortable.js` | Per-group card drag-reorder using SortableJS CDN. `window.exportCardOrder()` / `window.importCardOrder()` helpers available in console |
-| `music.js` | Web Audio API ambient music synced to background mode (stars/matrix/intervention) |
+| `music.js` | YouTube IFrame ambient music synced to background mode (stars/matrix/intervention). A `pageshow` handler covers bfcache restores: heap and DOM thaw with `playing` still true but iframe audio stays paused, so it attempts a resume through the same mute-then-unmute path a click uses and drops to an honest off state (class, `aria-pressed`, spin) when the player is not audibly going ~1.2s later |
 | `sound.js` | UI sound effects: exposes `window._neoSound` with `.dragStart()`, `.dropCard()`, `.unlock()`, and `window._neoSoundPing(freq, vol)`, `window._neoSoundDiscover()` |
 | `cursor.js` | Custom cursor glow element |
 | `entrance.js` | Card entrance stagger. Delays are **per group and capped** (8 × 55ms), not a global `index × 110ms` timeline. The old form grew with the catalog (5.4s at 50 cards) and leaked into the rail, because recent.js clones these cards and `cloneNode` copies the inline `animation-delay`. recent.js now clears that on every echo; do not reintroduce a global counter here |
@@ -114,6 +114,14 @@ fit at 1160px and the fifth peeks, which is the affordance; the trailing mask
 fade only appears when there is actually something off to the right
 (`.is-scrollable`, set by the observer at the end of `recent.js`).
 
+**Desktop breakout, left side only.** At rest the row is flush with the
+1160px column; once scrolled (`.is-scrolled`, same observer file), passed
+cards travel into the page margin and dissolve under a leading fade while a
+shelf-tone hairline lights the column edge they cross. The left-only shape is
+load-bearing: left overflow can never grow a scrollbar and the classic-
+scrollbar 100vw error self-cancels for rest alignment. Extend the right side
+and both guarantees die (full reasoning in the grid comment in `style.css`).
+
 Clones carry `data-echo-id`, never `data-card-id`, which is what keeps them out
 of the search index, the "N of M tools" count, the drag-reorder, the command
 palette and the terminal's catalog. **Favoriting a tool must not move a number
@@ -123,9 +131,20 @@ either scoping to `#tools` or filtering `.site-card--echo`.
 **The control strip** (`.card-tools`) sits bottom-right, opposite the arrow,
 the arrow means "go there", the strip means "keep this", and the two never
 share a corner. It holds the star, the pin (only on a saved card) and, in the
-favorites shelf, a drag handle. Secondary controls collapse to zero width at
-rest and grow on hover, so the pill is only as wide as it has something to say.
-A saved card keeps its strip visible at rest. That is the state readout.
+favorites shelf, a drag handle. The glyphs are unboxed: the surface is per
+control (a 28px hit box plus a hover chip each), not a shared pill, and
+secondary controls collapse to zero width at rest and grow on hover, so the
+row is only as wide as it has something to say. A saved card keeps its star
+visible at rest. That is the state readout, together with the gold rim.
+
+**The arrow is also a control**: clicking it opens the tool in a new tab
+(delegated capture-phase listener in `cards.js`), while the rest of the card
+stays same-tab. It is deliberately pointer-only and `aria-hidden`: Cmd or
+Ctrl+Enter on the focused card is the keyboard path to a new tab, and a
+focusable arrow would add ~55 tab stops for no new ability. Saving a tool
+fires a one-shot discovery burst (`favorites.js` + `.fav-burst` in
+`style.css`); the first save ever plays `_neoSoundDiscover`, later saves keep
+the quiet ping.
 
 Each control is a `<span role="button" tabindex="0">`, not a `<button>`,
 because a card is an `<a>` and nesting a button in a link is invalid. Clicks

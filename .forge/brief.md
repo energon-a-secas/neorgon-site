@@ -1,4 +1,4 @@
-# Brief — neorgon-site hub: no recency surface, 12 flat categories with no navigation, dead links and stale counts
+# Brief: neorgon-site hub: no recency surface, 12 flat categories with no navigation, dead links and stale counts
 
 Started 2026-08-08 10:24. Maintained by the `task` skill; read by `debrief` and `writeup`.
 
@@ -13,7 +13,7 @@ neorgon-site hub: no recency surface, 12 flat categories with no navigation, dea
 ## Approach
 
 Five changes to the hub, in dependency order. (1) Give every card a `data-added="YYYY-MM-DD"`
-attribute — this is the missing data model; the hub currently has no concept of recency at all.
+attribute: this is the missing data model; the hub currently has no concept of recency at all.
 (2) Build a "Recently Shipped" rail above the categories that reads those dates, renders the
 newest 6 as clones, and stamps a self-expiring NEW badge (~30 days) so the badge decays without
 anyone maintaining a list. (3) Add a sticky category rail under the header with live counts and
@@ -41,7 +41,7 @@ rotate the list. Dates expire on their own.
 
 **Reusing the floating category pills as the navigation.** They already exist and already filter.
 But they live inside the hero, scroll away immediately, and their physics simulation makes them
-imprecise click targets — wrong tool for "jump to a section 3000px down". The sticky rail is a
+imprecise click targets: wrong tool for "jump to a section 3000px down". The sticky rail is a
 separate, boring, reliable surface.
 
 ## Decisions
@@ -56,13 +56,13 @@ separate, boring, reliable surface.
 
 - `2026-08-08 10:26` Tool count contradicts itself in 4 places: hero HTML hardcodes 40, inline JS computes 43 at DOMContentLoaded (so it visibly flips), and title/meta description/OG/twitter/JSON-LD all hardcode 'We made 40 tools'.
 
-- `2026-08-08 10:27` stream **data model** done — 50 cards stamped. Two dates are proxies, marked inline: memes-site git history starts 2024-08-24 (repo bootstrap) and pieza-site's remote points at an unrelated repo so its git history is not this project's.
+- `2026-08-08 10:27` stream **data model** done: 50 cards stamped. Two dates are proxies, marked inline: memes-site git history starts 2024-08-24 (repo bootstrap) and pieza-site's remote points at an unrelated repo so its git history is not this project's.
 
-- `2026-08-08 10:36` stream **recent rail** done — 6-card rail + self-expiring NEW badge; clones use data-echo-id so search/previews/sortable skip them
+- `2026-08-08 10:36` stream **recent rail** done: 6-card rail + self-expiring NEW badge; clones use data-echo-id so search/previews/sortable skip them
 
-- `2026-08-08 10:36` stream **category nav** done — 11 sticky chips with live counts, IO scroll-spy, suppressed while searching, #group- deep links
+- `2026-08-08 10:36` stream **category nav** done: 11 sticky chips with live counts, IO scroll-spy, suppressed while searching, #group- deep links
 
-- `2026-08-08 10:36` stream **search + palette** done — Cmd+K palette (fuzzy ladder, recency tie-break); Enter-to-open + arrow walking in hero search; all 11 pills now 1:1 with DOM groups
+- `2026-08-08 10:36` stream **search + palette** done: Cmd+K palette (fuzzy ladder, recency tie-break); Enter-to-open + arrow walking in hero search; all 11 pills now 1:1 with DOM groups
 
 - `2026-08-08 10:36` Pill/group drift was worse than a label mismatch: the 'Learning' pill matched no DOM group at all and 'Game' pointed only at the locked ghost rushq, so clicking it filtered the catalog to zero results. Also found teamplay, stash, safeguard and pieza present in the DOM but absent from every pill ids array - unreachable by pill. Verified post-fix with a script comparing pill ids to group membership: 11/11 aligned, only the 3 ghost cards intentionally pill-less.
 
@@ -76,9 +76,9 @@ separate, boring, reliable surface.
 
 - `2026-08-08 10:57` Roughly 8 turns were lost to Chrome's disk cache replaying the committed pre-edit terminal.js through F5, ?cachebust=, #hash, touch and a full server restart, with no service worker registered. Diagnosed via performance.getEntriesByType('resource'): transferSize 0, decodedBodySize 15875, exactly matching 'git show HEAD:js/terminal.js | wc -c'. Serving on a fresh port is the reliable workaround.
 
-- `2026-08-08 10:57` stream **terminal** done — DOM-driven catalog replaces the hardcoded list, so a new card is reachable by every command with no terminal edit. 12 commands added (tools/categories/goto/open/search/new/random/whois/stats/theme/fortune + Tab completion). theme only sets the visitor cookie via NeoHeader.setTheme; fleet-wide CDN default deliberately not exposed - that belongs in an ops console, not a page anyone can open.
+- `2026-08-08 10:57` stream **terminal** done: DOM-driven catalog replaces the hardcoded list, so a new card is reachable by every command with no terminal edit. 12 commands added (tools/categories/goto/open/search/new/random/whois/stats/theme/fortune + Tab completion). theme only sets the visitor cookie via NeoHeader.setTheme; fleet-wide CDN default deliberately not exposed - that belongs in an ops console, not a page anyone can open.
 
-- `2026-08-08 10:57` stream **fixes** done — Removed the duplicate legacy footer; single-sourced the tool count (43) from the DOM in hero + all meta/OG/JSON-LD; fixed 3 CSP directives incl. the two that made the terminal's Convex login impossible in prod; fixed the scroll-spy and deep-link offset. Console errors 8 -> 3, both remaining benign (meta frame-ancestors warning, awesomesites:8831 not running locally). Dead links pieza/cardforge diagnosed but NOT fixed - DNS and TLS, outside this repo.
+- `2026-08-08 10:57` stream **fixes** done: Removed the duplicate legacy footer; single-sourced the tool count (43) from the DOM in hero + all meta/OG/JSON-LD; fixed 3 CSP directives incl. the two that made the terminal's Convex login impossible in prod; fixed the scroll-spy and deep-link offset. Console errors 8 -> 3, both remaining benign (meta frame-ancestors warning, awesomesites:8831 not running locally). Dead links pieza/cardforge diagnosed but NOT fixed - DNS and TLS, outside this repo.
 
 - `2026-08-08 11:11` Mobile defects found only by resizing to 390px, all fixed: (1) the recent rail stacked 6 cards vertically = 1670px / 1.98 screens, pushing the catalog to y=2228 - now a snap-scrolling row at 0.48 screens with the catalog at y=964; (2) snap alignment needs scroll-padding-inline, not padding-inline, or the first card snaps 18px out of line with its own heading; (3) the rail's sticky top was a hardcoded 62px against a 68px header, so 12px slid underneath - now --cat-rail-top from the live measurement.
 
@@ -90,21 +90,21 @@ separate, boring, reliable surface.
 
 - `2026-08-08 11:11` Repeated SIGKILL of the Playwright MCP Chrome left its profile unopenable (locked UKM db, login-database errors, immediate close). Deleting the whole mcp-chrome-<id> directory is the fix; killing processes alone is not.
 
-- `2026-08-11 17:54` Approach: three independent edits to the catalog. (1) Delete the API-fed Awesome Sites group + js/awesome-sites-hub.js + its CSP connect-src grant — the hub's contract becomes 'every card is a destination we own'. The Awesome Sites *card* stays: awesomesites.neorgon.com is ours, and Platforms stays for the same reason. (2) Add a data-status="soon" card state for the registry's three 'ready' sites (pieza, rigcheck, tickbox — all three 404 today), rendered as a non-link so a Soon card cannot send anyone to a dead domain. (3) Cap the entrance stagger and stop the rail inheriting it.
+- `2026-08-11 17:54` Approach: three independent edits to the catalog. (1) Delete the API-fed Awesome Sites group + js/awesome-sites-hub.js + its CSP connect-src grant. The hub's contract becomes 'every card is a destination we own'. The Awesome Sites *card* stays: awesomesites.neorgon.com is ours, and Platforms stays for the same reason. (2) Add a data-status="soon" card state for the registry's three 'ready' sites (pieza, rigcheck, tickbox, all three 404 today), rendered as a non-link so a Soon card cannot send anyone to a dead domain. (3) Cap the entrance stagger and stop the rail inheriting it.
 
-- `2026-08-11 17:54` Root cause of the slow rail: js/entrance.js sets an INLINE animation-delay of index*110ms on every catalog card (~5.4s at the 49th). js/recent.js then cloneNode()s those cards for the Recently-shipped rail, and cloneNode copies the inline style — so the echo's inherited animation-delay overrides the CSS 'animation-delay: var(--echo-delay)' at style.css:2236. The shelf whose whole job is 'look what just shipped' was the last thing on the page to appear.
+- `2026-08-11 17:54` Root cause of the slow rail: js/entrance.js sets an INLINE animation-delay of index*110ms on every catalog card (~5.4s at the 49th). js/recent.js then cloneNode()s those cards for the Recently-shipped rail, and cloneNode copies the inline style, so the echo's inherited animation-delay overrides the CSS 'animation-delay: var(--echo-delay)' at style.css:2236. The shelf whose whole job is 'look what just shipped' was the last thing on the page to appear.
 
 - `2026-08-11 17:54` Rejected: an IntersectionObserver scroll-reveal for the catalog. It reads better on a long page, but the CSS default is 'opacity:0 + animation forwards', which is what keeps the catalog visible when JS fails; driving reveal from an observer means a card is a blank slot if the observer never fires. Capping the stagger fixes the reported symptom with no new failure mode.
 
-- `2026-08-11 17:54` Rejected: hiding unpublished sites from the hub entirely. It solves the dead link but loses the thing asked for — a slot to put new work in before it ships. A dimmed Soon card is a roadmap; an absent card is nothing.
+- `2026-08-11 17:54` Rejected: hiding unpublished sites from the hub entirely. It solves the dead link but loses the thing asked for. A slot to put new work in before it ships. A dimmed Soon card is a roadmap; an absent card is nothing.
 
-- `2026-08-11 17:55` stream **awesome-feed** done — Group markup, js/awesome-sites-hub.js, the script tag and the awesomesites CSP connect-src grant are gone. The Awesome Sites card stays in Productivity. catnav.js's hidden-group filter was dead once the feed left — replaced with an empty-group filter, which is the invariant the original comment was actually protecting.
+- `2026-08-11 17:55` stream **awesome-feed** done: Group markup, js/awesome-sites-hub.js, the script tag and the awesomesites CSP connect-src grant are gone. The Awesome Sites card stays in Productivity. catnav.js's hidden-group filter was dead once the feed left, replaced with an empty-group filter, which is the invariant the original comment was actually protecting.
 
-- `2026-08-11 18:05` stream **soon-state** done — data-status=soon is one attribute that the card markup, hero count, search count, rail, palette and terminal all read. Cards render as <div> so they cannot navigate to a reserved domain. Verified: hero 46→43, palette shows a Soon chip and Enter scrolls instead of navigating (URL unchanged), search reports '5 of 43 tools · 1 coming soon' on a mixed query and no longer says 'no results' when the only match is a Soon card.
+- `2026-08-11 18:05` stream **soon-state** done: data-status=soon is one attribute that the card markup, hero count, search count, rail, palette and terminal all read. Cards render as <div> so they cannot navigate to a reserved domain. Verified: hero 46→43, palette shows a Soon chip and Enter scrolls instead of navigating (URL unchanged), search reports '5 of 43 tools · 1 coming soon' on a mixed query and no longer says 'no results' when the only match is a Soon card.
 
-- `2026-08-11 18:06` stream **entrance** done — Measured on the running page: 50 cards, worst-case entrance delay 5390ms → 440ms. Rail echoes now carry no inline animation-delay (cleared in recent.js) and compute 0/60/120/180/240/300ms from --echo-delay as the CSS intended. Also fixed a latent reduced-motion bug in the same file: the old branch set opacity:1 but left cardEnter running at delay 0, so reduced-motion users got the animation anyway.
+- `2026-08-11 18:06` stream **entrance** done: Measured on the running page: 50 cards, worst-case entrance delay 5390ms → 440ms. Rail echoes now carry no inline animation-delay (cleared in recent.js) and compute 0/60/120/180/240/300ms from --echo-delay as the CSS intended. Also fixed a latent reduced-motion bug in the same file: the old branch set opacity:1 but left cardEnter running at delay 0, so reduced-motion users got the animation anyway.
 
-- `2026-08-11 18:12` stream **docs** done — PROJECTS.md gains the hub's ownership rule + the Soon-card contract, a rigcheck-site row and a Rigcheck accent; HUB_REGISTRY.md gains a Soon-cards section with the markup and the flip-to-live steps; neorgon-site/CLAUDE.md documents data-status and warns entrance.js off a global counter. Caught two accent collisions while writing the docs: PROJECTS.md already reserved #22c55e for TickBox (I had used #16a34a) and #7c3aed belongs to CardForge (I had given it to Rigcheck) — both corrected in index.html, Rigcheck is now #0ea5e9.
+- `2026-08-11 18:12` stream **docs** done: PROJECTS.md gains the hub's ownership rule + the Soon-card contract, a rigcheck-site row and a Rigcheck accent; HUB_REGISTRY.md gains a Soon-cards section with the markup and the flip-to-live steps; neorgon-site/CLAUDE.md documents data-status and warns entrance.js off a global counter. Caught two accent collisions while writing the docs: PROJECTS.md already reserved #22c55e for TickBox (I had used #16a34a) and #7c3aed belongs to CardForge (I had given it to Rigcheck). Both corrected in index.html, Rigcheck is now #0ea5e9.
 
 - `2026-08-11 18:12` Verified on the running page (localhost:8800): hero 46→43; no Soon card has an href, a New badge, or a rail slot; search reads '5 of 43 tools · 1 coming soon' on a mixed query; palette Enter on a Soon row leaves the URL unchanged; worst catalog entrance delay 5390ms→440ms; rail echoes carry no inherited inline delay and compute 0–300ms. `make smoke` 18/18.
 
@@ -112,17 +112,17 @@ separate, boring, reliable surface.
 
 - `2026-08-11 19:04` The shelf renders clones through window._neoMakeEcho, extracted from recent.js in this session. Two shelves now clone catalog cards and every rule about a safe clone (retag data-card-id to data-echo-id, drop entrance.js's inline delay, convert a multi-tool card to a link) is a rule both must follow. A second copy of those rules would be a second chance to get one wrong. Consequence: favoriting a tool moves no number on the page, because data-echo-id is already what search, the count, sortable, the palette and the terminal all skip.
 
-- `2026-08-11 19:04` Rejected: wrapping each card in a .card-slot so the star could be a real <button> sibling of the <a>. search.js reparents .site-card elements into the merged grid and keys a WeakMap on card.parentElement, and sortable.js drags .sites-grid children — the wrapper would have needed surgery on both, and search is the most-used feature on the page. Chose a <span role=button tabindex=0> inside the card with the click intercepted and stopPropagation()d, which is the interception cards.js already does for multi-tool cards. Named trade-off: a screen reader announces a button inside a link.
+- `2026-08-11 19:04` Rejected: wrapping each card in a .card-slot so the star could be a real <button> sibling of the <a>. search.js reparents .site-card elements into the merged grid and keys a WeakMap on card.parentElement, and sortable.js drags .sites-grid children. The wrapper would have needed surgery on both, and search is the most-used feature on the page. Chose a <span role=button tabindex=0> inside the card with the click intercepted and stopPropagation()d, which is the interception cards.js already does for multi-tool cards. Named trade-off: a screen reader announces a button inside a link.
 
 - `2026-08-11 19:04` toggle() returns true saved / false removed / null when the id names nothing in the catalog. Started with a two-outcome boolean plus a #tools guard in terminal.js; that guard was unreachable (resolveTool already drops locked ghost cards) and the boolean would have let the terminal print 'Removed X' for a tool it never held. Three outcomes deleted the dead code and made the wrong report impossible.
 
-- `2026-08-11 20:09` Refinement pass: the single 28px star became a .card-tools pill (star + pin + drag handle) with secondary controls collapsing to zero width at rest, and 'saved' moved from an icon to a border state — a warm rim plus the card's existing ::after top hairline held on, with a brighter rim and corner wash for pinned. The old star was a precision target; a strip with a surface behind it means hovering anywhere on the card lands on something usable.
+- `2026-08-11 20:09` Refinement pass: the single 28px star became a .card-tools pill (star + pin + drag handle) with secondary controls collapsing to zero width at rest, and 'saved' moved from an icon to a border state. A warm rim plus the card's existing ::after top hairline held on, with a brighter rim and corner wash for pinned. The old star was a precision target; a strip with a surface behind it means hovering anywhere on the card lands on something usable.
 
-- `2026-08-11 20:09` Drag needed forceFallback: true, which the catalog's own sortable.js does not set. Shelf cards are <a> elements and SortableJS's default path is native HTML5 drag-and-drop, which on an anchor is the browser's own 'drag this link' gesture competing for the same motion. It is also unreachable from synthetic pointer events, so the default path could not be verified at all — with the fallback the whole drag was exercised end to end (Sortable.active true mid-drag, .sortable-fallback on the page, order and localStorage both updated).
+- `2026-08-11 20:09` Drag needed forceFallback: true, which the catalog's own sortable.js does not set. Shelf cards are <a> elements and SortableJS's default path is native HTML5 drag-and-drop, which on an anchor is the browser's own 'drag this link' gesture competing for the same motion. It is also unreachable from synthetic pointer events, so the default path could not be verified at all, with the fallback the whole drag was exercised end to end (Sortable.active true mid-drag, .sortable-fallback on the page, order and localStorage both updated).
 
 - `2026-08-11 20:09` Pinned/unpinned is a band, not a sort key you can fight: onMove refuses a cross-band drag while it is happening, so the card stops at the boundary instead of snapping back after the drop. ArrowLeft/ArrowRight on the drag handle do the same move from the keyboard, because a reorder that only exists for mice is not a reorder.
 
-- `2026-08-14 09:31` stream **run-the-checks** done — make check runs the linter, regenerates the sheet, and fails if the sheet was stale. make hooks routes core.hooksPath at .githooks/ so it runs pre-commit, scoped to commits that touch assets/icons, index.html, css/style.css or scripts/icon-*. Verified: a README-only commit skips the check entirely.
+- `2026-08-14 09:31` stream **run-the-checks** done: make check runs the linter, regenerates the sheet, and fails if the sheet was stale. make hooks routes core.hooksPath at .githooks/ so it runs pre-commit, scoped to commits that touch assets/icons, index.html, css/style.css or scripts/icon-*. Verified: a README-only commit skips the check entirely.
 
 - `2026-08-14 09:31` DESTRUCTIVE MISTAKE, self-inflicted: while proving the pre-commit hook I made a throwaway commit and ran 'git reset --hard HEAD~1' to undo it. That discards uncommitted work, and every tracked modification from this whole effort was unstaged. Lost index.html, css/style.css, js/search.js, 49 icons, docs/ICONS.md, the Makefile, and the blog registration. Untracked files (scripts/, post/, blog/img/, the post HTML, the briefs) survived. Rebuilt everything from the edits in session history; the diagram generator independently re-derived 0.88-2.33px -> 2.57px and .card-site-icon n->Y from the restored files, which confirms the restoration rather than assuming it.
 
@@ -134,29 +134,29 @@ separate, boring, reliable surface.
 
 - `2026-08-15 21:56` Header report reproduced only as a mechanism, not a symptom: in the Chrome pane the bar sits at rectTop 0 at scrollY 900, so it IS sticky here. But css/style.css:35 sets 'body { overflow-x: hidden }', which is the exact hazard the root CLAUDE.md documents against the footer kit ('a dozen sites set overflow-x:hidden on body, which breaks sticky'). hidden makes body a scroll container in engines that do not propagate body overflow to the viewport; the header then sticks to a box that never scrolls. Fixing the mechanism rather than arguing with the report.
 
-- `2026-08-15 21:56` Search 'parla' measured on the running page: '6 of 47 tools', order [Vibe Check, Hiring Pack, Character Sheet, Parla, Playbook, TubeStack]. Cause is two-part and both parts are needed: (1) doFilter adds EVERY id of any category whose keyword blob contains the substring — 'parla' is inside Social's keywords, so all 6 Social cards become matches; (2) the merged grid is filled in catalogCardsOrdered (DOM) order, so there is no ranking at all. Fixing only the ranking would still show 6 results for a 1-tool query.
+- `2026-08-15 21:56` Search 'parla' measured on the running page: '6 of 47 tools', order [Vibe Check, Hiring Pack, Character Sheet, Parla, Playbook, TubeStack]. Cause is two-part and both parts are needed: (1) doFilter adds EVERY id of any category whose keyword blob contains the substring, 'parla' is inside Social's keywords, so all 6 Social cards become matches; (2) the merged grid is filled in catalogCardsOrdered (DOM) order, so there is no ranking at all. Fixing only the ranking would still show 6 results for a 1-tool query.
 
-- `2026-08-15 22:02` stream **search ranking** done — Two defects, both fixed: scoreCard/rank() gives every match a score (name-exact 1000 down to loose 120) and syncCatalogMerge appends in that order; and the keyword blob is demoted to a fallback vocabulary that only expands a group when the query matched no card directly. Category labels still expand unconditionally because that is the pill-click path.
+- `2026-08-15 22:02` stream **search ranking** done: Two defects, both fixed: scoreCard/rank() gives every match a score (name-exact 1000 down to loose 120) and syncCatalogMerge appends in that order; and the keyword blob is demoted to a fallback vocabulary that only expands a group when the query matched no card directly. Category labels still expand unconditionally because that is the pill-click path.
 
-- ~~`2026-08-15 22:18` stream **sticky header** done — css/style.css:35 'body { overflow-x: hidden }' -> 'hidden' then 'clip'. clip cuts the horizontal overflow without making body a scroll container, so .header-bar and .cat-rail stick to the viewport in every engine, not only ones that propagate body overflow upward. Verified: computed overflow-x 'clip', overflow-y back to 'visible' (was 'auto' — that was the scroll container), header rectTop 0 at scrollY 1600, no horizontal overflow at 1280 or 375. HONEST LIMIT: could not reproduce the drifting header in this Chrome pane, where it was already sticky. What is fixed is the documented mechanism, not an observed symptom.~~ · superseded 2026-08-15 22:29, see correction below
+- ~~`2026-08-15 22:18` stream **sticky header** done: css/style.css:35 'body { overflow-x: hidden }' -> 'hidden' then 'clip'. clip cuts the horizontal overflow without making body a scroll container, so .header-bar and .cat-rail stick to the viewport in every engine, not only ones that propagate body overflow upward. Verified: computed overflow-x 'clip', overflow-y back to 'visible' (was 'auto'. That was the scroll container), header rectTop 0 at scrollY 1600, no horizontal overflow at 1280 or 375. HONEST LIMIT: could not reproduce the drifting header in this Chrome pane, where it was already sticky. What is fixed is the documented mechanism, not an observed symptom.~~ · superseded 2026-08-15 22:29, see correction below
 
-- `2026-08-15 22:18` stream **space + scroll cue** done — Both shelves are one horizontal row at every width (were a 3-col grid, so 6 cards = 2 rows). Measured at 1280x800: Recently shipped 609px -> 379px, category rail y=1297 -> y=1132 (165px higher), and with favorites also showing the saving is ~340px. Recently shipped itself sits 74px LOWER (664 -> 738) because the hero grew, which is the other half of what was asked. Scroll cue is a chevron pair in the hero that retires on the first scroll and is also a button that jumps to the first live section below.
+- `2026-08-15 22:18` stream **space + scroll cue** done: Both shelves are one horizontal row at every width (were a 3-col grid, so 6 cards = 2 rows). Measured at 1280x800: Recently shipped 609px -> 379px, category rail y=1297 -> y=1132 (165px higher), and with favorites also showing the saving is ~340px. Recently shipped itself sits 74px LOWER (664 -> 738) because the hero grew, which is the other half of what was asked. Scroll cue is a chevron pair in the hero that retires on the first scroll and is also a button that jumps to the first live section below.
 
-- `2026-08-15 22:18` stream **pill navigation** done — Constellation no longer collapses during a search. Matched pills travel to the middle (spring 0.003 -> 0.014 — at 0.003 they crept a third of the way in the second a reader looks, so it read as a dim, not a move), unmatched take a peripheral ring (0.008 -> 0.02, radius 0.38W -> 0.46W) at 16% opacity, hover back to full. The connection web became a proximity route map: k=2 nearest neighbours re-derived every 40 frames, quadratic-bezier bows, and a tapered signal head that takes the colour of the pill it travels toward. Chips now render only when the pill cloud never booted — verified in exactly that state (hidden pane, rAF frozen, pills 0, chips 'Social').
+- `2026-08-15 22:18` stream **pill navigation** done: Constellation no longer collapses during a search. Matched pills travel to the middle (spring 0.003 -> 0.014, at 0.003 they crept a third of the way in the second a reader looks, so it read as a dim, not a move), unmatched take a peripheral ring (0.008 -> 0.02, radius 0.38W -> 0.46W) at 16% opacity, hover back to full. The connection web became a proximity route map: k=2 nearest neighbours re-derived every 40 frames, quadratic-bezier bows, and a tapered signal head that takes the colour of the pill it travels toward. Chips now render only when the pill cloud never booted, verified in exactly that state (hidden pane, rAF frozen, pills 0, chips 'Social').
 
-- `2026-08-15 22:18` stream **hero copy** done — Tailor-made lead. Badge 'Free · Local · No account' with an 8-phrase rotation; H1 'Made to fit' + one of four typed completions; sub 'N tools, each cut for one job. Nothing to sign up for, nothing phoning home — and none of them are finished.' The page title, meta description, OG/Twitter pairs and the JSON-LD description carried the retired heading and the paywall joke, so all seven moved together. Nothing else in the fleet quoted them (grepped PROJECTS.md, HUB_REGISTRY.md, llms.txt, README).
+- `2026-08-15 22:18` stream **hero copy** done: Tailor-made lead. Badge 'Free · Local · No account' with an 8-phrase rotation; H1 'Made to fit' + one of four typed completions; sub 'N tools, each cut for one job. Nothing to sign up for, nothing phoning home, and none of them are finished.' The page title, meta description, OG/Twitter pairs and the JSON-LD description carried the retired heading and the paywall joke, so all seven moved together. Nothing else in the fleet quoted them (grepped PROJECTS.md, HUB_REGISTRY.md, llms.txt, README).
 
-- `2026-08-15 22:18` Measured after the fact, worth recording because it contradicts the estimate the layout option was chosen on: the predicted rail position was y~890 and the actual is y=1132. Two things I did not price — a shelf card is ~285px tall, not ~200, and the hero grew 74px (the scroll cue, plus the new sub-line wrapping to two lines). The direction is right and both asks are satisfied; the number is not the one on the option card.
+- `2026-08-15 22:18` Measured after the fact, worth recording because it contradicts the estimate the layout option was chosen on: the predicted rail position was y~890 and the actual is y=1132. Two things I did not price. A shelf card is ~285px tall, not ~200, and the hero grew 74px (the scroll cue, plus the new sub-line wrapping to two lines). The direction is right and both asks are satisfied; the number is not the one on the option card.
 
-- `2026-08-15 22:29` CORRECTION of the struck note above: The header report was literal and I mis-read it. The user does not want the bar pinned at all — they want it to LEAVE on the way down. The overflow-x fix stands on its own merit (body was a scroll container, which is a real defect), but it was not the ask. What they asked for is auto-hide.
+- `2026-08-15 22:29` CORRECTION of the struck note above: The header report was literal and I mis-read it. The user does not want the bar pinned at all. They want it to LEAVE on the way down. The overflow-x fix stands on its own merit (body was a scroll container, which is a real defect), but it was not the ask. What they asked for is auto-hide.
 
-- `2026-08-15 22:29` stream **header auto-hide** done — Auto-hide was welded to data-header-mode='app' in both the kit CSS and JS, so wanting the behaviour meant taking the slim 56px gradient bar with it. Added data-header-autohide='on' as an opt-in any mode can take, in the canonical packages/neorgon-ui/header/ (README documented), vendored to neorgon-site only via sync-header.sh --to. The hub keeps its transparent glass and now leaves on the way down. The docked category rail closes the 68px hole with one sibling rule, .header-bar.header-hidden ~ .cat-rail { top: 0 }, matched to the bar's own .26s — no JS and no second source of truth for the offset. Verified by driving the kit's own rAF-throttled listener with a synchronous rAF shim: visible at 60px (under its 80px threshold), hidden at 500/1500/2500 with the rail docked at 0, returns on a 200px scroll up, hides again on the next scroll down.
+- `2026-08-15 22:29` stream **header auto-hide** done: Auto-hide was welded to data-header-mode='app' in both the kit CSS and JS, so wanting the behaviour meant taking the slim 56px gradient bar with it. Added data-header-autohide='on' as an opt-in any mode can take, in the canonical packages/neorgon-ui/header/ (README documented), vendored to neorgon-site only via sync-header.sh --to. The hub keeps its transparent glass and now leaves on the way down. The docked category rail closes the 68px hole with one sibling rule, .header-bar.header-hidden ~ .cat-rail { top: 0 }, matched to the bar's own .26s. No JS and no second source of truth for the offset. Verified by driving the kit's own rAF-throttled listener with a synchronous rAF shim: visible at 60px (under its 80px threshold), hidden at 500/1500/2500 with the rail docked at 0, returns on a 200px scroll up, hides again on the next scroll down.
 
-- `2026-08-15 22:29` Em dashes are out of the hero sub-line and the two meta/JSON-LD descriptions that mirror it. The rest of the page's em dashes are pre-existing card copy and comments, deliberately left alone — the note was about the subtitle.
+- `2026-08-15 22:29` Em dashes are out of the hero sub-line and the two meta/JSON-LD descriptions that mirror it. The rest of the page's em dashes are pre-existing card copy and comments, deliberately left alone. The note was about the subtitle.
 
-- `2026-08-17 09:45` stream **debrief + writeup** done — Deck: docs/debrief-2026-08-17.yaml, 26 slides, eng audience, slides-site YAML. Dated filename because docs/debrief-2026-08.yaml already holds the Aug 13 pass and would have been clobbered. validate.mjs exit 0; geometry checked by walking all 26 slides in the player and measuring scrollHeight against clientHeight, zero overflow in either axis. Post: post/POST-planets.md (1768 words) plus blog/i-deleted-the-thing-i-defended.html, registered in blog/index.html, feed.xml and atom.xml, all three XML files re-parsed clean. Three diagrams from post/build-visuals-planets.mjs, which parses js/search.js for CATEGORIES membership, the SCORE table and the depth expression, so none of them can drift from the code. Two render defects caught and fixed in the generator rather than the SVG: overlapping pills in the depth field (added a separation pass) and a legend drawn through the last two rows of the score ladder (grew the canvas).
+- `2026-08-17 09:45` stream **debrief + writeup** done: Deck: docs/debrief-2026-08-17.yaml, 26 slides, eng audience, slides-site YAML. Dated filename because docs/debrief-2026-08.yaml already holds the Aug 13 pass and would have been clobbered. validate.mjs exit 0; geometry checked by walking all 26 slides in the player and measuring scrollHeight against clientHeight, zero overflow in either axis. Post: post/POST-planets.md (1768 words) plus blog/i-deleted-the-thing-i-defended.html, registered in blog/index.html, feed.xml and atom.xml, all three XML files re-parsed clean. Three diagrams from post/build-visuals-planets.mjs, which parses js/search.js for CATEGORIES membership, the SCORE table and the depth expression, so none of them can drift from the code. Two render defects caught and fixed in the generator rather than the SVG: overlapping pills in the depth field (added a separation pass) and a legend drawn through the last two rows of the score ladder (grew the canvas).
 
-- `2026-08-17 09:45` Found while writing the blog post, NOT fixed: blog/everything-on-the-page-was-correct.html loads <script src="js/starfield.js"> relative, which resolves to /blog/js/starfield.js and 404s — there is no blog/js directory. The new post uses /js/starfield.js. Left alone because it is a published post outside this change; flagged as a separate task.
+- `2026-08-17 09:45` Found while writing the blog post, NOT fixed: blog/everything-on-the-page-was-correct.html loads <script src="js/starfield.js"> relative, which resolves to /blog/js/starfield.js and 404s. There is no blog/js directory. The new post uses /js/starfield.js. Left alone because it is a published post outside this change; flagged as a separate task.
 
 - `2026-08-18 17:22` Root cause was two defects, not one. The visible half: an idle physics tick (spring to a random home + two sine wobbles scaled by depth^2 + pill-to-pill repulsion + damping) ran every frame. The hidden half: randomPositions() was asked for 12 points >=80px apart inside a box 680 wide and 108-200 tall, which is unsatisfiable, so it gave up after 200 attempts, dropped pills on top of each other, and the repulsion spent every frame failing to separate a layout that could not be separated. Killing only the wobble would have left overlapping pills.
 
@@ -206,6 +206,20 @@ separate, boring, reliable surface.
 
 - `2026-08-19 09:53` Diagnosed 'expanding a collapsed group reveals invisible cards' and wrote a revealCards() fix for it. The diagnosis was wrong: the preview tab reported visibilityState hidden, which froze all 76 of the page's animations at currentTime 0, so every card on the page measured opacity 0, not just the ones in collapsed groups. Retested with revealCards disabled: expanding creates a FRESH cardEnter animation at time 0 which finishes at opacity 1, because the browser restarts animations when a subtree becomes rendered again. revealCards was removed. Lesson: opacity read from a hidden tab is not evidence.
 
+- `2026-08-28 23:52` Approach: arrow gets thicker stroke, bigger hit target, gold-or-accent hover, and a delegated click listener (same interception pattern as .card-tools) that opens the card href in a new tab. Star keeps the control strip's functionality but loses the resting box; on save it fires a radial brightness burst plus the existing _neoSoundDiscover hook. Shelves generalize the sub-600px negative-margin full-bleed pattern to desktop so cards travel past the 1160px column edge before fading. Music adds a pageshow handler: on bfcache restore attempt resume, and if the player is not actually playing, clear the button state. Rejected alternative: rebuilding card controls as real buttons outside the anchor; CLAUDE.md documents why the span-in-anchor trade-off was chosen and reversing it breaks search.js reparenting and sortable drag targets.
+
+- `2026-08-28 23:52` Ten review agents launched per user request (arrow, star burst, star strip, rail breakout, music, motion polish, visual depth, perf budget, a11y, brand fit); implementation stays inline in the main thread since all edits land in the same few files.
+
+- `2026-08-28 23:55` Scope added mid-task by user: dispatch corner popup gets an animated satellite SVG at the start of its title, and the Dispatch site name is under review (French name or satnews/satell); five more review agents for that effort. Display-name surfaces change now; domain/repo/DNS rename is a separate decision to flag, not execute.
+
+- `2026-08-29 00:33` Decisions landed: arrow hover speaks per-card accent (brand-fit doctrine beat the uniform-gold proposal; gold stays the saved-state vocabulary); arrow is pointer-only and aria-hidden with Cmd/Ctrl+Enter as the keyboard path (a11y reviewer beat the 55-tab-stop role=button design); strip fully unboxed with per-control hover chips (star-strip agent beat brand-fit's conditional-box middle ground); burst is variant B (flash+ring+6 sparks), body-parented at z-30; first-ever save plays _neoSoundDiscover, later saves ping; shelves get a LEFT-only viewport breakout capped at 340px with is-scrolled leading fade and a lit column-edge hairline; music does attempt-resume-then-verify on pageshow (kept over the a11y agent's never-auto-resume stance: resuming continues the visitor's own choice and degrades to the honest off state when blocked); Dispatch display name is now Antenne (naming agent: satnews collides with a real satellite trade publication, depeche is Depeche Mode; antenne is the French on-air idiom under a satellite icon).
+
+- `2026-08-29 00:33` Verified in browser at localhost:8800: arrow 30px/2.5 stroke opens window.open href,_blank,noopener,noreferrer without navigating; strip transparent, right -5px bottom -3px; shelf bleed -172px at 1440w with resting card flush at x=172, scrolled card measured at x=-107 traveling the margin, is-scrolled and hairline toggling both ways; burst 6 sparks, cleans up, favorites round-trips; popup z 150 radius 16 label Antenne with 3-wave satellite, accent read #3b82f6, veil lifts, idles at 10s; embed masthead and Open in Antenne confirmed from the live local server. make smoke 36/36 after fixing genuine date rot (hero 17 to 16 shipped). Not live-tested: the actual bfcache pageshow path (devtools-attached pane defeats it; recipe is in the review) and touch hover:none rendering.
+
+- `2026-08-29 00:33` Regenerated: registry (76 sites valid), dispatch feed.xml, icon sheet, og-dispatch.jpg via generate-og.mjs --only=dispatch plus deploy (byte-identical for untouched sites). Pre-existing dirty work in doorman-site and enjeu-site was not touched. Queued #43 dispatch-site late-rendering bullets; spawned a chip for the search.js negative ellipse radius crash found at narrow widths.
+
+- `2026-08-29 01:43` Follow-up round on the Antenne popup, user-driven: embed grew ?brand=0 (state.js flag + conditional masthead in dispatch-site render.js, README documented) so the popup bar is the only place naming the site; the popup got a brushed-metal shell with a 16px left tool rail and machined groove around the dark glass body; the satellite was redrawn as a solid silhouette (panel-body-panel on the diagonal, dish dome facing its own two signal arcs, rotate(-45) group), first attempt fused dish and body at large scale and was redrawn; closing the popup now collapses it into a 44px metallic satellite dock in the same corner that reopens it, and a visit with no unseen news gets only the dock. Verified in browser: full lifecycle popup-close-dock-reopen, brand=0 masthead removal, quiet-visit dock-only path, console clean.
+
 ## Measured
 
 All figures below were read out of a live page via `browser_evaluate` against
@@ -228,7 +242,7 @@ All figures below were read out of a live page via `browser_evaluate` against
 The 3 remaining console messages are all benign: the `frame-ancestors`-via-meta
 warning (Chrome ignores that directive in a `<meta>` tag by design), and two from
 `awesome-sites-hub.js` trying `localhost:8831` because that sibling site is not
-running locally — production uses `awesomesites.neorgon.com`, which `connect-src`
+running locally: production uses `awesomesites.neorgon.com`, which `connect-src`
 allows.
 
 
@@ -262,7 +276,7 @@ _Closed 2026-08-14 09:37._
 
 ---
 
-## Run — 2026-08-15 21:56
+## Run: 2026-08-15 21:56
 
 **Problem.** The hub reads as a flat page, not a space console: search ranks a category blanket above the tool you named, the pill constellation unmounts exactly when it should be navigating, Recently shipped eats two screens, and the hero copy sells 'no paywall' instead of tailor-made
 
@@ -274,7 +288,7 @@ _Closed 2026-08-17 09:45._
 
 ---
 
-## Run — 2026-08-18 17:03
+## Run: 2026-08-18 17:03
 
 **Problem.** Hero constellation pills drift erratically and rearrange on filter; both read wrong for a planetary chart
 
@@ -286,7 +300,7 @@ _Closed 2026-08-18 18:11._
 
 ---
 
-## Run — 2026-08-19 09:35
+## Run: 2026-08-19 09:35
 
 **Problem.** Hub surfaces treat reference tools as news, superseded tools as current, and the terminal opens on a bare one-line greeting
 
@@ -375,3 +389,11 @@ environment that turned out to have a precise cause.
   alone, and the archive plus collapse plus banner plus dim fix together,
   because their HTML, CSS and JS interlock and an intermediate commit would
   not have worked. Not pushed.
+
+---
+
+## Run: 2026-08-28 23:52
+
+**Problem.** Hub polish: arrow affordance (thicker, gold hover, new-tab), boxless star with discovery burst, desktop full-bleed breakout for the shelves, music button stale-playing fix after bfcache return
+
+_Closed 2026-08-29 00:33._

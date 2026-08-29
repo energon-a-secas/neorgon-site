@@ -241,7 +241,11 @@
 
   function measure() {
     grids.forEach(function (g) {
-      g.classList.toggle('is-scrollable', g.scrollWidth - g.clientWidth > 4);
+      var over = g.scrollWidth - g.clientWidth > 4;
+      g.classList.toggle('is-scrollable', over);
+      /* Both classes from one measurement, so they can never disagree; a
+         favorites re-render resets scrollLeft and this clears the fade. */
+      g.classList.toggle('is-scrolled', over && g.scrollLeft > 2);
     });
   }
 
@@ -254,4 +258,19 @@
   /* Cards arriving or leaving changes the answer, and favorites does both. */
   var mo = new MutationObserver(measure);
   grids.forEach(function (g) { mo.observe(g, { childList: true }); });
+
+  /* The leading fade and the lit column edge are scroll states (.is-scrolled),
+     toggled here rather than styled per frame: the mask must only ever swap
+     between discrete class states or it re-rasterizes continuously. */
+  grids.forEach(function (g) {
+    var raf = null;
+    g.addEventListener('scroll', function () {
+      if (raf) return;
+      raf = requestAnimationFrame(function () {
+        raf = null;
+        g.classList.toggle('is-scrolled',
+          g.classList.contains('is-scrollable') && g.scrollLeft > 2);
+      });
+    }, { passive: true });
+  });
 })();

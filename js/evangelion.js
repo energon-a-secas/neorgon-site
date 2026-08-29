@@ -401,7 +401,7 @@
       blue: {
         label: '警告',
         sub: 'WARNING',
-        type: 'PATTERN BLUE — ANGEL DETECTED',
+        type: 'PATTERN BLUE: ANGEL DETECTED',
         duration: 5000,
       },
       red: {
@@ -413,7 +413,7 @@
       orange: {
         label: '注意',
         sub: 'CAUTION',
-        type: 'EVANGELION UNIT-01 — BERSERK MODE',
+        type: 'EVANGELION UNIT-01: BERSERK MODE',
         duration: 5500,
       },
     };

@@ -87,7 +87,7 @@ make serve
 # open http://localhost:8800
 ```
 
-Or open `index.html` directly — no dependencies, no install.
+Or open `index.html` directly: no dependencies, no install.
 
 The port is 8800, which is what `scripts/repo-tools.sh` `get_port()` assigns this project in
 the monorepo. It is the one source of truth for it; the Makefile follows it.

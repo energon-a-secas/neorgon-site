@@ -1,4 +1,4 @@
-# Brief — Close the five items left open by the search/icon run: port drift, chip-row wrap on mobile, a stale icon doc, icons still ignoring their card accent, and two motion behaviours never verified in a real browser
+# Brief: Close the five items left open by the search/icon run: port drift, chip-row wrap on mobile, a stale icon doc, icons still ignoring their card accent, and two motion behaviours never verified in a real browser
 
 Started 2026-08-14 00:22. Maintained by the `task` skill; read by `debrief` and `writeup`.
 
@@ -41,17 +41,17 @@ was rewritten to describe the final state instead.
 
 <!-- Appended by: brief.sh note "<what you learned>" -->
 
-- `2026-08-14 00:22` stream **port-drift** done — Makefile PORT 8877 -> 8800 and the matching line in the project's CLAUDE.md; scripts/repo-tools.sh get_port() is canonical and was already right. No other 8877 in live files.
+- `2026-08-14 00:22` stream **port-drift** done: Makefile PORT 8877 -> 8800 and the matching line in the project's CLAUDE.md; scripts/repo-tools.sh get_port() is canonical and was already right. No other 8877 in live files.
 
 - `2026-08-14 00:22` The published post's 'Where it still breaks' list names four items as open. Fixing them makes the post wrong, so blog/everything-on-the-page-was-correct.html and post/POST-correct-and-wrong.md must be reconciled before this run closes.
 
-- `2026-08-14 00:23` stream **chip-row** done — One scrollable line at <=600px, borrowing the hidden-scrollbar pattern .cat-rail-inner already uses. No '+N more' affordance invented.
+- `2026-08-14 00:23` stream **chip-row** done: One scrollable line at <=600px, borrowing the hidden-scrollbar pattern .cat-rail-inner already uses. No '+N more' affordance invented.
 
-- `2026-08-14 00:27` stream **icon-accent** done — 49 card icons converted from <img> to masked <span role=img aria-label>, taking var(--card-accent); 4 third-party brand marks and the raster logo stay <img>. Guarded with @supports. One defect found and fixed: a relative url() inside a custom property resolves against the stylesheet that substitutes the var(), not the HTML that declared it, so all 49 masks 404'd as /css/assets/... until the paths were made root-relative.
+- `2026-08-14 00:27` stream **icon-accent** done: 49 card icons converted from <img> to masked <span role=img aria-label>, taking var(--card-accent); 4 third-party brand marks and the raster logo stay <img>. Guarded with @supports. One defect found and fixed: a relative url() inside a custom property resolves against the stylesheet that substitutes the var(), not the HTML that declared it, so all 49 masks 404'd as /css/assets/... until the paths were made root-relative.
 
-- `2026-08-14 00:28` stream **icon-sheet** done — scripts/icon-sheet.py generates docs/icon-sheet.html from index.html + the icon dir: all 54 card icons at 60px and 28px, each in its own card's accent, raw brand marks flagged. Stale docs/icon-comparison.html removed (git 0e3afe3). First attempt bracketed cards by regex and found 29 of 54 because Soon and multi-tool cards are <div>; rewritten to anchor on the icon and walk back to the nearest --card-accent.
+- `2026-08-14 00:28` stream **icon-sheet** done: scripts/icon-sheet.py generates docs/icon-sheet.html from index.html + the icon dir: all 54 card icons at 60px and 28px, each in its own card's accent, raw brand marks flagged. Stale docs/icon-comparison.html removed (git 0e3afe3). First attempt bracketed cards by regex and found 29 of 54 because Soon and multi-tool cards are <div>; rewritten to anchor on the icon and walk back to the nearest --card-accent.
 
-- `2026-08-14 00:30` stream **motion-proof** done — Confirmed in Playwright (real Chromium, rAF running at 126fps, 11 pills booted). Constellation collapse eased 200 -> 147.7 -> 77.5 -> 25.5 -> 11.4 -> 0 over ~320ms, matching the 0.3s transition. Reveal scroll animated 0 -> 291 and landed exactly on the computed target of 291. Mobile chip row at the worst case (11 chips): 23px, one line, scrollable, no sideways body scroll.
+- `2026-08-14 00:30` stream **motion-proof** done: Confirmed in Playwright (real Chromium, rAF running at 126fps, 11 pills booted). Constellation collapse eased 200 -> 147.7 -> 77.5 -> 25.5 -> 11.4 -> 0 over ~320ms, matching the 0.3s transition. Reveal scroll animated 0 -> 291 and landed exactly on the computed target of 291. Mobile chip row at the worst case (11 chips): 23px, one line, scrollable, no sideways body scroll.
 
 - `2026-08-14 00:36` Converting the icons to spans broke both checkers silently: icon-lint.py matched only <img> and reported 'all 0 linted icons on standard' with exit 0, and the diagram generator charted NaN while still writing a PNG. Both now match img|span AND refuse to pass on a suspiciously small match; the regression was reproduced deliberately to watch them exit 2.
 

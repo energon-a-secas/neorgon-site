@@ -125,13 +125,14 @@
   }
 
   /* ── The control strip ────────────────────────────────────────────────────
-     One pill, bottom-right, opposite the arrow. The arrow at the top is "go
-     there"; this is "keep this", and the two gestures never share a corner.
+     Bare glyphs, bottom-right, opposite the arrow. The arrow at the top is
+     "go there"; this is "keep this", and the two gestures never share a
+     corner.
 
-     A pill rather than a bare icon because the old single 28px star was a
-     precision target — hovering anywhere on the card now surfaces a strip with
-     a real surface behind it, and the star alone stays visible on a saved card
-     so the state reads at rest.
+     The glyphs are unboxed but every control still owns a 28px hit box and a
+     per-control hover chip, so the targets stayed real when the pill's
+     backdrop went. The star alone stays visible on a saved card so the state
+     reads at rest.
 
      Each control is a <span role="button">, not a <button>, because a card is
      an <a> and nesting a button in a link is invalid. Clicks are intercepted
@@ -160,6 +161,36 @@
 
   function ping(on) {
     if (window._neoSoundPing) window._neoSoundPing(on ? 880 : 520, 0.014);
+  }
+
+  /* ── Discovery burst ──────────────────────────────────────────────────────
+     A one-shot flash, ring and sparks at the star's viewport position when a
+     tool is saved. Body-parented on purpose: the card clips overflow and its
+     filled cardEnter transform makes it a containing block for fixed
+     children, so nothing inside the card can escape (see .fav-burst in
+     style.css). The rect is captured before toggleFav because render()
+     rebuilds the shelf synchronously and can detach the clicked star. */
+  var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function favBurst(rect) {
+    if (REDUCED.matches) return;
+    if (!rect || (!rect.width && !rect.height)) return;
+    var b = document.createElement('div');
+    b.className = 'fav-burst';
+    b.setAttribute('aria-hidden', 'true');
+    b.style.left = (rect.left + rect.width / 2) + 'px';
+    b.style.top = (rect.top + rect.height / 2) + 'px';
+    b.innerHTML = '<span class="fb-flash"></span><span class="fb-ring"></span>';
+    for (var i = 0; i < 6; i++) {
+      var s = document.createElement('span');
+      s.className = 'fb-spark';
+      s.style.setProperty('--fb-a', (i * 60 + (Math.random() * 24 - 12)) + 'deg');
+      s.style.setProperty('--fb-d', (36 + Math.random() * 16) + 'px');
+      b.appendChild(s);
+    }
+    document.body.appendChild(b);
+    /* Timer, not animationend: it still fires in hidden tabs. */
+    setTimeout(function () { b.remove(); }, 700);
   }
 
   function mount(el, inShelf) {
@@ -194,7 +225,19 @@
     strip.appendChild(pin);
 
     var star = makeTool('fav-toggle', 'Save', ICON.star);
-    bind(star, function () { ping(toggleFav(id)); });
+    bind(star, function () {
+      var rect = star.getBoundingClientRect();
+      var on = toggleFav(id);
+      if (on === true) {
+        favBurst(rect);
+        /* The very first save is the discovery: the shelf itself appears.
+           It gets the sonar's chord; every later save keeps the quiet ping. */
+        if (items.length === 1 && window._neoSoundDiscover) window._neoSoundDiscover();
+        else ping(true);
+      } else {
+        ping(on);
+      }
+    });
     strip.appendChild(star);
 
     el.classList.add('has-fav');
@@ -223,7 +266,7 @@
       var star = strip.querySelector('.fav-toggle');
       star.classList.toggle('is-on', saved);
       star.setAttribute('aria-pressed', saved ? 'true' : 'false');
-      star.setAttribute('aria-label', (saved ? 'Remove ' : 'Save ') + name);
+      star.setAttribute('aria-label', saved ? 'Remove ' + name + ' from favorites' : 'Save ' + name + ' to favorites');
       star.setAttribute('title', saved ? 'Remove from favorites' : 'Save to favorites');
 
       var pin = strip.querySelector('.pin-toggle');
