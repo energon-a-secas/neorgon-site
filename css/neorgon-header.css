@@ -352,6 +352,11 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   transition-duration: .2s;
   transition-timing-function: var(--header-ease-in, ease);
 }
+/* Keyboard focus entering a hidden bar reveals it: focus must never sit
+   on an off-screen control (WCAG 2.4.7, and 2.2's 2.4.11). header.js
+   drops the class on focusin so the next scroll decision agrees with
+   what is painted; this rule covers the frame in between. */
+.header-bar.header-hidden:focus-within { transform: none; }
 
 /* ── Logo block ──────────────────────────────────────────────── */
 .header-logo {
@@ -369,7 +374,8 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   filter: brightness(0) invert(1);
   transition: transform .28s var(--header-ease, ease);
 }
-.header-logo-img:hover { transform: scale(1.06) rotate(-4deg); }
+.header-logo-img:hover,
+.header-title-link:hover .header-logo-img { transform: scale(1.06) rotate(-4deg); }
 
 /* min-height also fixes a target-size failure: at <=700px the subtitle is
    hidden and this link collapses to 22px, under the 24px WCAG 2.5.8
@@ -383,6 +389,26 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   justify-content: center;
   min-height: var(--header-control-h);
 }
+/* Current contract: mark + name are ONE anchor to the site's own home
+   (the img rides inside .header-title-link with alt=""), so the link's
+   accessible name is the title text and the logo stops being a second,
+   differently-behaved link. Scoped with :has() so the retired two-anchor
+   markup keeps rendering unchanged wherever it still exists. */
+.header-title-link:has(> .header-logo-img, > picture) {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.header-title-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+/* The one visible cue that the name is a control: the title warms to the
+   accent on hover. Kept subtle; the cursor and the logo tilt do the rest. */
+.header-logo h1 { transition: color .2s var(--header-ease, ease); }
+.header-title-link:hover h1 { color: var(--header-accent); }
 /* rem, not em: a shared component must not rescale because a site set its
    own body font-size. 1.2rem == 19.2px == today's rendered size.
 
@@ -590,6 +616,25 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   display: block;
 }
 
+/* ── Hub glyph: inclined planet + orbiting rocket ────────────────
+   .header-home now carries the kit's planet SVG (markup contract in
+   the README) — the one header link to neorgon.com, tooltip
+   "neorgon.com". Idle it is a still planet with the rocket parked;
+   on hover or keyboard focus the rocket does laps, smoke trailing.
+   Stroked glyph, so it sizes with --header-icon, not the solid token. */
+.header-home svg.nh-hub-icon {
+  width: var(--header-icon, 22px);
+  height: var(--header-icon, 22px);
+}
+.header-home .nh-orbit {
+  transform-origin: 12px 12px; /* viewBox centre — the planet */
+}
+.header-home:hover .nh-orbit,
+.header-home:focus-visible .nh-orbit {
+  animation: nh-orbit-lap 1.4s linear infinite;
+}
+@keyframes nh-orbit-lap { to { transform: rotate(360deg); } }
+
 /* ── Overflow toggle (⋯) — injected by header.js ─────────────── */
 .header-overflow { position: relative; display: flex; }
 .header-overflow[hidden] { display: none; }
@@ -789,7 +834,10 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   .header-bar[data-header-autohide="on"],
   .header-bar[data-header-autohide="on"].header-hidden { transition: none; }
   .header-logo-img { transition: none; }
-  .header-logo-img:hover { transform: none; }
+  .header-logo-img:hover,
+  .header-title-link:hover .header-logo-img { transform: none; }
+  .header-home:hover .nh-orbit,
+  .header-home:focus-visible .nh-orbit { animation: none; }
   .header-menu.open { animation: none; }
   .header-overflow-toggle:active,
   .header-theme-toggle:active,

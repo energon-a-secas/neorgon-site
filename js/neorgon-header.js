@@ -264,6 +264,12 @@
   function initAutoHide(header) {
     var lastY = window.scrollY;
     var ticking = false;
+    /* Focus entering the bar reveals it. CSS paints the same frame via
+       .header-hidden:focus-within; dropping the class here keeps the next
+       scroll decision in agreement with what is on screen. */
+    header.addEventListener('focusin', function () {
+      header.classList.remove('header-hidden');
+    });
     window.addEventListener('scroll', function () {
       if (ticking) return;
       ticking = true;
