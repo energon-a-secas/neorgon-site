@@ -144,6 +144,19 @@ def check(path: pathlib.Path, fix: bool) -> list[str]:
                 problems.append(f"missing {attr}=round")
                 out = re.sub(r"<svg\b", f'<svg {attr}="round"', out, count=1)
 
+        # The stroke has to be declared on the ROOT <svg>, not only on children.
+        # Nothing here cared until the favicon kit started recolouring these
+        # glyphs: it reads the root tag to decide whether an icon draws with
+        # lines or with solid shapes, so a glyph that puts stroke= only on its
+        # paths is classified as filled, takes the wrong padding, and keeps its
+        # authored magenta instead of the site's accent. Five files in this
+        # folder are drawn that way and would ship pink the day a card used one.
+        root = re.match(r"^.*?<svg[^>]*>", out, flags=re.S)
+        if root and not re.search(r'stroke="(?!none)', root.group(0)):
+            problems.append(f"stroke declared on children only, not on the root svg "
+                            f"(the favicon kit reads the root to tell stroke from fill)")
+            out = re.sub(r"<svg\b", f'<svg stroke="{BRAND}"', out, count=1)
+
     # `width="800px"` on the root fights the 28px CSS box and, worse, is what a
     # download from an icon site leaves behind — a reliable tell for "pasted in".
     for attr in ("width", "height"):

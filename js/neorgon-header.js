@@ -77,13 +77,25 @@
     tintFavicon(name);
   }
 
-  /* ── Favicon tint: the tab icon joins the theme ──────────────────────
-     With a visitor theme active, the favicon becomes the site's own logo
-     silhouetted in that theme's swatch, so the tab matches the page
-     (sakura turns the icon pink too). Default restores the original.
-     Opt out per site with <meta name="neo-favicon" content="off">.
-     A cross-origin logo (CDN) is only canvas-readable with CORS; when it
-     is not, toDataURL throws and the original favicon simply stays. */
+  /* ── Favicon tint: the tab icon joins the theme ──────────────────
+     With a visitor theme active the tab joins the theme, and how it does so
+     depends on what the site ships.
+
+     A site on the Favicon Kit links its own `favicon.svg`: a dark tile with
+     the tool's glyph in the tool's accent. Silhouetting that whole image, as
+     the original version did, floods the tile and throws away both the glyph
+     and the site's identity, so those sites get the **glyph** recoloured and
+     keep their tile. The tile colour is not hardcoded here: it is read off
+     the rendered icon as its most common opaque colour, so this file and the
+     generator cannot drift apart on a shared constant.
+
+     A site with no SVG favicon falls through to the original behaviour: the
+     header logo, silhouetted in the theme swatch.
+
+     Default restores the original. Opt out per site with
+     <meta name="neo-favicon" content="off">.
+     A cross-origin logo (CDN) is only canvas-readable with CORS; when it is
+     not, toDataURL throws and the original favicon simply stays. */
   function tintFavicon(name) {
     try {
       var meta = document.querySelector('meta[name="neo-favicon"]');
@@ -101,9 +113,15 @@
       for (var i = 0; i < THEMES.length; i++) {
         if (THEMES[i].id === name) theme = THEMES[i];
       }
+      if (!theme) return;
+
+      var svg = document.querySelector('link[rel~="icon"][type="image/svg+xml"]');
+      var own = svg && svg.getAttribute('data-neo-original') || (svg && svg.href);
+      if (own) { tintGlyph(link, own, theme.swatch); return; }
+
       var img = document.querySelector('.header-logo-img');
       var src = img && (img.currentSrc || img.src);
-      if (!theme || !src) return;
+      if (!src) return;
       var pic = new Image();
       if (src.indexOf(location.origin) !== 0) pic.crossOrigin = 'anonymous';
       pic.onload = function () {
@@ -122,6 +140,85 @@
       };
       pic.src = src;
     } catch (e) { /* the favicon must never break the header */ }
+  }
+
+  /* Recolour only the glyph of a Favicon Kit icon, leaving its tile alone.
+
+     Every pixel in that icon is a blend of exactly two colours: the tile and
+     the accent. So the tile is the most common opaque colour, each pixel's
+     distance from it says how much accent is in it, and re-mixing tile toward
+     the theme swatch by that same amount reproduces the icon with one colour
+     swapped, antialiasing included. No second file, no fetch (several fleet
+     sites forbid connect-src 'self'), and the source is same-origin so the
+     canvas is never tainted. */
+  function tintGlyph(link, src, swatch) {
+    var pic = new Image();
+    pic.onload = function () {
+      try {
+        var N = 64, c = document.createElement('canvas');
+        c.width = c.height = N;
+        var ctx = c.getContext('2d');
+        ctx.drawImage(pic, 0, 0, N, N);
+        var img = ctx.getImageData(0, 0, N, N), d = img.data;
+
+        var counts = {}, tile = null, best = 0, i, key;
+        for (i = 0; i < d.length; i += 4) {
+          if (d[i + 3] < 250) continue;
+          key = d[i] + ',' + d[i + 1] + ',' + d[i + 2];
+          counts[key] = (counts[key] || 0) + 1;
+          if (counts[key] > best) { best = counts[key]; tile = key; }
+        }
+        if (!tile) return;
+        var t = tile.split(',').map(Number);
+
+        /* Distance is measured over PIXELS THAT EXIST. A fully transparent
+           pixel still carries RGB 0,0,0 in the canvas buffer, and a dark tile
+           is far from black-with-no-alpha, so including them set `far` from
+           transparent nothing: every real glyph pixel then scored a fraction of
+           it and came back barely tinted. Invisible while the icon was an
+           opaque rounded square; the hexagon silhouette is mostly transparent,
+           which is what surfaced it. */
+        var far = 0, dist = new Float32Array(d.length / 4), n = 0;
+        for (i = 0, n = 0; i < d.length; i += 4, n++) {
+          if (d[i + 3] === 0) { dist[n] = -1; continue; }
+          dist[n] = Math.abs(d[i] - t[0]) + Math.abs(d[i + 1] - t[1]) + Math.abs(d[i + 2] - t[2]);
+          if (dist[n] > far) far = dist[n];
+        }
+
+        var sw = hexRGB(swatch);
+        if (!sw) return;
+
+        /* A mark drawn straight onto transparency is not untintable, it is
+           entirely glyph: there is no tile to measure against, so recolour
+           every pixel that exists and keep its alpha. The fleet's parent mark
+           is exactly this shape. */
+        if (far < 30) {
+          for (i = 0; i < d.length; i += 4) {
+            if (d[i + 3] === 0) continue;
+            d[i] = sw[0]; d[i + 1] = sw[1]; d[i + 2] = sw[2];
+          }
+          ctx.putImageData(img, 0, 0);
+          link.href = c.toDataURL('image/png');
+          return;
+        }
+
+        for (i = 0, n = 0; i < d.length; i += 4, n++) {
+          if (dist[n] < 0) continue;
+          var k = dist[n] / far;
+          d[i]     = t[0] + (sw[0] - t[0]) * k;
+          d[i + 1] = t[1] + (sw[1] - t[1]) * k;
+          d[i + 2] = t[2] + (sw[2] - t[2]) * k;
+        }
+        ctx.putImageData(img, 0, 0);
+        link.href = c.toDataURL('image/png');
+      } catch (e) { /* keep the original favicon */ }
+    };
+    pic.src = src;
+  }
+
+  function hexRGB(hex) {
+    var m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(String(hex).trim());
+    return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : null;
   }
 
   /* ── Dropdown controller: one open at a time, Esc / outside click,
@@ -179,6 +276,149 @@
       closeMenu();
     }
   });
+
+  /* ── The Energon mark, and why the kit injects it ───────────────────
+     The logo shipped as a raster <img> forced white by
+     `filter: brightness(0) invert(1)`. That is correct on a dark header and
+     wrong everywhere else: measured against the skins, white vanishes on a
+     pale header and ink muddies on the default gradient, and no single fixed
+     colour survives all of them.
+
+     An inline SVG inherits `currentColor`, which the header already sets per
+     skin and per theme, so the mark is right on backgrounds that do not exist
+     yet. The kit swaps the element rather than the fleet's markup: 74 sites
+     keep their <img>, it stays the no-JS fallback, and there is no per-site
+     edit to get wrong.
+
+     This is the same mark the favicon kit generates from
+     (packages/neorgon-ui/favicon/marks/energon-mark.svg), traced once from the
+     PNG whose alpha carries the counter. Keep them in step. */
+  var MARK_T = 'translate(2.4411,1.0000) scale(0.0450358) translate(-46.0,-11.0) translate(0.000000,512.000000) scale(0.100000,-0.100000)';
+  var MARK_D = 'M2235 4859 l-260 -152 -234 -135 -235 -134 -65 -40 -64 -40 -96 -55 -96 -56 -304 -174 -304 -174 -41 -16 -41 -16 -17 -15 -18 -15 0 -1222 0 -1223 18 -21 17 -21 135 -78 135 -79 140 -83 140 -83 155 -92 155 -92 289 -172 289 -172 305 -171 306 -170 22 -15 22 -14 99 59 98 59 225 128 225 128 220 125 220 125 260 152 260 152 178 99 178 99 22 20 23 20 -4 408 -4 407 -16 0 -17 0 -115 -68 -115 -68 -215 -126 -215 -125 -140 -78 -140 -78 -140 -82 -140 -82 -250 -140 -250 -141 -117 -70 -117 -71 -73 44 -73 43 -380 218 -380 217 -140 79 -140 80 -111 64 -112 64 -6 31 -6 31 0 767 0 767 13 15 12 16 150 83 150 83 425 246 425 245 80 43 80 42 45 1 45 0 350 -194 350 -194 0 -13 0 -12 -45 -27 -45 -27 -345 -188 -345 -188 -305 -169 -305 -169 -15 -14 -14 -15 9 -9 10 -10 342 -185 341 -186 9 0 9 0 74 47 75 46 180 102 180 102 165 95 165 95 95 55 95 55 175 103 175 102 310 180 310 180 44 27 44 26 4 12 4 12 -83 42 -83 42 -170 95 -170 95 -150 87 -150 87 -110 65 -110 65 -450 258 -450 258 -99 59 -100 58 -41 0 -40 0 -260 -151z';
+
+  function markSvg(cls, extra) {
+    return '<svg class="' + cls + '" viewBox="0 0 24 24" fill="currentColor" ' +
+      'aria-hidden="true" xmlns="http://www.w3.org/2000/svg">' + (extra || '') +
+      '<g transform="' + MARK_T + '" fill-rule="evenodd"><path d="' + MARK_D + '"/></g></svg>';
+  }
+
+  /* Replace the raster logo with a vector one.
+
+     Two sources, and which applies is declared by the site rather than guessed.
+     A site generated by the Favicon Kit carries <meta name="neo-mark"> and a
+     /logo.svg holding its OWN glyph; it gets that. Everything else gets the
+     Energon mark embedded above.
+
+     The site logo is applied as a CSS mask over `background: currentColor`,
+     not as an <img>, because an <img> cannot inherit the header's colour and
+     that is the whole point: the same mark has to read on the default gradient
+     and on a pale skin. This is the technique the hub already uses for its own
+     card icons, so it is a fleet pattern rather than a new trick.
+
+     Dropping the generated favicon.svg in here instead would have been the
+     obvious move and is wrong twice: it carries a dark hexagon tile, which is
+     a dark chip on a dark bar, and its accent is fixed, so it cannot follow a
+     skin.
+
+     The <img> is only replaced when it is actually the Energon logo, so a site
+     shipping its own wordmark there keeps it. */
+  function upgradeLogo(header) {
+    try {
+      var img = header.querySelector('img.header-logo-img');
+      if (!img) return;
+      var src = (img.getAttribute('src') || '').toLowerCase();
+      if (src.indexOf('energon') === -1) return;
+
+      var own = document.querySelector('meta[name="neo-mark"][content="on"]');
+      var node;
+      if (own) {
+        node = document.createElement('span');
+        node.className = 'header-logo-img header-logo-mark header-logo-own';
+        /* The mask URL is derived from the manifest link rather than hardcoded
+           to /logo.svg. A fleet site is served at its domain root and gets the
+           absolute form; a kit showcase or the template is served from a
+           subdirectory and gets the relative one. The same generator writes
+           both, so the manifest href is exactly the prefix in force here. */
+        var mani = document.querySelector('link[rel="manifest"]');
+        var href = mani ? mani.getAttribute('href') : '/site.webmanifest';
+        var url = href.replace(/site\.webmanifest$/, 'logo.svg');
+        node.style.webkitMaskImage = 'url("' + url + '")';
+        node.style.maskImage = 'url("' + url + '")';
+      } else {
+        var span = document.createElement('span');
+        span.innerHTML = markSvg('header-logo-img header-logo-mark');
+        node = span.firstChild;
+      }
+      if (img.alt) node.setAttribute('aria-label', img.alt);
+      node.setAttribute('role', 'img');
+      img.parentNode.replaceChild(node, img);
+    } catch (e) { /* the logo must never break the header */ }
+  }
+
+  /* The home control: the mark at the size its neighbours run at, with a
+     satellite that laps it on hover.
+
+     The first version put the mark inside a full-radius orbit ring, and it
+     measured badly: the RING spanned the control's 18px while the identifying
+     mark rendered at 8.2px, against 18px for the GitHub octicon beside it. The
+     eye compares the shape that identifies, not the outermost pixel, so the
+     control read as an afterthought. The ring is gone and the mark takes the
+     footprint; the satellite keeps the orbit idea at no cost to size and gives
+     the existing .nh-orbit animation something to move.
+
+     transform-origin stays the viewBox centre, so the satellite laps the mark
+     rather than spinning in place, and header.css already stops it under
+     prefers-reduced-motion.
+
+     The orbit is an inclined ellipse and the satellite passes BEHIND the mark
+     for half of it, which is why there are two dots: the far one is drawn
+     before the mark so the mark occludes it, the near one after. Each is
+     visible for its own half of the lap.
+
+     The ellipse's semi-major axis is capped, not chosen: an inline svg clips
+     to its viewBox, so a satellite whose OUTER EDGE passes 12 units from the
+     pivot is sliced at four points of every lap. An earlier circular orbit put
+     that edge at 13.1 and was quietly cut on hover, which no static render can
+     show. 10.2 plus a 1.35 radius leaves 11.55 of the 12 available.
+
+     Measured before shipping: at the header's real 22px the satellite is
+     FULLY hidden in 1 frame of 48, so the mark reads as occluding it rather
+     than as losing it.
+
+     The satellite carries a rim, styled in header.css, because a currentColor
+     dot crossing a currentColor mark merges into the silhouette and reads as a
+     stray pixel rather than a moon. See the note there on which token it uses
+     and where that assumption ends. */
+  function upgradeHome(header) {
+    try {
+      var home = header.querySelector('.header-home');
+      if (!home) return;
+      var old = home.querySelector('svg.nh-hub-icon');
+      if (!old) return;
+      var span = document.createElement('span');
+      span.innerHTML =
+        '<svg class="nh-hub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+        'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ' +
+        'aria-hidden="true" xmlns="http://www.w3.org/2000/svg">' +
+        /* The orbit is drawn, not implied: a faint inclined ellipse sitting
+           in the lower half, so the control reads as a planet with a ring even
+           while it is standing still. The far half of the satellite's path is
+           drawn BEFORE the mark so the mark occludes it; the near half after.
+           That paint order is the whole depth trick. */
+        '<ellipse class="nh-ring" cx="12" cy="15.2" rx="9.6" ry="3.4" ' +
+        'transform="rotate(-30 12 15.2)" fill="none" stroke="currentColor" ' +
+        'stroke-width=".75" opacity=".4"/>' +
+        '<circle class="nh-sat nh-sat-back" cx="3.69" cy="20" r="1.5" ' +
+        'fill="currentColor"/>' +
+        '<g transform="translate(12,12) scale(0.90) translate(-12,-12)">' +
+        '<g transform="' + MARK_T + '" fill-rule="evenodd" fill="currentColor" stroke="none">' +
+        '<path d="' + MARK_D + '"/></g></g>' +
+        '<circle class="nh-sat nh-sat-front" cx="20.31" cy="10.4" r="1.5" ' +
+        'fill="currentColor"/>' +
+        '</svg>';
+      home.replaceChild(span.firstChild, old);
+    } catch (e) { /* the home control must never break the header */ }
+  }
 
   /* ── Theme switcher (injected before .header-home) ──────────────────── */
   var PALETTE_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -580,6 +820,12 @@
        default. Add <meta name="neo-theme-switcher" content="on"> to a
        site's <head> to show the palette button there. (?theme=x and the
        neo_theme cookie work regardless.) */
+    /* Before the overflow snapshot: buildOverflow records the movable controls
+       once, and swapping an element after that would leave the menu holding a
+       node no longer in the tree. */
+    upgradeLogo(header);
+    upgradeHome(header);
+
     if (document.querySelector('meta[name="neo-theme-switcher"][content="on"]')) {
       buildThemeSwitcher(header);
     }

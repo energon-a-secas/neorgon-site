@@ -371,8 +371,29 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   width: auto;
   flex-shrink: 0;
   display: block;
-  filter: brightness(0) invert(1);
   transition: transform .28s var(--header-ease, ease);
+}
+/* The raster fallback still needs forcing white; the injected vector must not
+   be filtered, because it already inherits the header's own text colour and
+   inverting it would undo exactly the thing it was swapped in to fix. */
+img.header-logo-img { filter: brightness(0) invert(1); }
+svg.header-logo-mark { fill: currentColor; width: auto; }
+/* A site that ships its own mark gets it as a mask over currentColor, so the
+   glyph follows the header's text colour exactly as the inline svg does. An
+   <img> could not: it paints its own pixels and ignores the cascade. */
+.header-logo-own {
+  /* Width tracks height rather than restating the token: .header-logo-img
+     already sets height, and it drops to --header-logo-h-mobile under 700px.
+     Pinning width to the desktop value gave a 36x28 box on a phone. */
+  aspect-ratio: 1;
+  width: auto;
+  background: currentColor;
+  /* The image itself is set inline by header.js, derived from the manifest
+     link, because a fleet site is served at its domain root and a kit showcase
+     is not. Only the parts that do not vary live here. */
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: contain;    mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
 }
 .header-logo-img:hover,
 .header-title-link:hover .header-logo-img { transform: scale(1.06) rotate(-4deg); }
@@ -617,13 +638,23 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   box-sizing: border-box;
   padding: 0;
   border-radius: 6px;
-  color: var(--header-icon-color, var(--header-text-dim));
+  /* Full strength, not --header-icon-color. The dim was meant as hierarchy and
+     did not read as one: .header-source carries no colour rule at all, so it
+     inherits the header's own #f9f9f9, and the home control sitting beside it
+     at 78% looked like a misconfiguration rather than a decision. The other
+     user of that token is the bordered theme toggle, which has a border to
+     carry its own weight; this one does not. */
+  color: var(--header-text);
   text-decoration: none;
   flex-shrink: 0;
   transition: color .18s var(--header-ease, ease),
               background .18s var(--header-ease, ease);
 }
-.header-home:hover { color: var(--header-text); background: var(--header-menu-hover); }
+/* --header-accent is the pink on the default palette and the skin's own accent
+   everywhere else, so the highlight stays on-brand without hardcoding magenta
+   into a control that ships to seven skins. */
+.header-home:hover,
+.header-home:focus-visible { color: var(--header-accent); background: var(--header-menu-hover); }
 .header-home svg {
   width: var(--header-icon-solid, 20px);
   height: var(--header-icon-solid, 20px);
@@ -641,13 +672,64 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   height: var(--header-icon, 22px);
 }
 .header-home .nh-orbit {
-  transform-origin: 12px 12px; /* viewBox centre — the planet */
+  transform-origin: 12px 12px; /* viewBox centre, for the legacy planet markup */
 }
 .header-home:hover .nh-orbit,
 .header-home:focus-visible .nh-orbit {
   animation: nh-orbit-lap 1.4s linear infinite;
 }
 @keyframes nh-orbit-lap { to { transform: rotate(360deg); } }
+
+/* ── Inclined orbit: the satellite passes in front of the mark and behind it ──
+   Two dots on one elliptical path, each shown for its own half of the lap. The
+   far one is drawn before the mark in document order, so the mark occludes it;
+   that occlusion IS the depth, and it costs nothing but paint order.
+
+   offset-path rather than a rotate: a rotation can only trace a circle, and
+   squashing it into an ellipse with scaleY would squash the satellite too,
+   because the counter-scale would have to sit inside the rotation. Where
+   offset-path is unsupported the dots simply rest at their authored cx/cy,
+   which is a still icon rather than a broken one.
+
+   The semi-major axis is capped by the viewBox: an inline svg clips to it, so
+   10.2 plus the 1.35 radius leaves 11.55 of the 12 available. */
+.header-home .nh-sat {
+  offset-rotate: 0deg;
+  /* The rim separates the satellite from the mark when it crosses it: without
+     one, a currentColor dot over a currentColor mark merges into the
+     silhouette and reads as a stray pixel rather than a moon.
+     --header-bg-end is the right hook because the rim's job is to look like
+     the background, so it vanishes over open header and shows only as a gap
+     against the mark. Measured caveat: every skin shipped today redefines
+     --header-bg-start and --header-bg-mid but leaves --header-bg-end at
+     #040714, so this resolves to one dark value everywhere right now. A skin
+     that ends light gets the rim right for free, but only if it sets that
+     token; one that ends light without setting it would show a dark ring. */
+  stroke: var(--header-bg-end, #040714);
+  stroke-width: .8;
+}
+.header-home .nh-sat-back { opacity: 0; }
+/* On hover the mark takes the accent, and currentColor would carry the
+   satellite with it: a pink dot on a pink mark is a dot you cannot find. It
+   holds the header's text colour instead, so the moon stays legible against
+   whatever the mark has become. */
+.header-home:hover .nh-sat,
+.header-home:focus-visible .nh-sat { fill: var(--header-text); }
+.header-home:hover .nh-sat-front,
+.header-home:focus-visible .nh-sat-front {
+  animation: nh-sat-lap 2.6s linear infinite, nh-sat-near 2.6s steps(1, end) infinite;
+}
+.header-home:hover .nh-sat-back,
+.header-home:focus-visible .nh-sat-back {
+  animation: nh-sat-lap 2.6s linear infinite, nh-sat-far 2.6s steps(1, end) infinite;
+}
+.header-home:hover .nh-sat,
+.header-home:focus-visible .nh-sat {
+  offset-path: path("M20.31 10.40 A9.6 3.4 -30 1 1 3.69 20.00 A9.6 3.4 -30 1 1 20.31 10.40");
+}
+@keyframes nh-sat-lap  { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+@keyframes nh-sat-near { 0% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes nh-sat-far  { 0% { opacity: 0; } 50% { opacity: 1; } }
 
 /* ── Overflow toggle (⋯) — injected by header.js ─────────────── */
 .header-overflow { position: relative; display: flex; }
@@ -851,7 +933,9 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
   .header-logo-img:hover,
   .header-title-link:hover .header-logo-img { transform: none; }
   .header-home:hover .nh-orbit,
-  .header-home:focus-visible .nh-orbit { animation: none; }
+  .header-home:focus-visible .nh-orbit,
+  .header-home:hover .nh-sat,
+  .header-home:focus-visible .nh-sat { animation: none; }
   .header-menu.open { animation: none; }
   .header-overflow-toggle:active,
   .header-theme-toggle:active,
