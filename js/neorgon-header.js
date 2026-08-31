@@ -355,40 +355,21 @@
     } catch (e) { /* the logo must never break the header */ }
   }
 
-  /* The home control: the mark at the size its neighbours run at, with a
-     satellite that laps it on hover.
+  /* The home control: the mark at the centre of a galaxy.
 
-     The first version put the mark inside a full-radius orbit ring, and it
-     measured badly: the RING spanned the control's 18px while the identifying
-     mark rendered at 8.2px, against 18px for the GitHub octicon beside it. The
-     eye compares the shape that identifies, not the outermost pixel, so the
-     control read as an afterthought. The ring is gone and the mark takes the
-     footprint; the satellite keeps the orbit idea at no cost to size and gives
-     the existing .nh-orbit animation something to move.
+     The mark stays upright and the orbit system spins around it, which is the
+     only arrangement that works: a rotating letterform is unreadable.
 
-     transform-origin stays the viewBox centre, so the satellite laps the mark
-     rather than spinning in place, and header.css already stops it under
-     prefers-reduced-motion.
+     Sizing is the whole argument. The galaxy needs room the mark used to take,
+     and at the kit's 22px icon the mark fell to 14px against the 18px of the
+     GitHub control beside it, which is the regression this control was fixed
+     for two rounds ago. Measured across sizes, a 26px icon puts the mark back
+     at exactly 18px while the arms reach 25px of the 40px control box, so the
+     galaxy is paid for in icon size rather than in legibility.
 
-     The orbit is an inclined ellipse and the satellite passes BEHIND the mark
-     for half of it, which is why there are two dots: the far one is drawn
-     before the mark so the mark occludes it, the near one after. Each is
-     visible for its own half of the lap.
-
-     The ellipse's semi-major axis is capped, not chosen: an inline svg clips
-     to its viewBox, so a satellite whose OUTER EDGE passes 12 units from the
-     pivot is sliced at four points of every lap. An earlier circular orbit put
-     that edge at 13.1 and was quietly cut on hover, which no static render can
-     show. 10.2 plus a 1.35 radius leaves 11.55 of the 12 available.
-
-     Measured before shipping: at the header's real 22px the satellite is
-     FULLY hidden in 1 frame of 48, so the mark reads as occluding it rather
-     than as losing it.
-
-     The satellite carries a rim, styled in header.css, because a currentColor
-     dot crossing a currentColor mark merges into the silhouette and reads as a
-     stray pixel rather than a moon. See the note there on which token it uses
-     and where that assumption ends. */
+     A rigid rotate replaces the earlier offset-path satellite: the arms and
+     dots turn as one body, so there is no elliptical path to follow, nothing
+     to clip against the viewBox, and no front/behind pair to keep in sync. */
   function upgradeHome(header) {
     try {
       var home = header.querySelector('.header-home');
@@ -397,25 +378,12 @@
       if (!old) return;
       var span = document.createElement('span');
       span.innerHTML =
-        '<svg class="nh-hub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-        'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ' +
+        '<svg class="nh-hub-icon" viewBox="0 0 24 24" fill="none" ' +
         'aria-hidden="true" xmlns="http://www.w3.org/2000/svg">' +
-        /* The orbit is drawn, not implied: a faint inclined ellipse sitting
-           in the lower half, so the control reads as a planet with a ring even
-           while it is standing still. The far half of the satellite's path is
-           drawn BEFORE the mark so the mark occludes it; the near half after.
-           That paint order is the whole depth trick. */
-        '<ellipse class="nh-ring" cx="12" cy="15.2" rx="9.6" ry="3.4" ' +
-        'transform="rotate(-30 12 15.2)" fill="none" stroke="currentColor" ' +
-        'stroke-width=".75" opacity=".4"/>' +
-        '<circle class="nh-sat nh-sat-back" cx="3.69" cy="20" r="1.5" ' +
-        'fill="currentColor"/>' +
-        '<g transform="translate(12,12) scale(0.90) translate(-12,-12)">' +
+        '<g transform="translate(12,12) scale(0.72) translate(-12,-12)">' +
         '<g transform="' + MARK_T + '" fill-rule="evenodd" fill="currentColor" stroke="none">' +
         '<path d="' + MARK_D + '"/></g></g>' +
-        '<circle class="nh-sat nh-sat-front" cx="20.31" cy="10.4" r="1.5" ' +
-        'fill="currentColor"/>' +
-        '</svg>';
+        '<g class="nh-orbit"><path d=\"M2.47 17.50 A11.0 11.0 0 0 1 14.85 1.37\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.05\" stroke-linecap=\"round\"/><path d=\"M21.53 6.50 A11.0 11.0 0 0 1 9.15 22.63\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.05\" stroke-linecap=\"round\"/><circle cx=\"21.71\" cy=\"6.84\" r=\"1.25\" fill=\"currentColor\"/><circle cx=\"2.29\" cy=\"17.16\" r=\"1.25\" fill=\"currentColor\"/></g></svg>';
       home.replaceChild(span.firstChild, old);
     } catch (e) { /* the home control must never break the header */ }
   }

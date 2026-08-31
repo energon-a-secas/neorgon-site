@@ -668,8 +668,12 @@ svg.header-logo-mark { fill: currentColor; width: auto; }
    on hover or keyboard focus the rocket does laps, smoke trailing.
    Stroked glyph, so it sizes with --header-icon, not the solid token. */
 .header-home svg.nh-hub-icon {
-  width: var(--header-icon, 22px);
-  height: var(--header-icon, 22px);
+  /* Deliberately larger than --header-icon: the galaxy's arms occupy the outer
+     ring, so at 22px the MARK fell to 14px against 18px for the neighbouring
+     control. 26px puts it back at 18px, measured, while the arms still land
+     inside the 40px box. */
+  width: var(--header-hub-icon, 26px);
+  height: var(--header-hub-icon, 26px);
 }
 .header-home .nh-orbit {
   transform-origin: 12px 12px; /* viewBox centre, for the legacy planet markup */
@@ -680,56 +684,11 @@ svg.header-logo-mark { fill: currentColor; width: auto; }
 }
 @keyframes nh-orbit-lap { to { transform: rotate(360deg); } }
 
-/* ── Inclined orbit: the satellite passes in front of the mark and behind it ──
-   Two dots on one elliptical path, each shown for its own half of the lap. The
-   far one is drawn before the mark in document order, so the mark occludes it;
-   that occlusion IS the depth, and it costs nothing but paint order.
-
-   offset-path rather than a rotate: a rotation can only trace a circle, and
-   squashing it into an ellipse with scaleY would squash the satellite too,
-   because the counter-scale would have to sit inside the rotation. Where
-   offset-path is unsupported the dots simply rest at their authored cx/cy,
-   which is a still icon rather than a broken one.
-
-   The semi-major axis is capped by the viewBox: an inline svg clips to it, so
-   10.2 plus the 1.35 radius leaves 11.55 of the 12 available. */
-.header-home .nh-sat {
-  offset-rotate: 0deg;
-  /* The rim separates the satellite from the mark when it crosses it: without
-     one, a currentColor dot over a currentColor mark merges into the
-     silhouette and reads as a stray pixel rather than a moon.
-     --header-bg-end is the right hook because the rim's job is to look like
-     the background, so it vanishes over open header and shows only as a gap
-     against the mark. Measured caveat: every skin shipped today redefines
-     --header-bg-start and --header-bg-mid but leaves --header-bg-end at
-     #040714, so this resolves to one dark value everywhere right now. A skin
-     that ends light gets the rim right for free, but only if it sets that
-     token; one that ends light without setting it would show a dark ring. */
-  stroke: var(--header-bg-end, #040714);
-  stroke-width: .8;
-}
-.header-home .nh-sat-back { opacity: 0; }
-/* On hover the mark takes the accent, and currentColor would carry the
-   satellite with it: a pink dot on a pink mark is a dot you cannot find. It
-   holds the header's text colour instead, so the moon stays legible against
-   whatever the mark has become. */
-.header-home:hover .nh-sat,
-.header-home:focus-visible .nh-sat { fill: var(--header-text); }
-.header-home:hover .nh-sat-front,
-.header-home:focus-visible .nh-sat-front {
-  animation: nh-sat-lap 2.6s linear infinite, nh-sat-near 2.6s steps(1, end) infinite;
-}
-.header-home:hover .nh-sat-back,
-.header-home:focus-visible .nh-sat-back {
-  animation: nh-sat-lap 2.6s linear infinite, nh-sat-far 2.6s steps(1, end) infinite;
-}
-.header-home:hover .nh-sat,
-.header-home:focus-visible .nh-sat {
-  offset-path: path("M20.31 10.40 A9.6 3.4 -30 1 1 3.69 20.00 A9.6 3.4 -30 1 1 20.31 10.40");
-}
-@keyframes nh-sat-lap  { from { offset-distance: 0%; } to { offset-distance: 100%; } }
-@keyframes nh-sat-near { 0% { opacity: 1; } 50% { opacity: 0; } }
-@keyframes nh-sat-far  { 0% { opacity: 0; } 50% { opacity: 1; } }
+/* The galaxy turns as one rigid body on hover, so a plain rotate does it.
+   This replaced an offset-path satellite on an inclined ellipse: that needed a
+   front/back pair kept in sync and a semi-major axis capped so the dot did not
+   clip the viewBox, and none of it is needed once the arms sit outside the
+   mark instead of crossing it. */
 
 /* ── Overflow toggle (⋯) — injected by header.js ─────────────── */
 .header-overflow { position: relative; display: flex; }
@@ -934,8 +893,8 @@ svg.header-logo-mark { fill: currentColor; width: auto; }
   .header-title-link:hover .header-logo-img { transform: none; }
   .header-home:hover .nh-orbit,
   .header-home:focus-visible .nh-orbit,
-  .header-home:hover .nh-sat,
-  .header-home:focus-visible .nh-sat { animation: none; }
+  .header-home:hover .nh-orbit,
+  .header-home:focus-visible .nh-orbit { animation: none; }
   .header-menu.open { animation: none; }
   .header-overflow-toggle:active,
   .header-theme-toggle:active,
