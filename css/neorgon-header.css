@@ -892,8 +892,6 @@ svg.header-logo-mark { fill: currentColor; width: auto; }
   .header-logo-img:hover,
   .header-title-link:hover .header-logo-img { transform: none; }
   .header-home:hover .nh-orbit,
-  .header-home:focus-visible .nh-orbit,
-  .header-home:hover .nh-orbit,
   .header-home:focus-visible .nh-orbit { animation: none; }
   .header-menu.open { animation: none; }
   .header-overflow-toggle:active,
