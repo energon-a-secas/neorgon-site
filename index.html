@@ -16,15 +16,15 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="preconnect" href="https://cdn.neorgon.org" crossorigin>
   <title>Neorgon | Made to Fit the Exact Problem</title>
-  <meta name="description" content="54 tools, each cut for one job. Free, local, no account, and the whole catalog is six months old.">
+  <meta name="description" content="56 tools, each cut for one job. Free, local, no account, and the whole catalog is six months old.">
   <meta property="og:title" content="Neorgon: Made to Fit the Exact Problem">
-  <meta property="og:description" content="54 tools, each cut for one job. Free, local, no account. Six months old.">
+  <meta property="og:description" content="56 tools, each cut for one job. Free, local, no account. Six months old.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://neorgon.com/">
   <meta property="og:site_name" content="Neorgon">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Neorgon: Made to Fit the Exact Problem">
-  <meta name="twitter:description" content="54 tools, each cut for one job. Free, local, no account. Six months old.">
+  <meta name="twitter:description" content="56 tools, each cut for one job. Free, local, no account. Six months old.">
   <meta name="twitter:image" content="https://neorgon.com/og-preview.jpg">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://neorgon.com/">
@@ -39,7 +39,7 @@
     "@type": "WebSite",
     "name": "Neorgon",
     "url": "https://neorgon.com/",
-    "description": "54 tools, each cut for one job. Free, local, no account, and the whole catalog is six months old.",
+    "description": "56 tools, each cut for one job. Free, local, no account, and the whole catalog is six months old.",
     "author": { "@type": "Organization", "name": "Neorgon", "url": "https://neorgon.com/" }
   }
   </script>
@@ -128,7 +128,7 @@
       <span class="neon-word" id="heroTyping"></span><span class="typing-cursor" id="typingCursor"></span>
     </h1>
     <p class="hero-sub">
-      <span id="toolCount">54</span> tools, each cut for one job. Free, local,
+      <span id="toolCount">56</span> tools, each cut for one job. Free, local,
       no account. <span id="shipRecent">16</span> of them shipped in the last 30 days.
     </p>
     <div class="hero-search-wrap">
@@ -534,23 +534,24 @@
       <div class="sites-grid">
 
       <!-- Mosaic -->
-      <div class="site-card soon-card" data-card-id="mosaic" data-status="soon"
-           style="--card-glow: rgba(244,63,94,.3); --card-glow-border: rgba(244,63,94,.35); --card-accent: #f43f5e;">
+      <a class="site-card" data-card-id="mosaic" data-added="2026-08-29"
+         href="https://mosaic.neorgon.com/"
+         style="--card-glow: rgba(244,63,94,.3); --card-glow-border: rgba(244,63,94,.35); --card-accent: #f43f5e;">
         <div class="card-content">
           <div class="card-top">
             <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/mosaic.svg')"></span></div>
-            <span class="soon-badge">Soon</span>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </div>
           <div class="card-domain">mosaic.neorgon.com</div>
           <h3 class="card-name">Mosaic</h3>
-          <div class="card-desc">Photo collages that stay editable. Change the grid, the shape or the column count at any point and nothing you placed is lost.</div>
+          <div class="card-desc">Build photo collages that stay editable. Change the grid, the shape or the column count at any time without losing the photos you already placed.</div>
           <div class="card-tags">
             <span class="card-tag">Photos</span>
             <span class="card-tag">Collage</span>
             <span class="card-tag">Memes</span>
           </div>
         </div>
-      </div>
+      </a>
 
       <!-- Presentation Sage -->
       <a class="site-card" data-card-id="slides" data-added="2026-03-01"
@@ -1387,6 +1388,26 @@
         </div>
       </a>
 
+      <!-- Aficion -->
+      <a class="site-card" data-card-id="aficion" data-added="2026-08-31"
+         href="https://aficion.neorgon.com/"
+         style="--card-glow: rgba(251,191,36,.3); --card-glow-border: rgba(251,191,36,.35); --card-accent: #fbbf24;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/aficion.svg')"></span></div>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">aficion.neorgon.com</div>
+          <h3 class="card-name">Aficion</h3>
+          <div class="card-desc">Every hobby and the crafts underneath it on one map. Mark what you practise, trace the paths between them, and compare maps with a friend.</div>
+          <div class="card-tags">
+            <span class="card-tag">Hobbies</span>
+            <span class="card-tag">Atlas</span>
+            <span class="card-tag">Share</span>
+          </div>
+        </div>
+      </a>
+
       </div>
     </div>
 
@@ -1874,7 +1895,7 @@
     var el = document.getElementById('toolCount');
     if (el && count > 0) el.textContent = count;
 
-    /* The tempo claim, from the same cards. 54 tools in six months with 17 in
+    /* The tempo claim, from the same cards. 56 tools in six months with 17 in
        the last month is the whole "fast iterations" position, and until
        2026-08-28 the page stated it as "none of them are finished", which a
        reader deciding whether to trust a tool reads as risk rather than pace.

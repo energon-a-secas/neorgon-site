@@ -30,6 +30,7 @@ Neorgon tools cover planning and strategy, developer utilities, hiring and inter
 - [Lockdown](https://lockdown.neorgon.com/): Site security scanner with endpoint discovery and hardening tips
 - [Meme Vault](https://memes.neorgon.com/): Browse, vote, and upload memes
 - [Mettle](https://mettle.neorgon.com/): Reasoning maturity probe — chained failure-and-recovery questions score thinking depth across five virtues, fully local
+- [Mosaic](https://mosaic.neorgon.com/): Build photo collages that stay editable, changing the grid, shape or column count at any time without losing the photos you already placed
 - [OG Studio](https://ogstudio.neorgon.com/): Generate 1200x630 social preview images for all Neorgon tools
 - [Parla](https://parla.neorgon.com/): Latin American slang translator with visual word mapping
 - [Pathfinder](https://pathfinder.neorgon.com/): Visual strategy canvas with gap detection and AI prompt export
