@@ -45,8 +45,35 @@
   function link(href, text, external) {
     var a = el('a', null, text);
     a.href = href;
-    if (external) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    if (external) {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      /* A minimal north-east arrow, drawn rather than typed: the character
+         renders as an emoji on some platforms and as a box on others, and it
+         has to sit on the text baseline at 1em next to a 12px label. It is
+         aria-hidden because the link already announces itself as opening a new
+         tab through the title; the arrow is for the eye. */
+      a.appendChild(arrow());
+      a.title = text + ' (opens in a new tab)';
+    }
     return a;
+  }
+  function arrow() {
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('class', 'neo-footer-out');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('width', '10'); svg.setAttribute('height', '10');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '3');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    var path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', 'M7 17 17 7M9 7h8v8');
+    svg.appendChild(path);
+    return svg;
   }
   function sep() {
     var s = el('span', 'neo-footer-sep', '·');
@@ -188,11 +215,15 @@
     /* Only add the hub link when the site's own copy doesn't already
        carry one — retrofits keep their hand-written "Part of Neorgon". */
     if (!inner.querySelector('a[href*="neorgon.com"]')) {
-      items.push(link(HUB, 'Part of Neorgon'));
+      /* The hub is a different site, so it opens in a new tab and says so with
+         the same arrow every other outbound link here uses. It used to replace
+         the page you were on, which on a game mid-run is a door you did not
+         mean to walk through. */
+      items.push(link(HUB, 'Part of Neorgon', true));
     }
 
     var repo = meta('neo-repo');
-    if (repo) items.push(link(/^https?:/.test(repo) ? repo : GH + '/' + repo, 'Source', true));
+    if (repo) items.push(link(/^https?:/.test(repo) ? repo : GH + '/' + repo, 'Code', true));
 
     var version = meta('neo-version');
     if (version) items.push(el('span', 'neo-footer-stamp', /^v/i.test(version) ? version : 'v' + version));

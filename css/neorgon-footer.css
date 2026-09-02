@@ -533,3 +533,9 @@ body.neo-footer-root {
     word-break: break-all;
   }
 }
+
+/* The outbound arrow on a footer link. Sized in em so it tracks the label at
+   whatever size a site's footer runs, and nudged up off the baseline because a
+   45-degree arrow reads low when it is optically centred. */
+.neo-footer-out { display: inline-block; vertical-align: -0.05em; margin-left: 0.28em; width: 0.72em; height: 0.72em; opacity: 0.75; }
+.neo-footer a:hover .neo-footer-out, .neo-footer a:focus-visible .neo-footer-out { opacity: 1; }

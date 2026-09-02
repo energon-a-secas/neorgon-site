@@ -3244,6 +3244,10 @@ body.search-active #tools {
    no JS and no second source of truth for the offset. The `top` transition
    above is matched to the bar's own .26s so the two move as one piece. */
 .header-bar.header-hidden ~ .cat-rail { top: 0; }
+/* Companion for the NeoKeys chrome toggle's kit-owned state. Dormant until
+   this site opts into the H key; harmless meanwhile, and it means opting in
+   is a head-wiring change with no CSS chase. */
+html[data-chrome="off"] .cat-rail { top: 0; }
 
 .cat-rail[hidden] { display: none; }
 
