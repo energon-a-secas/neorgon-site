@@ -270,7 +270,7 @@ function phoneRail() {
   ${bar(212, before, catBefore, INK, 'Before')}
   ${bar(352, after, catAfter, ACCENT, 'After')}
   ${footnote(64, H - 96, `Same ${K.railSize} cards. Below 600px the grid becomes a snap-scrolling row: first card full, second peeking.`)}
-  ${footnote(64, H - 66, `The catalog moved up ${catBefore - catAfter}px — from below the fold to inside the first screen and a bit.`)}
+  ${footnote(64, H - 66, `The catalog moved up ${catBefore - catAfter}px: from below the fold to inside the first screen and a bit.`)}
   ${footnote(64, H - 36, 'Measured with getBoundingClientRect().height / innerHeight on a live page.')}`);
 }
 
