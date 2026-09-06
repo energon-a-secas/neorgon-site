@@ -377,7 +377,7 @@ html:not([data-theme]) .header-bar[data-header-mode="hub"] {
    be filtered, because it already inherits the header's own text colour and
    inverting it would undo exactly the thing it was swapped in to fix. */
 img.header-logo-img { filter: brightness(0) invert(1); }
-svg.header-logo-mark { fill: currentColor; width: auto; }
+svg.header-logo-mark { color: var(--header-text); fill: currentColor; width: auto; }
 /* A site that ships its own mark gets it as a mask over currentColor, so the
    glyph follows the header's text colour exactly as the inline svg does. An
    <img> could not: it paints its own pixels and ignores the cascade. */
@@ -387,6 +387,16 @@ svg.header-logo-mark { fill: currentColor; width: auto; }
      Pinning width to the desktop value gave a 36x28 box on a phone. */
   aspect-ratio: 1;
   width: auto;
+  /* Declared, not inherited. `background: currentColor` resolves against
+     whatever the ancestor set, and the logo is always inside an <a>: on a site
+     whose logo anchor carries no class, that ancestor is an unstyled link and
+     currentColor is the UA's #0000EE. The mark then paints link-blue, silently,
+     because nothing in the page is wrong enough to throw. Every fleet site
+     happens to wrap the logo in .header-title-link (which the kit gives
+     color: inherit), so this only surfaced when ops-console adopted the kit
+     with a bare <a>. Stating the colour here makes the mask independent of the
+     markup around it, which is the contract the rest of the kit already keeps. */
+  color: var(--header-text);
   background: currentColor;
   /* The image itself is set inline by header.js, derived from the manifest
      link, because a fleet site is served at its domain root and a kit showcase
@@ -661,11 +671,14 @@ svg.header-logo-mark { fill: currentColor; width: auto; }
   display: block;
 }
 
-/* ── Hub glyph: inclined planet + orbiting rocket ────────────────
-   .header-home now carries the kit's planet SVG (markup contract in
-   the README) — the one header link to neorgon.com, tooltip
-   "neorgon.com". Idle it is a still planet with the rocket parked;
-   on hover or keyboard focus the rocket does laps, smoke trailing.
+/* ── Hub glyph: the Energon mark at the centre of a galaxy ───────
+   .header-home is the one header link to neorgon.com, tooltip
+   "neorgon.com". The page stamps a placeholder SVG (markup contract
+   in the README) and upgradeHome() replaces it on init with the mark
+   at scale(0.72) inside a <g class="nh-orbit"> of two arcs and two
+   dots. Idle the whole thing is still; on hover or keyboard focus the
+   orbit group turns as one rigid body while the mark stays upright,
+   because a rotating letterform is unreadable.
    Stroked glyph, so it sizes with --header-icon, not the solid token. */
 .header-home svg.nh-hub-icon {
   /* Deliberately larger than --header-icon: the galaxy's arms occupy the outer
