@@ -2,6 +2,7 @@
   const HOVER_DELAY = 1200;
   const PREVIEW_PATH = 'assets/previews/';
   const PREVIEW_MAP = {
+    quiz: 'quiz.gif',
     rappel: 'rappel.gif',
     runcible: 'runcible.gif',
     floorplan: 'floorplan.gif',
