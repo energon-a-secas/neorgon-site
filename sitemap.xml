@@ -36,4 +36,6 @@
   <url><loc>https://stackrank.neorgon.com/</loc></url>
   <url><loc>https://teamplay.neorgon.com/</loc></url>
   <url><loc>https://tubestack.neorgon.com/</loc></url>
+  <url><loc>https://neorgon.com/privacy/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://neorgon.com/tos/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
