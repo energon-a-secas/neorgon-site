@@ -1,4 +1,4 @@
-import { internalQuery, internalMutation } from "./_generated/server";
+import { internalQuery, internalMutation, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
 /**
@@ -94,5 +94,43 @@ export const upsertUser = internalMutation({
     }
     await ctx.db.insert("users", { username, passwordHash });
     return { created: true };
+  },
+});
+
+/**
+ * Session rows for the `interference` gate.
+ *
+ * A login mints one of these; `interference:set` is the only thing that reads
+ * them. They are deliberately short-lived and never leave the terminal's
+ * closure, so a token has the same lifetime the old client-only `authedUser`
+ * flag had, and none of its authority.
+ */
+
+export const createSession = internalMutation({
+  args: { username: v.string(), token: v.string(), expiresAt: v.number() },
+  handler: async (ctx, { username, token, expiresAt }) => {
+    const now = Date.now();
+    /* Sweep every expired row, not just this user's. Per-user sweeping leaves
+       one dead row behind for anyone who logs in once and never again, which
+       is the case that makes the table grow without bound. The table only ever
+       holds live logins, so the full scan is a handful of documents. */
+    const all = await ctx.db.query("sessions").collect();
+    for (const row of all) {
+      if (row.expiresAt <= now) await ctx.db.delete(row._id);
+    }
+    await ctx.db.insert("sessions", { token, username, expiresAt });
+  },
+});
+
+/** Public on purpose: holding the token is the right to end the session. */
+export const revokeSession = mutation({
+  args: { token: v.string() },
+  handler: async (ctx, { token }) => {
+    const row = await ctx.db
+      .query("sessions")
+      .withIndex("by_token", (q) => q.eq("token", token))
+      .first();
+    if (row) await ctx.db.delete(row._id);
+    return { ok: true as const };
   },
 });

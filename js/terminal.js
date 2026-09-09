@@ -8,6 +8,11 @@
 
   /* ── Auth state ── */
   let authedUser = null;
+  /* Server-side half of the session, minted by auth:login. Lives in this
+     closure only, never in storage: the same lifetime authedUser has. It is
+     what `interfere` presents, because a mutation cannot trust a variable
+     the page owns. */
+  let authToken = null;
 
   /* ── Convex HTTP client (lazy-loaded) ── */
   const CONVEX_URL = 'https://quaint-cobra-151.convex.cloud';
@@ -422,6 +427,7 @@
         addLine('  ghost list: show hidden cards', 'sys');
         addLine('  ghost reset: restore all hidden cards', 'sys');
         addLine('  broadcast <m>show toast on page', 'sys');
+        addLine('  interfere <theme>|off: force the theme on every open hub tab', 'sys');
         addLine('  logout: end session', 'sys');
       }
     },
@@ -793,6 +799,7 @@
 
         if (result.ok) {
           authedUser = result.username;
+          authToken = result.token || null;
           resetClientRateLimit();
           updatePrompt();
           addLine(`Welcome back, ${authedUser}.`, 'sys');
@@ -812,6 +819,16 @@
       }
     },
   };
+
+  /* "4m ago" for the interference audit line. Coarse on purpose: the row
+     records when an order was given, not how long ago to the second. */
+  function sinceLabel(at) {
+    const secs = Math.max(0, Math.round((Date.now() - at) / 1000));
+    if (secs < 60) return `${secs}s ago`;
+    if (secs < 3600) return `${Math.round(secs / 60)}m ago`;
+    if (secs < 86400) return `${Math.round(secs / 3600)}h ago`;
+    return `${Math.round(secs / 86400)}d ago`;
+  }
 
   /* ── Authenticated commands (require login) ── */
   const authCommands = {
@@ -882,10 +899,68 @@
       }
       localStorage.setItem('neorgon-ghost', JSON.stringify(hidden));
     },
+    /* Interference: force the theme on every open hub tab.
+       The write goes through the existing HTTP client; the *effect* arrives
+       back through js/interference.js's WebSocket subscription, so this tab
+       bursts along with the others and the order is felt where it was given.
+       Interference sits below the visitor in the header kit's precedence, so
+       a tab opened with `?theme=` sees the burst and keeps its own theme. */
+    async interfere(args) {
+      const arg = (args || '').trim().toLowerCase();
+
+      if (arg === 'list') { publicCommands.theme('list'); return; }
+
+      if (!arg) {
+        try {
+          const client = await getConvex();
+          const row = await client.query('interference:get', {});
+          if (!row || !row.theme) { addLine('Interference: released.', 'sys'); return; }
+          addLine(`Interference: ${row.theme}, set by ${row.by} ${sinceLabel(row.at)}.`, 'sys');
+        } catch (err) {
+          addLine('Connection failed.', 'err');
+        }
+        return;
+      }
+
+      const release = arg === 'off';
+      if (!release) {
+        const ids = (window.NeoHeader && window.NeoHeader.themes) || [];
+        if (ids.indexOf(arg) === -1) {
+          addLine(`Unknown theme: "${arg}". Type "interfere list".`, 'err');
+          return;
+        }
+      }
+
+      if (!authToken) { addLine('Not signed in.', 'err'); return; }
+
+      try {
+        const client = await getConvex();
+        await client.mutation('interference:set', { token: authToken, theme: release ? null : arg });
+        addLine(release
+          ? 'Interference released. Tabs return to their own theme.'
+          : `Interference set: ${arg}. Every open hub tab is switching.`, 'sys');
+      } catch (err) {
+        /* The server's two refusals are the only ones worth repeating; every
+           other failure is the network and says so. */
+        const msg = String((err && err.message) || '');
+        if (msg.indexOf('Not signed in.') !== -1) addLine('Not signed in.', 'err');
+        else if (msg.indexOf('Bad theme.') !== -1) addLine('Bad theme.', 'err');
+        else addLine('Connection failed.', 'err');
+      }
+    },
     logout() {
       addLine(`Goodbye, ${authedUser}.`, 'sys');
+      /* Best effort: holding the token is the right to end the session, and a
+         failed revoke must not stop the local half of logging out. */
+      const token = authToken;
       authedUser = null;
+      authToken = null;
       updatePrompt();
+      if (token) {
+        getConvex()
+          .then(client => client.mutation('authDb:revokeSession', { token }))
+          .catch(() => {});
+      }
     },
   };
 
@@ -956,6 +1031,8 @@
         pool = Array.from(new Set(liveTools().map(t => t.group.toLowerCase())));
       } else if (cmd === 'theme') {
         pool = (window.NeoHeader && window.NeoHeader.themes) || [];
+      } else if (cmd === 'interfere') {
+        pool = ((window.NeoHeader && window.NeoHeader.themes) || []).concat(['off', 'list']);
       } else {
         return;
       }

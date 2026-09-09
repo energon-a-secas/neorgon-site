@@ -4,6 +4,7 @@ import { action, internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import { compare, hash } from "bcryptjs";
+import { randomBytes } from "node:crypto";
 
 /**
  * Admin terminal auth.
@@ -20,13 +21,16 @@ import { compare, hash } from "bcryptjs";
 
 const BCRYPT_ROUNDS = 12;
 
+/** A session token outlives one sitting at the terminal and nothing longer. */
+const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+
 /** Same message whether the user is unknown or the password is wrong. */
 const GENERIC_ERROR = "Invalid credentials.";
 
 /** Annotated explicitly: an action referencing internal.* from its own api
  *  module is circular, and TS gives up inferring the handler's return. */
 type LoginResult =
-  | { ok: true; username: string | null }
+  | { ok: true; username: string | null; token: string }
   | { ok: false; error: string; locked?: boolean; remaining?: number };
 
 type SeedResult = { ok: true; username: string; created: boolean };
@@ -67,7 +71,18 @@ export const login = action({
     }
 
     await ctx.runMutation(internal.authDb.clearFailures, { username: normalized });
-    return { ok: true as const, username: state.username };
+
+    /* The token is the server-side half of the session. Until it existed the
+       only evidence of a login was a variable inside terminal.js's closure,
+       which a mutation has no way to check and no reason to believe. */
+    const token = randomBytes(32).toString("hex");
+    await ctx.runMutation(internal.authDb.createSession, {
+      username: state.username,
+      token,
+      expiresAt: Date.now() + SESSION_TTL_MS,
+    });
+
+    return { ok: true as const, username: state.username, token };
   },
 });
 

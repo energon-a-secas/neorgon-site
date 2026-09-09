@@ -3543,3 +3543,122 @@ body.palette-open { overflow: hidden; }
     0 0 32px var(--card-glow, rgba(120,0,255,.3));
 }
 .site-card.kbd-active::before { opacity: 1; }
+
+/* ── Interference burst ─────────────────────────────────────────────────────
+   The visible half of js/interference.js. Four fixed layers under the
+   terminal (z 10000), so the reply that fired the order stays readable while
+   the page behind it goes to static. Colours come only from the CDN base
+   tokens, and only opacity and transform move, so the whole thing is
+   compositor work and nothing reflows.
+
+   Every layer rests at opacity 0 with no animation attached. The animations
+   exist only under .is-playing, which the module adds and removes, so a page
+   that never receives an order pays for four empty divs and nothing else. */
+.interference {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9990;
+  overflow: hidden;
+}
+.interference > * {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.interference .veil {
+  background: var(--bg);
+}
+/* The noise is generated, not fetched: an feTurbulence tile as a data URI, so
+   the burst costs no request and cannot 404. `screen` keeps it as light on
+   the veil rather than a grey film over it. Overscanned 8% because the layer
+   jitters, and a jitter on a flush layer shows the page edge. */
+.interference .static {
+  inset: -8%;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+  background-size: 160px 160px;
+}
+.interference .scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    color-mix(in srgb, var(--text-primary) 10%, transparent) 2px 3px
+  );
+}
+.interference .wash {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.interference.is-playing .veil {
+  animation: interference-veil 1400ms var(--ease-snap) forwards;
+}
+.interference.is-playing .static {
+  animation: interference-static 1400ms linear forwards,
+             interference-jitter 320ms steps(8, end) infinite;
+}
+.interference.is-playing .scanlines {
+  animation: interference-scanlines 1400ms linear forwards;
+}
+.interference.is-playing .wash {
+  animation: interference-wash 1400ms linear forwards;
+}
+
+@keyframes interference-veil {
+  0%   { opacity: 0; }
+  10%  { opacity: .55; }
+  65%  { opacity: .55; }
+  100% { opacity: 0; }
+}
+@keyframes interference-static {
+  0%    { opacity: 0; }
+  8.6%  { opacity: .5; }
+  42.9% { opacity: .5; }
+  78.6% { opacity: 0; }
+  100%  { opacity: 0; }
+}
+@keyframes interference-jitter {
+  0%   { transform: translate3d(-2%, 1%, 0); }
+  100% { transform: translate3d(2%, -1%, 0); }
+}
+@keyframes interference-scanlines {
+  0%    { opacity: 0;   transform: translate3d(0, 0, 0); }
+  7.1%  { opacity: .35; }
+  71.4% { opacity: 0; }
+  100%  { opacity: 0;   transform: translate3d(0, 8px, 0); }
+}
+@keyframes interference-wash {
+  0%    { opacity: 0; }
+  34.3% { opacity: .18; }
+  64.3% { opacity: 0; }
+  100%  { opacity: 0; }
+}
+
+/* Reduced motion is a plain cross-fade, 600ms, nothing moves. The three
+   moving layers are removed rather than stilled: a still noise tile is a grey
+   sheet over the page, which is worse than no burst at all. */
+@media (prefers-reduced-motion: reduce) {
+  .interference .static,
+  .interference .scanlines,
+  .interference .wash {
+    display: none;
+  }
+  .interference.is-playing .veil {
+    animation: interference-veil-reduced 600ms linear forwards;
+    /* The blanket `*, *::before, *::after { animation-duration: 0.01ms
+       !important }` at the top of this file's reduced-motion section is what
+       stills the rest of the page, and an important longhand outranks this
+       shorthand's duration whatever the specificity. Without taking the
+       duration back the cross-fade finishes in 0.01ms, the veil never paints,
+       and the theme swaps as a hard cut under the module's land timer. This
+       veil is the one animation the reduced path is meant to keep: it moves
+       nothing, it only fades, which is the accessible form of the burst
+       rather than an exception to the preference. */
+    animation-duration: 600ms !important;
+  }
+}
+@keyframes interference-veil-reduced {
+  0%    { opacity: 0; }
+  33.3% { opacity: .6; }
+  100%  { opacity: 0; }
+}

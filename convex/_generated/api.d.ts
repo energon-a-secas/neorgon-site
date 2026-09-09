@@ -9,6 +9,8 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as authDb from "../authDb.js";
+import type * as interference from "../interference.js";
 
 import type {
   ApiFromModules,
@@ -18,6 +20,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  authDb: typeof authDb;
+  interference: typeof interference;
 }>;
 
 /**
