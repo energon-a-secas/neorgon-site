@@ -59,8 +59,8 @@
 
     <section class="story-section">
       <h2 class="section-title">The short version</h2>
-      <p class="section-content">Neorgon is a collection of free, open-source tools run by one person. There is no advertising, nothing is sold, and there is no cross-site profile of you. Most tools need no account at all: of the sites on this hub, only three ask you to sign in, and they ask because they store something you created and want it back later.</p>
-      <p class="section-content">Last updated 9 September 2026.</p>
+      <p class="section-content">Neorgon is a collection of free, open-source tools run by one person. There is no advertising, nothing is sold, and nothing follows you between sites to profile you. The one record that spans sites is a list, kept in your own account and shown only to you, of which Neorgon sites you have used while signed in. Most tools need no account at all: of the sites on this hub, only three ask you to sign in, and they ask because they store something you created and want it back later.</p>
+      <p class="section-content">Last updated 10 September 2026.</p>
     </section>
 
     <section class="story-section">
@@ -79,6 +79,7 @@
       <p class="section-content">Sign-in is handled by Clerk, an authentication provider. Clerk stores your email address, your username if you set one, and a password if you create one. Neorgon never sees or stores your password.</p>
       <p class="section-content">If you choose <strong>Sign in with Google</strong>, Neorgon requests exactly three pieces of information from your Google account: <code>openid</code>, your email address (<code>userinfo.email</code>) and your basic profile (<code>userinfo.profile</code>, which is your name and profile picture). These are Google's basic non-sensitive scopes. No Gmail, Drive, Calendar, Contacts or any other Google service is requested or accessible.</p>
       <p class="section-content">That Google information is used for one purpose: to identify you when you return, so the site can show you your own saved work. It is not sold, not shared with anyone, not used for advertising, not used to train any model, and not transferred to third parties except the infrastructure providers listed below that are needed to run the service.</p>
+      <p class="section-content">One account works on every Neorgon site that has sign-in, and it remembers which of those sites you have used while signed in: the site's name, and the day you first and last used it. Nothing about what you did there is recorded. The list is stored with your Clerk account so the account menu can show it under <strong>Your Neorgon sites</strong>. You can read it and clear it from that menu. While you are signed in, a Neorgon site's own code can read it, the same way it can read your name and email; no site uses it to decide what you may do.</p>
     </section>
 
     <section class="story-section">
@@ -108,7 +109,7 @@
     <section class="story-section">
       <h2 class="section-title">Keeping and deleting</h2>
       <p class="section-content">Analytics records are aggregate counts and are not tied to you. Account data and the content you create are kept until you delete them.</p>
-      <p class="section-content">You can delete your account from the account menu on any site where you signed in, which removes your Clerk identity. To have the content stored against that account removed as well, or if a delete control is missing on a particular tool, ask and it will be deleted.</p>
+      <p class="section-content">You can delete your account from the account menu on any site where you signed in, which removes your Clerk identity and the list of sites you used with it. The list alone is cleared from the same menu, under Your Neorgon sites. To have the content stored against that account removed as well, or if a delete control is missing on a particular tool, ask and it will be deleted.</p>
       <p class="section-content">Revoking Neorgon's access to your Google account at any time is done at <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">myaccount.google.com/permissions</a>.</p>
     </section>
 
