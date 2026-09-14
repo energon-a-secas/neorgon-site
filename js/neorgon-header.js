@@ -258,8 +258,11 @@
     var items = menuItems(openMenu);
     var idx = items.indexOf(document.activeElement);
     if (e.key === 'Escape') {
+      /* closeMenu() nulls openTrigger, so the trigger is captured first;
+         without this, Escape dropped focus to <body> on every site. */
+      var trigger = openTrigger;
       closeMenu();
-      if (openTrigger) openTrigger.focus();
+      if (trigger) trigger.focus();
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       (items[idx + 1] || items[0]) && (items[idx + 1] || items[0]).focus();
@@ -349,8 +352,14 @@
         span.innerHTML = markSvg('header-logo-img header-logo-mark');
         node = span.firstChild;
       }
-      if (img.alt) node.setAttribute('aria-label', img.alt);
-      node.setAttribute('role', 'img');
+      if (img.alt) {
+        node.setAttribute('role', 'img');
+        node.setAttribute('aria-label', img.alt);
+      } else {
+        /* alt="" meant decorative; the swapped-in mark stays decorative, the
+           title link beside it carries the name. */
+        node.setAttribute('aria-hidden', 'true');
+      }
       img.parentNode.replaceChild(node, img);
     } catch (e) { /* the logo must never break the header */ }
   }
@@ -455,15 +464,22 @@
     var toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'header-overflow-toggle';
-    toggle.setAttribute('aria-haspopup', 'menu');
+    /* Not aria-haspopup="menu": the panel holds the site's own buttons and
+       links with their native roles, and ARIA requires a menu to own
+       menuitem children. A labelled group is the honest description; the
+       kit's arrow keys, Escape and outside-click still apply to it. */
+    toggle.setAttribute('aria-haspopup', 'true');
     toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-controls', 'neo-header-overflow-menu');
     toggle.setAttribute('aria-label', 'More actions');
     toggle.title = 'More actions';
     toggle.textContent = '⋯';
 
     var menu = document.createElement('div');
     menu.className = 'header-menu header-overflow-menu';
-    menu.setAttribute('role', 'menu');
+    menu.id = 'neo-header-overflow-menu';
+    menu.setAttribute('role', 'group');
+    menu.setAttribute('aria-label', 'More actions');
 
     toggle.addEventListener('click', function (e) {
       e.stopPropagation();
