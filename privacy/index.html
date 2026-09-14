@@ -59,8 +59,9 @@
 
     <section class="story-section">
       <h2 class="section-title">The short version</h2>
-      <p class="section-content">Neorgon is a collection of free, open-source tools run by one person. There is no advertising, nothing is sold, and nothing follows you between sites to profile you. The one record that spans sites is a list, kept in your own account and shown only to you, of which Neorgon sites you have used while signed in. Most tools need no account at all: of the sites on this hub, only three ask you to sign in, and they ask because they store something you created and want it back later.</p>
-      <p class="section-content">Last updated 10 September 2026.</p>
+      <p class="section-content">Neorgon is a collection of free, open-source tools run by one person. There is no advertising, nothing is sold, and nothing follows you between sites to profile you. The one record that spans sites is a list, kept in your own account and shown only to you, of which Neorgon sites you have used while signed in. Most tools need no account at all. The few that ask you to sign in do so because they store something you created and want it back later.</p>
+      <p class="section-content">On Vitrina you can choose to publish your shelf, which makes part of it visible to anyone who has its address. That is described in its own section below.</p>
+      <p class="section-content">Last updated 14 September 2026.</p>
     </section>
 
     <section class="story-section">
@@ -71,12 +72,12 @@
     <section class="story-section">
       <h2 class="section-title">Analytics, which is the only thing collected from everyone</h2>
       <p class="section-content">Two privacy-preserving analytics services run on most sites: GoatCounter and Cloudflare Web Analytics. Both count page views without cookies and without building a profile that follows you between sites. They record a page URL, a referrer, an approximate country, and a browser and platform family.</p>
-      <p class="section-content">Neither service is Google Analytics. No Google Analytics, Plausible or Umami tag exists on any Neorgon site, and no advertising or retargeting pixel is installed anywhere.</p>
+      <p class="section-content">Neither service is Google Analytics. No Google Analytics, Plausible or Umami tag exists on any Neorgon site, and no advertising or retargeting pixel is installed anywhere. Neither service runs on a public shelf page on Vitrina.</p>
     </section>
 
     <section class="story-section">
-      <h2 class="section-title">Accounts, on the three sites that have them</h2>
-      <p class="section-content">Sign-in is handled by Clerk, an authentication provider. Clerk stores your email address, your username if you set one, and a password if you create one. Neorgon never sees or stores your password.</p>
+      <h2 class="section-title">Accounts, on the sites that have them</h2>
+      <p class="section-content">Sign-in is handled by Clerk, an authentication provider. Clerk stores your email address, and a password if you create one. Neorgon never sees or stores your password.</p>
       <p class="section-content">If you choose <strong>Sign in with Google</strong>, Neorgon requests exactly three pieces of information from your Google account: <code>openid</code>, your email address (<code>userinfo.email</code>) and your basic profile (<code>userinfo.profile</code>, which is your name and profile picture). These are Google's basic non-sensitive scopes. No Gmail, Drive, Calendar, Contacts or any other Google service is requested or accessible.</p>
       <p class="section-content">That Google information is used for one purpose: to identify you when you return, so the site can show you your own saved work. It is not sold, not shared with anyone, not used for advertising, not used to train any model, and not transferred to third parties except the infrastructure providers listed below that are needed to run the service.</p>
       <p class="section-content">One account works on every Neorgon site that has sign-in, and it remembers which of those sites you have used while signed in: the site's name, and the day you first and last used it. Nothing about what you did there is recorded. The list is stored with your Clerk account so the account menu can show it under <strong>Your Neorgon sites</strong>. You can read it and clear it from that menu. While you are signed in, a Neorgon site's own code can read it, the same way it can read your name and email; no site uses it to decide what you may do.</p>
@@ -84,13 +85,41 @@
 
     <section class="story-section">
       <h2 class="section-title">What you create</h2>
-      <p class="section-content">On a site where you sign in, what you make is stored in that site's own database, which is a Convex deployment. Each site has a separate database, so an account on one does not carry your content to another. Examples are the memes you upload, the character sheets you build, and the lists you save.</p>
+      <p class="section-content">On a site where you sign in, what you make is stored in that site's own database, which is a Convex deployment. Each site has a separate database, so an account on one does not carry your content to another. Examples are the memes you upload, the character sheets you build, the lists you save, and the book shelf you keep on Vitrina.</p>
       <p class="section-content">Content is stored against your account identifier so that the site can show it back to you and stop anyone else from editing it.</p>
     </section>
 
     <section class="story-section">
+      <h2 class="section-title">Your shelf on Vitrina</h2>
+      <p class="section-content">Vitrina uses the same Neorgon account as the other sites. Signed out, your shelf is kept in your browser's local storage and is not uploaded anywhere. Signed in, your shelf is kept in Vitrina's own Convex database. A shelf already in your browser moves into your account only when you press the button that moves it; it is never moved on its own.</p>
+      <p class="section-content">What Vitrina stores for a signed-in account, all of it keyed by your Clerk user id and never by your email or name:</p>
+      <p class="section-content"><strong>A profile</strong>, once you choose a handle: the handle, whether your shelf is published, the time a moderator suspended it if one did, and when the profile was created and last changed.</p>
+      <p class="section-content"><strong>One row per book.</strong> For a book from the catalogue, that is its catalogue number. For a book you added by hand, it is what you typed: title, authors, year, pages, publisher, collection, dimensions, and optionally the address of a cover or spine image, which your browser then loads from that address. Any book row can also hold your shelf label, your note, the "listed as" text and the date the book was added.</p>
+      <p class="section-content"><strong>The size of your shelf</strong>: how many books it holds and how many bytes they take. One shelf holds at most 2000 books and 8 MiB.</p>
+      <p class="section-content">Vitrina uses this to show you your shelf wherever you sign in and, if you publish it, to show its public part to others. It is kept until you delete it or your Neorgon account is deleted, as described under Keeping and deleting.</p>
+      <p class="section-content"><strong>Rate limits.</strong> To slow down abuse, saving, editing or removing books, trying to claim or change a handle, publishing a shelf and asking for deletion each record your account id, the kind of action and the time. A daily job deletes each record once it is more than 31 days old, if it has not been deleted sooner, and deleting your Vitrina data deletes yours along with the rest.</p>
+      <p class="section-content"><strong>Suspensions.</strong> If a moderator suspends an account, its Clerk user id and the time the suspension began are kept even after that person deletes their Vitrina data, so that deleting and starting again does not undo the suspension. This record exists to prevent abuse and is kept for as long as the suspension stands.</p>
+    </section>
+
+    <section class="story-section">
+      <h2 class="section-title">Public shelves on Vitrina</h2>
+      <p class="section-content">A shelf is private unless you publish it. Publishing is off by default, and needs a handle, the publish switch turned on by you, and your statement that you are 16 or older. Vitrina keeps no separate record of that statement; the only record is that your shelf is published. Publishing also has to be open on Vitrina as a whole. At launch it is closed, and while it is closed nobody can publish and a handle can only be reserved.</p>
+      <p class="section-content">A published shelf is shown at <code>https://vitrina.neorgon.com/u/?</code> followed by your handle. It shows your handle, and the books from the catalogue with the shelf label you gave each one. It never shows your notes, the dates you added books, the "listed as" text, books you added by hand, image addresses you entered, your email, your name, your profile picture or your account id.</p>
+      <p class="section-content">Public shelves are not listed in any directory or sitemap, and each page asks search engines not to index it. They are not counted by analytics. A site you reach by following a link from a public shelf is told at most that you came from vitrina.neorgon.com, not whose shelf it was.</p>
+      <p class="section-content">A handle is not a secret. Anyone who tries to claim a handle that is already taken is told it is taken, so the attempt shows that the handle is in use.</p>
+      <p class="section-content">You can change your handle at most 3 times in 30 days. When you change or delete a handle, the old one is held for 30 days so nobody else can claim it and receive links meant for you. During that time Vitrina keeps only the bare handle and the date the hold ends, linked to no account. Then it is released.</p>
+      <p class="section-content">Turning the publish switch off, or deleting your Vitrina data, hides the shelf from anyone who loads the page after that. Copies other people made while it was public, such as screenshots or saved pages, are outside Neorgon's control and cannot be recalled.</p>
+      <p class="section-content">The operator can hide a public shelf that breaks the <a href="/tos/">terms</a>, delete the Vitrina data behind it, and release a held handle early. Anyone can report a public shelf with the report control on its page. The report includes the page address, and so the shelf's handle.</p>
+    </section>
+
+    <section class="story-section">
+      <h2 class="section-title">Book images on Vitrina</h2>
+      <p class="section-content">Vitrina shows real cover and spine scans from the catalogue of La Tercera Fundación. Apart from small copies of the books on the demo shelf, your browser loads those images straight from tercerafundacion.net, including when you look at someone else's public shelf. That site therefore receives your IP address, your browser's usual request details, and the fact that the request came from vitrina.neorgon.com. Because each image is its own request, it can also see which books' images a page asked for. It does not receive your account, your handle, your notes or your shelf labels. What it does with those requests is up to that site.</p>
+    </section>
+
+    <section class="story-section">
       <h2 class="section-title">Correction reports</h2>
-      <p class="section-content">Some sites carry a small beacon for reporting a mistake on the page. If you use it, the report stores the text you wrote, the page it was sent from, an optional contact detail if you choose to leave one, and a one-way hash of your IP address used only to slow down abuse. The raw IP address is not stored.</p>
+      <p class="section-content">Some sites carry a small beacon for reporting a mistake on the page. If you use it, the report stores the text you wrote, the page it was sent from, an optional contact detail if you choose to leave one, and a one-way hash of your IP address used only to slow down abuse. The raw IP address is not stored. On a public shelf page, the page address includes the shelf's handle.</p>
       <p class="section-content">Reports arrive in a private queue. Only what an operator decides to publish reaches the public record, and it is rewritten in the operator's own words rather than published verbatim.</p>
     </section>
 
@@ -98,24 +127,26 @@
       <h2 class="section-title">Cookies and local storage</h2>
       <p class="section-content">One first-party cookie is set: <code>neo_theme</code>, which remembers a colour theme you picked and is shared across neorgon.com subdomains so the choice follows you between tools. It contains a theme name and nothing else. It is not used for tracking.</p>
       <p class="section-content">Signing in sets session cookies from Clerk, which are what keep you signed in. Sessions on the free plan last seven days.</p>
-      <p class="section-content">Many tools keep your preferences and drafts in your browser's local storage. That data never leaves your device and is not readable by Neorgon.</p>
+      <p class="section-content">Many tools keep your preferences and drafts in your browser's local storage. That data stays on your device and is not readable by Neorgon. On Vitrina, if you are signed in and press the button that moves your browser shelf into your account, those books are uploaded to Vitrina's database, as described above.</p>
     </section>
 
     <section class="story-section">
       <h2 class="section-title">Who else processes data</h2>
-      <p class="section-content">GitHub Pages hosts the pages. Cloudflare provides analytics and a content delivery network. Clerk provides authentication. Convex provides the databases. Google receives an authentication request only if you choose to sign in with Google. Each is used for the function named and nothing else.</p>
+      <p class="section-content">GitHub Pages hosts the pages. GoatCounter and Cloudflare provide analytics, and Cloudflare also provides a content delivery network. Clerk provides authentication. Convex provides the databases, including Vitrina's. Google receives an authentication request only if you choose to sign in with Google. La Tercera Fundación, at tercerafundacion.net, receives the image requests Vitrina pages make. Each is used for the function named and nothing else.</p>
     </section>
 
     <section class="story-section">
       <h2 class="section-title">Keeping and deleting</h2>
       <p class="section-content">Analytics records are aggregate counts and are not tied to you. Account data and the content you create are kept until you delete them.</p>
       <p class="section-content">You can delete your account from the account menu on any site where you signed in, which removes your Clerk identity and the list of sites you used with it. The list alone is cleared from the same menu, under Your Neorgon sites. To have the content stored against that account removed as well, or if a delete control is missing on a particular tool, ask and it will be deleted.</p>
+      <p class="section-content">Vitrina's data can be deleted in two ways. <strong>Delete my Vitrina data</strong>, in Vitrina, removes your profile, and with it any published shelf, at once. Every book, your shelf totals and your rate-limit records are then deleted in the background, and a final pass runs about five minutes later. While that runs, Vitrina keeps a note of your account id and when the deletion started, so nothing can be saved to the shelf being deleted, and removes it at the end. This does not delete your Neorgon account, which the other Neorgon sites share.</p>
+      <p class="section-content">Deleting your Neorgon account also erases your Vitrina data, normally within a day. If that has not happened, ask through the contact route below and it will be deleted. Either way, your old handle is held for 30 days, and if the account was suspended, the suspension record stays as described under Your shelf on Vitrina.</p>
       <p class="section-content">Revoking Neorgon's access to your Google account at any time is done at <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">myaccount.google.com/permissions</a>.</p>
     </section>
 
     <section class="story-section">
       <h2 class="section-title">Children</h2>
-      <p class="section-content">These tools are not directed at children and no account information is knowingly collected from anyone under 13.</p>
+      <p class="section-content">These tools are not directed at children and no account information is knowingly collected from anyone under 13. Publishing a shelf on Vitrina also needs your statement that you are 16 or older.</p>
     </section>
 
     <section class="story-section">
