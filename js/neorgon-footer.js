@@ -208,13 +208,28 @@
     return 'updated ' + d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
   }
 
+  /* The hub, not merely something hosted on it. This used to be the selector
+     a[href*="neorgon.com"], which a "you might also like" line pointing at a
+     sibling site satisfies, so the attribution disappeared from the sites most
+     likely to link their neighbours: client-says-site lost it that way, and
+     incident-runbook-site and runcible-site were doing the same silently. A
+     resolved .href is compared, so a relative link reads as this site's own
+     origin (which is what it is) rather than matching on a substring. */
+  function linksHub(inner) {
+    var links = inner.querySelectorAll('a[href]');
+    for (var i = 0; i < links.length; i++) {
+      if (/^https?:\/\/(www\.)?neorgon\.com(\/|$)/i.test(links[i].href)) return true;
+    }
+    return false;
+  }
+
   function buildBar(footer, inner, disclaimer) {
     var items = [];
     if (disclaimer) items.push(disclaimer);
 
     /* Only add the hub link when the site's own copy doesn't already
        carry one — retrofits keep their hand-written "Part of Neorgon". */
-    if (!inner.querySelector('a[href*="neorgon.com"]')) {
+    if (!linksHub(inner)) {
       /* The hub is a different site, so it opens in a new tab and says so with
          the same arrow every other outbound link here uses. It used to replace
          the page you were on, which on a game mid-run is a door you did not
