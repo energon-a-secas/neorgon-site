@@ -13,6 +13,13 @@ document.addEventListener('DOMContentLoaded', function () {
       delay: 120,
       delayOnTouchOnly: true,
       touchStartThreshold: 5,
+      /* The controls inside a card are not drag surfaces. Without this a
+         mousedown on a tag, on the `+N` chip or on the favorites strip begins a
+         card drag, so every one of those controls is competing with the gesture
+         that moves the card it sits in. `filter` is the reason `.card-tag` can
+         carry `cursor: pointer` honestly. */
+      filter: '.card-tag, .card-tag-more, .card-tools',
+      preventOnFilter: false,
       onStart() { if (window._neoSound) window._neoSound.dragStart(); },
       onEnd() { if (window._neoSound) window._neoSound.dropCard(); },
     });

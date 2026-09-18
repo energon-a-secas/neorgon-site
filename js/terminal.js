@@ -29,6 +29,63 @@
     return convex;
   }
 
+  /* ── Neorgon account (Clerk), a second and separate login ─────────────────
+     Two logins live in this terminal and they are deliberately unconnected:
+
+       login <u> <p>   a row in the Convex `users` table. Grants authCommands:
+                       ghost, broadcast, interfere. A handful of these exist and
+                       they are not handed out.
+       signin          the Neorgon account that already works on memes, sash,
+                       vitrina and the rest of the fleet. Grants identity, and
+                       nothing else.
+
+     Unconnected is the security position, not an oversight. Clerk sign-up is
+     open across the fleet, so letting a Clerk session satisfy the authCommands
+     gate would hand `interfere` to anyone who can register an email address.
+     The `users` table holds no column pointing at a Clerk user id, and adding
+     one is a schema change rather than part of a login command.
+
+     Imported on demand, so a visitor who never types `signin` downloads
+     neither this kit nor clerk-js. The kit itself then reads the `__client_uat`
+     cookie and only reaches Clerk if a session already exists somewhere on
+     neorgon.com. */
+  let NeoAuth = null;
+
+  async function getAuth() {
+    if (NeoAuth) return NeoAuth;
+    /* Root-absolute on purpose. `import()` from a classic script resolves
+       against the document's base URL, and the hub is served from the origin
+       root on localhost:8800 and on neorgon.com alike. */
+    const mod = await import('/js/neorgon-auth.js');
+    NeoAuth = mod.NeoAuth;
+    /* Not passed `convex`: the terminal's Convex calls authenticate with the
+       admin `authToken` they are given explicitly, never with ctx.auth, so
+       binding the Clerk token to that client would suggest a link that the
+       paragraph above says must not exist. */
+    await NeoAuth.start();
+    return NeoAuth;
+  }
+
+  /* Every account command needs the kit, and every one of them has to survive
+     the three ways it can be unusable: the module fails to load, the page
+     carries no Clerk key, or this is localhost, where a pk_live_ key refuses
+     the origin by design. Returning null and having said why beats each
+     command inventing its own half of that. */
+  async function accountKit() {
+    let auth;
+    try {
+      auth = await getAuth();
+    } catch (err) {
+      addLine('Could not load the account kit.', 'err');
+      return null;
+    }
+    if (auth.state.status === 'unavailable') {
+      addLine('This page carries no Clerk key, so accounts are off here.', 'err');
+      return null;
+    }
+    return auth;
+  }
+
   /* ── Client-side rate limiter (prevents Convex calls = zero cost) ── */
   const RL_KEY = 'neorgon-term-rl';
   const LOCKOUT_TIERS = [
@@ -192,7 +249,7 @@
     const groups = new Set(all.filter(t => !t.locked && t.group).map(t => t.group));
     const dated = live.map(t => t.added).filter(Boolean).sort();
     const last = dated.length ? dated[dated.length - 1] : '';
-    const fresh = live.filter(t => { const d = relDays(t.added); return d !== null && d <= 30; });
+    const fresh = fresh30();
 
     addLine('  NEORGON TOOLWORKS · web terminal', 'motd');
     addLine(`  ${lastLoginLine()}`, 'sys');
@@ -210,12 +267,27 @@
     if (last) statLine('last ship', last + relDaysLabel(last), w);
     statLine('theme', (window.NeoHeader && window.NeoHeader.getTheme()) || 'default', w);
     addLine('', 'sys');
-    if (fresh.length) {
-      addLine(`  * ${fresh.length} ${fresh.length === 1 ? 'tool' : 'tools'} shipped in the last 30 days. ` +
+    if (fresh) {
+      addLine(`  * ${fresh} ${fresh === 1 ? 'tool' : 'tools'} shipped in the last 30 days. ` +
               'Type "new" to see them.', 'motd');
     }
     addLine('  Type "help" for commands. Tab completes. Esc Esc closes.', 'sys');
     addLine('', 'sys');
+  }
+
+  /* "Shipped in the last 30 days", from the one module that owns it.
+     This was computed here twice, in the banner and in `stats`, and both said 17
+     where the rail and the `New` badges said 16: this file has no notion of a
+     group carrying `data-recent="off"`, so it counts a UI Lab tool the recency
+     surfaces drop. The fallback is that broader count, kept for the case where
+     recent.js found no dated cards and returned early, and it is the same
+     prefer-then-fall-back shape `new` already uses for `window._neoRecent`. */
+  function fresh30() {
+    if (typeof window._neoFresh30 === 'number') return window._neoFresh30;
+    return liveTools().filter(t => {
+      const d = relDays(t.added);
+      return d !== null && d <= 30;
+    }).length;
   }
 
   /* ── Terminal open/close ── */
@@ -276,14 +348,28 @@
      Excludes .site-card--echo — the Recently shipped rail holds clones, and
      counting them would report every recent tool twice. */
   function catalog() {
-    /* Document-wide, not scoped to #tools: the three locked ghost cards live in
-       the hidden secret section, and scoping to #tools made `stats` report
-       "0 locked" while three ghosts sat on the page. */
+    /* Document-wide, not scoped to #tools: the locked ghost cards live in the
+       hidden secret section, and scoping to #tools made `stats` report
+       "0 locked" while ghosts sat on the page. The count is deliberately not
+       written here: it said "three" while two were on the page, because a
+       ghost was retired and the comment was not. `stats` counts them. */
     return Array.from(document.querySelectorAll('.site-card[data-card-id]'))
       .filter(el => !el.classList.contains('site-card--echo'))
       .map(el => {
         const txt = sel => ((el.querySelector(sel) || {}).textContent || '').trim();
-        const group = el.closest('.card-group');
+
+        /* The card's home group, not whichever group it is sitting in right
+           now. search.js reparents every matched card into
+           #catalogSearchMerged while a search is active, so the plain
+           `closest('.card-group')` reported `category  Matches` from `whois`
+           for any tool the visitor had searched for, and `groupId` pointed at
+           the merge container rather than the category. `data-home-group` is
+           stamped by search.js at load; the closest() form stays as the
+           fallback for a card outside the catalog, which is where the ghosts
+           live. */
+        const homeGroup = el.dataset.homeGroup
+          ? document.getElementById(el.dataset.homeGroup) : null;
+        const group = homeGroup || el.closest('.card-group');
         const domain = txt('.card-domain');
         let href = el.getAttribute('href');
         if (!href) {
@@ -397,7 +483,7 @@
       addLine('  nerv [level]: trigger NERV warning (blue/red/orange)', 'sys');
       addLine('  warp: engage warp drive', 'sys');
       addLine('  reset-layout: restore default card order', 'sys');
-      addLine('  export-layoutcopy layout JSON to clipboard', 'sys');
+      addLine('  export-layout: copy layout JSON to clipboard', 'sys');
       addLine('', 'sys');
       addLine('Housekeeping:', 'sys');
       addLine('  help: show this message', 'sys');
@@ -406,8 +492,18 @@
       addLine('  whoami: who are you?', 'sys');
       addLine('  fortune: unsolicited advice', 'sys');
       addLine('  date: current date', 'sys');
-      addLine('  login <u> <p>authenticate', 'sys');
       addLine('  exit: close terminal', 'sys');
+      addLine('', 'sys');
+      /* Two logins, listed apart and labelled by what each is for. Sitting them
+         next to each other under one heading is how "login" got read as the way
+         in to a Neorgon account. */
+      addLine('Your Neorgon account:', 'sys');
+      addLine('  signin: sign in (one account for every neorgon.com site)', 'sys');
+      addLine('  signout: sign out of it', 'sys');
+      addLine('  sites: where this account has been used', 'sys');
+      addLine('', 'sys');
+      addLine('Site admin (a different account, not this one):', 'sys');
+      addLine('  login <u> <p>: authenticate for the admin commands', 'sys');
       addLine('', 'sys');
       addLine('Tab completes commands and tool names. ↑ / ↓ walk history.', 'sys');
       addLine('', 'sys');
@@ -426,7 +522,7 @@
         addLine('  ghost <id>: hide/show a card by ID', 'sys');
         addLine('  ghost list: show hidden cards', 'sys');
         addLine('  ghost reset: restore all hidden cards', 'sys');
-        addLine('  broadcast <m>show toast on page', 'sys');
+        addLine('  broadcast <m>: show toast on page', 'sys');
         addLine('  interfere <theme>|off: force the theme on every open hub tab', 'sys');
         addLine('  logout: end session', 'sys');
       }
@@ -649,7 +745,6 @@
       /* Same source as `categories` — counting groups from live tools only
          dropped Platforms (all external) and reported 10 against the rail's 11. */
       const groups = new Set(all.filter(t => !t.locked && t.group).map(t => t.group));
-      const fresh = live.filter(t => { const d = relDays(t.added); return d !== null && d <= 30; });
       addLine('neorgon.com', 'sys');
       addLine(`  tools        ${live.length} live \u00b7 ${all.filter(t => t.locked).length} locked \u00b7 ` +
               `${all.filter(t => t.external).length} external \u00b7 ` +
@@ -659,7 +754,7 @@
         addLine(`  first ship   ${dated[0]}`, 'sys');
         addLine(`  last ship    ${dated[dated.length - 1]}`, 'sys');
       }
-      addLine(`  new (30d)    ${fresh.length}`, 'sys');
+      addLine(`  new (30d)    ${fresh30()}`, 'sys');
       addLine(`  theme        ${(window.NeoHeader && window.NeoHeader.getTheme()) || 'default'}`, 'sys');
     },
     /* Visitor-scoped only: writes the neo_theme cookie through the header kit,
@@ -692,7 +787,9 @@
          terminal is the one place the site gets to have an opinion. */
       const lines = [
         'A tool you built for yourself is the only user research that never lies.',
-        'The site with 43 tools started as one page with one button.',
+        /* Counted, not typed. This line said 43 while the hub shipped 63, which
+           is exactly what the line about hardcoded lists below warns about. */
+        `The site with ${liveTools().length} tools started as one page with one button.`,
         'Naming is the hard part. Everything else is typing.',
         'A dead link is a broken promise. Check your DNS.',
         'Ship it small. Ship it hidden. Ship it anyway.',
@@ -704,7 +801,12 @@
       ];
       addLine(lines[Math.floor(Math.random() * lines.length)], 'sys');
     },
-    whoami() {
+    /* Both identities, because there are two and a person holding one of them
+       has no way to tell from the prompt, which only ever shows the admin one.
+       Deliberately NOT routed through accountKit(): "who am I" is worth
+       answering even when the account half cannot be reached, so a kit that
+       fails to load costs one missing line rather than an error. */
+    async whoami() {
       if (authedUser) {
         addLine(`Logged in as: ${authedUser}`, 'sys');
         addLine('Clearance level: admin', 'sys');
@@ -712,6 +814,12 @@
         addLine('You are a visitor at neorgon.com', 'sys');
         addLine('Clearance level: explorer', 'sys');
       }
+      try {
+        const auth = await getAuth();
+        if (auth.state.status === 'unavailable') return;
+        if (auth.state.signedIn) addLine(`Neorgon account: ${auth.state.label}`, 'sys');
+        else addLine('Neorgon account: none. "signin" to use one.', 'sys');
+      } catch (err) { /* account half unreachable: the admin half still answered */ }
     },
     date() { addLine(new Date().toString(), 'sys'); },
     exit() { closeTerm(); },
@@ -817,6 +925,68 @@
         if (window._neoSound) window._neoSound.deny();
         addLine('Connection failed.', 'err');
       }
+    },
+
+    /* ── Account commands ──────────────────────────────────────────────────
+       The dialog is the Auth Kit's own native <dialog>, opened with
+       showModal(), so it lands in the top layer above the terminal overlay and
+       the page behind both goes inert. The kit swallows the Escape that closes
+       it, which is why the terminal does not also close underneath. Focus
+       returns here afterwards: with no `invoker` to hand back to, the kit would
+       otherwise leave it on <body> and the next keystroke would go nowhere. */
+    async signin() {
+      const auth = await accountKit();
+      if (!auth) return;
+
+      if (auth.state.signedIn) {
+        addLine(`Already signed in as ${auth.state.label}.`, 'sys');
+        addLine('"signout" to sign out. "sites" for where this account has been used.', 'sys');
+        return;
+      }
+
+      addLine('Opening the Neorgon sign-in dialog…', 'sys');
+      const signedIn = await auth.openSignIn({
+        reason: 'One Neorgon account, for every Neorgon site.'
+      });
+      input.focus();
+
+      if (signedIn) {
+        addLine(`Signed in as ${auth.state.label}.`, 'sys');
+        addLine('This account works on every neorgon.com site. "sites" lists them.', 'sys');
+        /* Named, because someone who typed one login and got another's
+           permissions would be right to be confused about which they have. */
+        addLine('Admin commands still need "login <user> <pass>"; that is a separate account.', 'sys');
+      } else {
+        addLine('Sign-in dismissed.', 'sys');
+      }
+    },
+
+    async signout() {
+      const auth = await accountKit();
+      if (!auth) return;
+      if (!auth.state.signedIn) {
+        addLine('You are not signed in to a Neorgon account.', 'err');
+        /* The near-miss worth catching: an admin typing `signout` means
+           `logout`, and being told "not signed in" while the prompt still reads
+           their name is the least helpful true answer available. */
+        if (authedUser) addLine(`Signed in as admin ${authedUser} though. Use "logout" for that.`, 'sys');
+        return;
+      }
+      const label = auth.state.label;
+      await auth.signOut();
+      addLine(`Signed out of ${label}. Still on the page.`, 'sys');
+    },
+
+    async sites() {
+      const auth = await accountKit();
+      if (!auth) return;
+      if (!auth.state.signedIn) {
+        addLine('Sign in first: "signin".', 'err');
+        return;
+      }
+      addLine('Opening "Your Neorgon sites"…', 'sys');
+      await auth.openSites();
+      input.focus();
     },
   };
 

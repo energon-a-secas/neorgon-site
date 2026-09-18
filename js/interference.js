@@ -7,8 +7,16 @@
    `ConvexHttpClient`, which is request/response only and cannot watch
    anything; a subscription needs the WebSocket `ConvexClient` and its
    `onUpdate`. Keeping the two separate means the terminal's auth path is
-   untouched by anything here, and a socket that never opens costs the page
-   nothing but this file.
+   untouched by anything here.
+
+   The cost is real and worth stating plainly: a receiver has to be listening to
+   receive, so EVERY visitor pays for this feature, not just an admin. Measured
+   on a fresh load with the terminal never opened: 15 cross-origin requests to
+   esm.sh and one open WebSocket. `schedule()` below defers it to idle, which
+   moves the cost off the critical path but does not remove it. Visibility
+   gating was considered and rejected for the reason the setTimeout floor
+   exists: a hub left in a background tab is the normal case for this feature,
+   and that is precisely the tab requestIdleCallback will not wake.
 
    Precedence is the header kit's: visitor > season > opt-out > skin >
    default. Interference sits BELOW the visitor, so a tab opened with

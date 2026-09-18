@@ -139,6 +139,28 @@
     if (stampBadge(c.el, c.ts)) freshCount++;
   });
 
+  /* ── The hero's tempo claim, from this same count ────────────────────────
+     "N of them shipped in the last 30 days" used to be computed a second time
+     by an inline script in index.html, and the two answers disagreed: 17 there
+     against 16 here. Two causes, both invisible to a reader. That script had no
+     notion of `data-recent="off"`, so it counted a UI Lab tool this list drops;
+     and it compared ISO strings against a cutoff built from the local clock
+     while this file does fractional-UTC-day arithmetic, which moves the
+     boundary for a card added exactly 30 days ago.
+
+     `freshCount` is the number a visitor can audit, because it is the number of
+     `New` badges the same loop just stamped. The hero now states that, so the
+     page cannot claim one more tool than it can show. Whoever owns the badge
+     owns the sentence about the badge. */
+  var shipRecentEl = document.getElementById('shipRecent');
+  if (shipRecentEl && freshCount > 0) shipRecentEl.textContent = freshCount;
+
+  /* Published for terminal.js, which prints the same claim in its login banner
+     and in `stats` and had a third implementation of the window. Same
+     arrangement as `window._neoRecent` below: the terminal prefers this and
+     falls back to counting for itself. */
+  window._neoFresh30 = freshCount;
+
   /* ── Build the rail ─────────────────────────────────────────────────────── */
   var relFmt = (function () {
     /* Intl.RelativeTimeFormat is widely supported; fall back to plain text. */

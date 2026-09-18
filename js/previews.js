@@ -3,6 +3,22 @@
   const PREVIEW_PATH = 'assets/previews/';
   const PREVIEW_MAP = {
     portent: 'portent.gif',
+    gamme: 'gamme.gif',
+    aficion: 'aficion.gif',
+    dispatch: 'dispatch.gif',
+    vitrina: 'vitrina.gif',
+    pixeldoll: 'pixeldoll.gif',
+    boardwright: 'boardwright.gif',
+    enjeu: 'enjeu.gif',
+    rushq: 'rushq.gif',
+    rewind: 'rewind.gif',
+    sortie: 'sortie.gif',
+    neokeys: 'neokeys.gif',
+    carnet: 'carnet.gif',
+    cadrage: 'cadrage.gif',
+    mosaic: 'mosaic.gif',
+    releve: 'releve.gif',
+    echeance: 'echeance.gif',
     quiz: 'quiz.gif',
     rappel: 'rappel.gif',
     runcible: 'runcible.gif',
@@ -47,16 +63,19 @@
     buyhacks: 'buyhacks.gif',
     snippets: 'snippets.gif',
     vibecheck: 'vibecheck.gif',
-    autopilot: 'autopilot.gif',
-    rushq: 'rushq.gif',
-    ehq: 'ehq.gif',
     'resume-forge': 'resume-forge.gif',
     tubestack: 'tubestack.gif',
     stackrank: 'stackrank.gif',
   };
 
-  /* Global flag — settings panel sets this */
-  window._neoPreviewsEnabled = false;
+  /* The off default, claimed only if nobody has claimed it.
+     settings.js loads BEFORE this file and has already published the visitor's
+     saved `previews` pref by the time we get here, so a plain assignment
+     overwrites it: the toggle rendered on, `aria-pressed="true"`, and the
+     feature was off, with nothing on screen to explain why. Same guard
+     settings.js already uses for _neoSoundEnabled, and unlike swapping the two
+     script tags it cannot be undone by a future reorder. */
+  if (window._neoPreviewsEnabled === undefined) window._neoPreviewsEnabled = false;
 
   const failed = new Set();
 

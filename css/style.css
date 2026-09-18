@@ -407,7 +407,14 @@ body {
   opacity: .16;
   filter: saturate(.55);
 }
-.tag-pill.repelled:hover {
+/* Keyboard focus restores it for the same reason hover does, and for one more:
+   these are buttons and they stay in the tab order while receded, so a keyboard
+   visitor searching for something was tabbing onto controls held at 16% opacity
+   with no way to see where the focus ring had gone. Dropping them from the tab
+   order was the other option and it is worse, it takes the ability away from
+   one group of visitors to fix how it looks for them. */
+.tag-pill.repelled:hover,
+.tag-pill.repelled:focus-visible {
   opacity: 1;
   filter: none;
 }
@@ -892,11 +899,81 @@ span.card-site-icon {
   line-height: 1.6;
   flex: 1;
 }
+/* One line at rest, every tag still in the DOM. `overflow: hidden` rather
+   than `display: none` on the surplus is deliberate: the accessible tree and
+   search.js's index are both unclipped, so nothing is hidden from a reader or
+   from a query, only from the paint. js/tags.js measures which tags fall
+   below the first line and writes --tag-line-h; without that file the row is
+   an ordinary wrapping flex row, which is the honest no-JS fallback. */
 .card-tags {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 4px;
+}
+.card-tags {
+  /* The favorites control strip claims this same corner when a card is saved
+     (see .site-card.has-fav below), so the chip's offset is a token rather
+     than a literal `right: 0`. */
+  --tag-strip-w: 0px;
+}
+.card-tags.has-gutter { padding-right: 46px; }
+.card-tags.is-clipped {
+  max-height: var(--tag-line-h, none);
+  overflow: hidden;
+}
+.card-tags.is-clipped.is-open {
+  max-height: none;
+  overflow: visible;
+}
+
+/* Sits in the gutter the row reserved for it, so it never displaces a tag or
+   wraps to a line it would then be clipped on. */
+.card-tag-more {
+  position: absolute;
+  top: 0;
+  right: var(--tag-strip-w, 0px);
+  cursor: pointer;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, var(--card-accent, #818cf8) 40%, transparent);
+  color: color-mix(in srgb, var(--card-accent, #818cf8) 85%, #fff);
+  background: color-mix(in srgb, var(--card-accent, #818cf8) 12%, rgba(8, 12, 26, .9));
+  transition: background .2s ease, border-color .2s ease;
+}
+.card-tag-more:hover {
+  border-style: solid;
+  background: color-mix(in srgb, var(--card-accent, #818cf8) 24%, rgba(8, 12, 26, .95));
+}
+/* Open, the chip is a plain trailing item: the row is no longer clipped, so
+   the gutter it was pinned into is no longer reserved on every line. */
+.card-tags.is-open .card-tag-more {
+  position: static;
+  order: 99;
+}
+.card-tags.is-open { padding-right: 0; }
+
+/* A tag runs its own search on click (js/tags.js). Pointer-only and not
+   focusable, matching .card-arrow: the query it produces is reachable by
+   typing the same word into the search box, so a tab stop per tag would add
+   roughly 214 of them for no new ability.
+
+   Do NOT re-add a `body.drag-enabled` override here. That class is added
+   unconditionally by sortable.js on load, so it is never absent, and a rule
+   hung off it does not mean "while dragging", it means "always" and at higher
+   specificity. One shipped here briefly and made every tag and chip read
+   `grab`, which is the opposite of what they do. Tags are excluded from the
+   drag instead, via Sortable's `filter`. */
+.card-tag,
+.card-tag-more { cursor: pointer; }
+.card-tag:hover {
+  border-color: color-mix(in srgb, var(--card-accent, #818cf8) 65%, transparent);
+  background: color-mix(in srgb, var(--card-accent, #818cf8) 18%, transparent);
 }
 .card-tag {
   font-size: .68rem;
@@ -926,10 +1003,20 @@ span.card-site-icon {
   background: #0a0e1a;
 }
 .card-preview.visible { opacity: 1; }
+/* `cover`, never `fill`. A card box is 358px wide and 233..285 tall, so its
+   aspect runs 1.26..1.53 and no single recording matches every card exactly.
+   `fill` resolved that by stretching each axis independently, which with the
+   old 646x300 captures (aspect 2.153) rendered every preview 1.537x narrower
+   than it was shot: text condensed, circles into ellipses, a screenshot of a
+   site nobody could ship. The recorder now writes 646x462 (aspect 1.398, the
+   median card), and `cover` spends the residual on a crop of at most 10% at
+   either end of the height range instead of distorting the whole frame.
+   Anything reintroducing `fill` here reintroduces that, silently, because a
+   squashed screenshot still looks like a screenshot. */
 .card-preview img {
   width: 100%;
   height: 100%;
-  object-fit: fill;
+  object-fit: cover;
   display: block;
 }
 .card-preview::after {
@@ -3045,8 +3132,17 @@ body.search-active #tools {
 }
 .site-card.is-pinned::after { opacity: 1; }
 
-/* Reserve the corner so a long tag row never runs under the resting strip. */
-.site-card.has-fav .card-tags { padding-right: 28px; }
+/* Reserve the corner so a long tag row never runs under the resting strip.
+   Declared as the two tokens the tag-row block defines rather than as
+   `padding-right`, because tags.js also reserves a gutter there for the `+N`
+   chip. Two rules setting one padding at different specificities in two
+   halves of this file is how the chip ended up under the star: the variables
+   compose, a second `padding-right` only overrides. */
+.site-card.has-fav .card-tags {
+  --tag-strip-w: 28px;
+  padding-right: var(--tag-strip-w);
+}
+.site-card.has-fav .card-tags.has-gutter { padding-right: calc(46px + var(--tag-strip-w)); }
 
 /* Dragging inside the shelf. Sortable's classes are shared with the catalog's
    own reorder (js/sortable.js), so these only add what the shelf needs. */

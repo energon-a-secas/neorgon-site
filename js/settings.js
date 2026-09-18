@@ -138,8 +138,10 @@
     };
   }
 
-  /* Global flags default to true */
+  /* Global flags fall back to the saved pref, so a consumer still reads the
+     visitor's choice when its toggle element is missing from the panel. */
   if (window._neoSoundEnabled === undefined) window._neoSoundEnabled = prefs.sound;
+  if (window._neoPreviewsEnabled === undefined) window._neoPreviewsEnabled = prefs.previews;
 
   btn.addEventListener('click', () => {
     const open = panel.classList.toggle('open');

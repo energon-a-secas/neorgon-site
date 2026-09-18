@@ -29,6 +29,17 @@
   const nativeGridByCard = new WeakMap();
   catalogCardsOrdered.forEach(function (card) {
     nativeGridByCard.set(card, card.parentElement);
+
+    /* The same fact, written where other modules can read it. This file is the
+       only one that moves a card out of its category, so it is the only one
+       that can say where the card belongs, and a WeakMap says it privately.
+       Anything asking "what category is this tool in" via
+       `closest('.card-group')` gets `Matches` for every matched card while a
+       search is active, which is what made the terminal's `whois` print
+       `category  Matches` for a tool whose category is Social. Stamped once at
+       load, before any path can reparent anything. */
+    var home = card.closest('.card-group');
+    if (home && home.id) card.dataset.homeGroup = home.id;
   });
 
   /* Build searchable index */
@@ -70,9 +81,19 @@
 
      One group is deliberately absent: **Archive**. The 1:1 rule exists to stop
      a pill filtering to nothing, and a group with no pill fails in the safe
-     direction — an archived tool is still scored by name, so `skillmap` is a
-     search away, it simply is not something the hero constellation offers.
-     A pill would advertise the one shelf on the page we are arguing against. */
+     direction — an archived tool is still scored by name, so `skillmap` and
+     `chasqui` are a search away, they simply are not something the hero
+     constellation offers. A pill would advertise the one shelf on the page we
+     are arguing against.
+
+     Archiving a card removes it from its old category's `ids` **and takes its
+     words out of that category's `keywords` with it**. The id is the obvious
+     half; the vocabulary is the half that was missed for `chasqui`, and it is
+     the more damaging one. `keywords` is a fallback that expands the *whole*
+     group when a query matched no card directly, so leaving `whatsapp aisensy`
+     under Social meant a search for either term returned eleven live tools, not
+     one of which sends a message. An id left behind is a wrong recommendation;
+     vocabulary left behind is eleven of them. */
   const CATEGORIES = [
     { label: 'Planning',      color: '#4ade80', ids: ['pathfinder','doorman','loadout','floorplan'], keywords: 'floorplan team map teams groups sub-groups shared spaces bands rooms office pixel yaml profiles extends percentages allocation split org chart reorg planning visual canvas export learning roadmap pathfinder skill map strategy doorman build vs buy duplicate vendor deliverable cost estimate scope tokens engineers reverse engineer doorman fallacy loadout team meetings workload overload balance week manager distribution drag drop calendar bottle capacity' },
     { label: 'DevOps',        color: '#fbbf24', ids: ['infradrills','snippets','safeguard','lockdown','runbook','echeance'], keywords: 'devops challenges cli cheatsheet search aws kubernetes docker k8s shell terminal commands bash powershell windows wsl macos git infra drills snippets lockdown security scanner endpoints headers incident runbook alert response on-call checklist cardforge card designer editor json export rush q game builder safeguard hardening guides accounts devices privacy echeance credentials tokens api keys expiry expiration renew renewal rotate revoke oauth inventory ics calendar reminders llms tutorials secrets tracker' },
@@ -119,22 +140,31 @@
   var SCORE = {
     nameExact:  1000,
     nameWord:    700,
-    nameLoose:   560,
+    tagWord:     600,  /* a tag, at a word start: what the tool is ABOUT */
+    nameLoose:   560,  /* mid-word, inside a name: often a coincidence */
     catExact:    520,  /* the query IS a category label — a pill click */
     domain:      460,
-    tag:         380,
     desc:        220,
     loose:       120,  /* matched somewhere, mid-word */
     catLabel:     90,  /* part of a label: "dev" → DevOps */
     catKeyword:   80   /* fallback vocabulary; only when nothing matched */
   };
 
+  /* The cascade is ordered by how deliberate the match is, not by which field
+     it landed in. `wordStart` on a tag is somebody having declared the subject;
+     `indexOf` on a name is a substring that happens to be in there. Ranking the
+     second above the first is what put Incident Runbook and Playbook above
+     Bouquin for the query "book": two compound words ending in the query,
+     against the one card in the catalog whose subject and tag are literally
+     Books. A tag hit is above the loose name hit for that reason, and stays
+     below `nameWord`, because a tool whose NAME starts with the word is still
+     the better answer than one that merely carries the tag. */
   function scoreCard(item, q) {
     if (item.name === q) return SCORE.nameExact;
     if (wordStart(item.name, q)) return SCORE.nameWord;
+    if (wordStart(item.tagText, q)) return SCORE.tagWord;
     if (item.name.indexOf(q) >= 0) return SCORE.nameLoose;
     if (wordStart(item.domain, q) || wordStart(item.id, q)) return SCORE.domain;
-    if (wordStart(item.tagText, q)) return SCORE.tag;
     if (wordStart(item.desc, q)) return SCORE.desc;
     if (item.text.indexOf(q) >= 0) return SCORE.loose;
     return 0;
@@ -301,6 +331,10 @@
       var el = document.createElement('button');
       el.type = 'button';
       el.className = 'tag-pill';
+      /* Off until paintPillStates says otherwise. A toggle that only grows
+         `aria-pressed` after the first search announces no state on the one
+         pass that matters most, the first. */
+      el.setAttribute('aria-pressed', 'false');
       el.textContent = cat.label;
       el.style.color = cat.color;
       el.style.setProperty('--pill-color', cat.color + '80');
@@ -772,9 +806,17 @@
      readout the cloud owes a reader was the one thing motion preference
      switched off. */
   function paintPillStates() {
+    /* A pill is a toggle: clicking the one whose label is already the query
+       clears it. That was said in colour and scale only, so a screen reader
+       heard twelve identical buttons and could not tell which one was on, or
+       that any of them could be off. `matched` is the wrong thing to expose
+       here, several pills light up for one query; pressed means "this pill's
+       label IS the query", which is exactly what a second click undoes. */
+    var q = input.value.trim().toLowerCase();
     pills.forEach(function (p) {
       p.el.classList.toggle('matched', p.matched && isFiltering);
       p.el.classList.toggle('repelled', !p.matched && isFiltering);
+      p.el.setAttribute('aria-pressed', String(q === p.cat.label.toLowerCase()));
     });
     /* Base-route alpha and orbit alpha both key off the matched set, and this
        is the one function every path that changes it already calls. */

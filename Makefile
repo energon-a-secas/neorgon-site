@@ -17,8 +17,13 @@ stop: ## Kill process using the dev server port
 ## Icon standard: weight, colour, render mode, and a sheet that cannot go stale.
 ## Exits non-zero if anything is off OR if the generated sheet is out of date,
 ## because a doc that silently lags the thing it documents is the failure this
-## whole check exists to prevent.
+## whole check exists to prevent. Same reasoning covers PREVIEW_MAP: a preview
+## whose GIF is missing dies through `img.onerror` with nothing logged, and the
+## hardcoded tool counts in the meta and JSON-LD descriptions, which no visitor
+## can see going stale because the hero computes the copy they do see.
 check:
+	@python3 scripts/preview-lint.py
+	@python3 scripts/count-lint.py
 	@python3 scripts/icon-lint.py
 	@python3 scripts/icon-sheet.py >/dev/null
 	@if git ls-files --error-unmatch docs/icon-sheet.html >/dev/null 2>&1; then \

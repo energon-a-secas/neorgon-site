@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="color-scheme" content="dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://esm.sh https://gc.zgo.at https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.neorgon.org; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://cdn.neorgon.org https://neorgon.goatcounter.com; connect-src https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com https://esm.sh https://quaint-cobra-151.convex.cloud wss://quaint-cobra-151.convex.cloud https://neorgon.goatcounter.com https://cloudflareinsights.com https://dispatch.neorgon.com http://localhost:8873; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://dispatch.neorgon.com http://localhost:8873; upgrade-insecure-requests">
+  <!-- No `frame-ancestors` here. Browsers ignore that directive when it arrives
+       via <meta> and log a console error for it, so it bought no clickjacking
+       protection and cost a permanent error that hid real ones. GitHub Pages
+       cannot set response headers; if framing protection is wanted it has to
+       come from a Cloudflare Worker or a header rule, not from this tag. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://esm.sh https://gc.zgo.at https://static.cloudflareinsights.com https://clerk.neorgon.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.neorgon.org; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://cdn.neorgon.org https://neorgon.goatcounter.com https://img.clerk.com; connect-src https://www.youtube.com https://www.youtube-nocookie.com https://youtubei.googleapis.com https://*.googlevideo.com https://esm.sh https://quaint-cobra-151.convex.cloud wss://quaint-cobra-151.convex.cloud https://neorgon.goatcounter.com https://cloudflareinsights.com https://dispatch.neorgon.com http://localhost:8873 https://clerk.neorgon.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://dispatch.neorgon.com http://localhost:8873 https://challenges.cloudflare.com; worker-src blob:; upgrade-insecure-requests">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
@@ -57,6 +62,17 @@
   <meta name="neo-repo" content="energon-a-secas/neorgon-site">
   <link rel="stylesheet" href="css/neorgon-footer.css">
   <script defer src="js/neorgon-footer.js"></script>
+  <!-- Neorgon Auth Kit. No `.neo-auth` header slot on purpose: the hub has no
+       account-gated feature except the terminal, so a "Sign in" button on the
+       fleet's front door would be an affordance leading nowhere. The kit is
+       imported on demand by terminal.js `signin`. To put the button back, add
+       `<div class="neo-auth" data-neo-auth data-keep-mobile hidden></div>`
+       inside `.header-right` before `.header-home`; nothing else changes.
+       The stylesheet is not deferrable: it paints the kit's own dialog. -->
+  <meta name="clerk-publishable-key" content="pk_live_Y2xlcmsubmVvcmdvbi5jb20k">
+  <meta name="neo-auth-site" content="Neorgon">
+  <meta name="neo-auth-reason" content="Sign in to your Neorgon account. One account works on every Neorgon site.">
+  <link rel="stylesheet" href="css/neorgon-auth.css">
 </head>
 <body>
 
@@ -259,7 +275,7 @@
           <h3 class="card-name">Loadout</h3>
           <div class="card-desc">Drag your team onto meeting blocks across the week and watch each person's workload fill a bottle, so you catch overload before it happens.</div>
           <div class="card-tags">
-            <span class="card-tag">Team</span>
+            <span class="card-tag">Teams</span>
             <span class="card-tag">Meetings</span>
             <span class="card-tag">Workload</span>
           </div>
@@ -666,7 +682,7 @@
           <div class="card-tags">
             <span class="card-tag">Claude</span>
             <span class="card-tag">Agents</span>
-            <span class="card-tag">Exam Prep</span>
+            <span class="card-tag">Exams</span>
           </div>
         </div>
       </a>
@@ -765,7 +781,7 @@
           <div class="card-desc">Learn focus and the exposure triangle, walk through video and photo settings on a Sony a6700 menu replica, and lint your setup for contradictions.</div>
           <div class="card-tags">
             <span class="card-tag">Camera</span>
-            <span class="card-tag">Learn</span>
+            <span class="card-tag">Learning</span>
             <span class="card-tag">Video</span>
           </div>
         </div>
@@ -785,7 +801,7 @@
           <h3 class="card-name">Carnet</h3>
           <div class="card-desc">A to-do list kept in your own Puter account. Offline until you sign in, then the same list on every browser.</div>
           <div class="card-tags">
-            <span class="card-tag">To-do</span>
+            <span class="card-tag">Tasks</span>
             <span class="card-tag">Offline-first</span>
             <span class="card-tag">Sync</span>
           </div>
@@ -985,7 +1001,7 @@
           <div class="card-tags">
             <span class="card-tag">Cards</span>
             <span class="card-tag">Strategy</span>
-            <span class="card-tag">Game</span>
+            <span class="card-tag">Games</span>
           </div>
         </div>
       </a>
@@ -1263,7 +1279,7 @@
           <div class="card-tags">
             <span class="card-tag">Fun</span>
             <span class="card-tag">Memes</span>
-            <span class="card-tag">Videos</span>
+            <span class="card-tag">Video</span>
           </div>
         </div>
       </a>
@@ -1307,7 +1323,6 @@
           </div>
         </div>
       </a>
-
 
       <!-- Portent -->
       <a class="site-card" data-card-id="portent" data-added="2026-09-18"
@@ -1656,7 +1671,7 @@
           <div class="card-tags">
             <span class="card-tag">Self-assessment</span>
             <span class="card-tag">Reasoning</span>
-            <span class="card-tag">Private</span>
+            <span class="card-tag">Privacy</span>
           </div>
         </div>
       </a>
@@ -1803,7 +1818,7 @@
           <h3 class="card-name">GitLab</h3>
           <div class="card-desc">Private repos, CI pipelines, and internal tooling. The quieter side of the operation.</div>
           <div class="card-tags">
-            <span class="card-tag">Private</span>
+            <span class="card-tag">Privacy</span>
             <span class="card-tag">CI/CD</span>
             <span class="card-tag">Pipelines</span>
           </div>
@@ -1843,6 +1858,28 @@
     <div class="card-group" id="group-archive" data-group="archive" data-collapsed="true" data-recent="off" style="--group-color: #8b8fa3">
       <h2 class="group-label"><span class="group-dot"></span> Archive</h2>
       <div class="sites-grid">
+
+      <!-- Chasqui: parked, no replacement -->
+      <a class="site-card archived-card" data-card-id="chasqui" data-added="2026-09-18" data-status="archived"
+         href="https://github.com/energon-a-secas/chasqui-site"
+         style="--card-glow: rgba(139,143,163,.2); --card-glow-border: rgba(139,143,163,.25); --card-accent: #8b8fa3;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/chasqui.svg')"></span></div>
+            <span class="archived-badge">Archived</span>
+            <svg class="card-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <div class="card-domain">github.com/energon-a-secas/chasqui-site</div>
+          <h3 class="card-name">Chasqui</h3>
+          <div class="card-desc">WhatsApp relay for Neorgon. Trigger an AiSensy template for a number and watch the send, the refusal and the reply land in one live thread.</div>
+          <div class="card-superseded">Parked: the wiring works, but AiSensy's free plan refuses API campaigns. Notes and the revive path live in the repo.</div>
+          <div class="card-tags">
+            <span class="card-tag">WhatsApp</span>
+            <span class="card-tag">Convex</span>
+            <span class="card-tag">Proof of concept</span>
+          </div>
+        </div>
+      </a>
 
       <!-- Skill Map: superseded by Pathfinder -->
       <a class="site-card archived-card" data-card-id="skillmap" data-added="2026-02-28" data-status="archived"
@@ -2083,6 +2120,11 @@
 <!-- After recent.js: favorites.js uses the clone helper recent.js exports. -->
 <script defer src="js/favorites.js"></script>
 <script defer src="js/catnav.js"></script>
+<!-- After favorites.js: a saved card's control strip claims the same corner the
+     +N chip is pinned into, and the gutter tags.js measures has to be the one
+     that is actually reserved. Not order-critical beyond that: the tag click
+     reaches search.js through a dispatched input event, not a load-time hook. -->
+<script defer src="js/tags.js"></script>
 <!-- After catnav.js: catnav builds its chip labels from .group-label textContent,
      and collapse.js reparents that heading into a button. -->
 <script defer src="js/collapse.js"></script>
@@ -2104,32 +2146,14 @@
     var el = document.getElementById('toolCount');
     if (el && count > 0) el.textContent = count;
 
-    /* The tempo claim, from the same cards. 64 tools in six months with 17 in
-       the last month is the whole "fast iterations" position, and until
-       2026-08-28 the page stated it as "none of them are finished", which a
-       reader deciding whether to trust a tool reads as risk rather than pace.
-       Derived, because a hand-typed figure here would be stale within a week
-       and VOICE.md forbids a counter that claims more than the code verifies.
+    /* The tempo claim next to this one, "N of them shipped in the last 30
+       days", is NOT computed here. It used to be, with its own 30-day
+       arithmetic, and it answered 17 where recent.js answered 16 for the same
+       window. `#shipRecent` now belongs to js/recent.js, which owns the `New`
+       badge, so the sentence and the badges a reader can count come from one
+       loop. Do not recompute it here; see the comment at `freshCount`.
        The static fallback in the HTML is allowed to understate, never to
        overstate: smoke check 21 enforces that direction. */
-    var cut = new Date();
-    cut.setDate(cut.getDate() - 30);
-    /* Compare ISO date strings, not Date objects. data-added is date-only, so
-       new Date(d) is UTC midnight while a cutoff built from the clock carries
-       today's time: a card added exactly 30 days ago falls on the wrong side,
-       and the local timezone moves the boundary again. That is how this same
-       window returned 17 in smoke check 21 and 15 in the browser. Lexical
-       comparison on YYYY-MM-DD is exact and has no timezone. */
-    var cutoff = cut.getFullYear() + '-' +
-                 String(cut.getMonth() + 1).padStart(2, '0') + '-' +
-                 String(cut.getDate()).padStart(2, '0');
-    var recent = 0;
-    cards.forEach(function (c) {
-      var d = c.getAttribute('data-added');
-      if (d && d >= cutoff) recent++;
-    });
-    var rel = document.getElementById('shipRecent');
-    if (rel && recent > 0) rel.textContent = recent;
   });
 </script>
 
