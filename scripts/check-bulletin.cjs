@@ -74,11 +74,19 @@ function check(value, message) { assert.ok(value, message); checks++; }
     for (const width of [320, 390, 768]) {
       const mobile = await browser.newPage({ ...browserOptions, viewport: { width, height: 844 }, reducedMotion: 'reduce' });
       let fetched = false;
-      await mobile.route('**/data/posts.json', route => { fetched = true; return route.fulfill({ json: feed }); });
+      await mobile.route('**/data/posts.json', route => { fetched = true; return route.fulfill({ json: feed, headers: { 'access-control-allow-origin': '*' } }); });
       await prepareLocalWebkit(mobile);
-      await mobile.goto(base); await mobile.waitForTimeout(2800);
+      await mobile.goto(base); await mobile.locator('.dispatch-dock').waitFor();
       check(!fetched, `no bulletin request at ${width}`);
       check(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `no page overflow at ${width}`);
+      await mobile.locator('.dispatch-dock').click();
+      await mobile.locator('.dispatch-story').first().waitFor();
+      check(fetched, `mobile feed loads on demand at ${width}`);
+      check(await mobile.locator('.dispatch-pop').isVisible(), `news accessible at ${width}`);
+      check(await mobile.locator('.dispatch-pop').evaluate(el => el.scrollWidth <= el.clientWidth), `mobile bulletin fits at ${width}`);
+      await mobile.locator('.dispatch-pop__close').focus();
+      await mobile.keyboard.press('Escape');
+      check(await mobile.locator('.dispatch-dock').evaluate(el => el === document.activeElement), `mobile Escape returns focus at ${width}`);
       await mobile.close();
     }
 
@@ -91,6 +99,23 @@ function check(value, message) { assert.ok(value, message); checks++; }
     await fallback.waitForTimeout(400);
     check(await fallback.locator('#tools .site-card[data-card-id="parla"]').isVisible(), 'catalog search works without feed');
     await fallback.close();
+
+    const recovery = await browser.newPage({ ...browserOptions, viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+    let failFeed = true;
+    await recovery.route('**/data/posts.json', route => failFeed ? route.abort() : route.fulfill({ json: { posts: [story('recovered')] }, headers: { 'access-control-allow-origin': '*' } }));
+    await prepareLocalWebkit(recovery);
+    await recovery.goto(base);
+    await recovery.locator('.dispatch-dock').click();
+    await recovery.getByRole('button', { name: 'Try again' }).waitFor();
+    check(await recovery.locator('.dispatch-pop__state').textContent().then(t => t.includes('unavailable')), 'mobile failure explains what happened');
+    failFeed = false;
+    await recovery.getByRole('button', { name: 'Try again' }).click();
+    await recovery.locator('.dispatch-story').waitFor();
+    check(await recovery.locator('.dispatch-pop__close').evaluate(el => el === document.activeElement), 'retry keeps a stable keyboard target');
+    await recovery.locator('#heroSearch').click();
+    check(await recovery.locator('.dispatch-pop').count() === 0, 'outside tap closes mobile news');
+    check(await recovery.locator('#heroSearch').evaluate(el => el === document.activeElement), 'outside tap preserves its own focus');
+    await recovery.close();
 
     const storage = await browser.newPage({ ...browserOptions, viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
     await storage.addInitScript(() => { Storage.prototype.setItem = () => { throw new Error('disabled'); }; Storage.prototype.getItem = () => { throw new Error('disabled'); }; });

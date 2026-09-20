@@ -272,7 +272,9 @@ a small shape badge and a written label identify Launch, Feature, Fix, or Note.
 The newest story includes a two-line summary. Static artwork keeps this small
 surface readable; GIF previews remain an opt-in catalog interaction.
 
-The bulletin stays desktop-only (900px and up), caps its height to the viewport,
-and scrolls on short screens. Automatic opening does not move focus. Explicit
+The bulletin opens automatically only on desktop (900px and up). Mobile gets a
+44px dock and an on-demand panel with safe-area spacing, loading and retry
+states, and outside-tap dismissal. Its height is capped to the viewport and its
+contents scroll on short screens. Automatic opening does not move focus. Explicit
 opening focuses the close button; closing or Escape returns focus to the labeled
 Antenne dock. Reduced motion removes the entrance and arrow transitions.

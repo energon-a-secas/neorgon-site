@@ -1,4 +1,4 @@
-// Antenne's desktop bulletin uses the published feed and local catalog artwork.
+// Antenne uses the published feed and local catalog artwork. Mobile loads on demand.
 // No iframe or remote favicon service: the hub owns its small, accessible view.
 (function () {
   'use strict';
@@ -136,6 +136,67 @@
   var popup;
   var posts = [];
   var edition;
+  var feedState = 'idle';
+  var pending = null;
+  var interacted = false;
+
+  function renderContent() {
+    if (!popup) return;
+    var content = popup.querySelector('.dispatch-pop__content');
+    content.replaceChildren();
+    content.setAttribute('aria-busy', String(feedState === 'loading'));
+    if (feedState === 'ready') {
+      var list = node('ul', 'dispatch-pop__list');
+      posts.forEach(function (post, i) { list.appendChild(storyItem(post, i)); });
+      content.appendChild(list);
+      return;
+    }
+    var message = feedState === 'error' ? 'Fleet news is unavailable right now.'
+      : feedState === 'empty' ? 'No fleet news yet. Check back soon.' : 'Loading fleet news…';
+    var state = node('div', 'dispatch-pop__state');
+    state.appendChild(node('p', '', message));
+    if (feedState === 'error' || feedState === 'empty') {
+      var retry = node('button', 'dispatch-pop__retry', 'Try again');
+      retry.type = 'button';
+      retry.addEventListener('click', function () {
+        popup.querySelector('.dispatch-pop__close').focus({ preventScroll: true });
+        loadFeed();
+      });
+      state.appendChild(retry);
+    }
+    content.appendChild(state);
+  }
+
+  function loadFeed() {
+    if (pending) return pending;
+    feedState = 'loading';
+    renderContent();
+    var controller = new AbortController();
+    var timeout = setTimeout(function () { controller.abort(); }, 10000);
+    pending = fetch(BASE + 'data/posts.json', { cache: 'no-cache', signal: controller.signal })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Feed unavailable');
+        return res.json();
+      })
+      .then(function (doc) {
+        posts = normalize(doc);
+        feedState = posts.length ? 'ready' : 'empty';
+        edition = posts.length ? 'v2:' + JSON.stringify(posts.map(function (p) { return [p.id, p.date]; })) : null;
+      })
+      .catch(function () { feedState = 'error'; })
+      .finally(function () {
+        clearTimeout(timeout);
+        pending = null;
+        renderContent();
+      });
+    return pending;
+  }
+
+  function openBulletin() {
+    interacted = true;
+    show(true);
+    if (feedState === 'idle' || feedState === 'error') loadFeed();
+  }
 
   function showDock() {
     if (!dock) {
@@ -144,25 +205,29 @@
       dock.setAttribute('aria-label', 'Open Antenne fleet news');
       accentInto(dock);
       dock.innerHTML = satSvg('dispatch-dock__sat', 20) + '<span>Antenne</span>';
-      dock.addEventListener('click', function () { show(true); });
+      dock.addEventListener('click', openBulletin);
       document.body.appendChild(dock);
     }
     dock.hidden = false;
     dock.setAttribute('aria-expanded', 'false');
   }
 
-  function dismiss() {
-    try { localStorage.setItem(KEY, edition); } catch (e) { /* Storage is optional. */ }
+  function dismiss(options) {
+    options = options || {};
+    interacted = true;
+    if (edition && options.remember !== false) {
+      try { localStorage.setItem(KEY, edition); } catch (e) { /* Storage is optional. */ }
+    }
     if (popup) popup.remove();
     popup = null;
     showDock();
     // Safari does not focus buttons on a pointer click. Dismissal is always a
     // deliberate close/Escape action, so return focus even in that case.
-    dock.focus({ preventScroll: true });
+    if (options.focus !== false) dock.focus({ preventScroll: true });
   }
 
   function show(focus) {
-    if (popup || !desktop.matches) return;
+    if (popup) return;
     if (dock) { dock.hidden = true; dock.setAttribute('aria-expanded', 'true'); }
     popup = node('aside', 'dispatch-pop');
     popup.id = 'dispatch-bulletin';
@@ -177,13 +242,14 @@
     var close = node('button', 'dispatch-pop__close', '×');
     close.type = 'button';
     close.setAttribute('aria-label', 'Dismiss fleet news');
-    close.addEventListener('click', dismiss);
+    close.addEventListener('click', function () { dismiss(); });
     bar.appendChild(label);
     bar.appendChild(close);
     popup.appendChild(bar);
-    var list = node('ul', 'dispatch-pop__list');
-    posts.forEach(function (post, i) { list.appendChild(storyItem(post, i)); });
-    popup.appendChild(list);
+    var content = node('div', 'dispatch-pop__content');
+    content.setAttribute('aria-live', 'polite');
+    popup.appendChild(content);
+    renderContent();
     var footer = node('a', 'dispatch-pop__footer');
     footer.href = BASE;
     footer.target = '_blank';
@@ -201,21 +267,29 @@
   }
 
   function boot() {
-    if (!desktop.matches) return;
-    fetch(BASE + 'data/posts.json', { cache: 'no-cache' })
-      .then(function (res) { return res.ok ? res.json() : null; })
-      .then(function (doc) {
-        posts = normalize(doc);
-        if (!posts.length) return;
-        // Include story identity: a second publication on the same date is new.
-        edition = 'v2:' + JSON.stringify(posts.map(function (p) { return [p.id, p.date]; }));
-        var seen;
-        try { seen = localStorage.getItem(KEY); } catch (e) { /* Storage is optional. */ }
-        if (seen === edition) showDock();
-        else show(false);
-      })
-      .catch(function () { /* Feed unavailable: the catalog remains usable. */ });
+    // Phones get an entry point immediately; the feed waits for an explicit tap.
+    if (!desktop.matches) { showDock(); return; }
+    loadFeed().then(function () {
+      if (!desktop.matches) { if (!popup) showDock(); return; }
+      if (interacted || feedState !== 'ready') return;
+      var seen;
+      try { seen = localStorage.getItem(KEY); } catch (e) { /* Storage is optional. */ }
+      if (seen === edition) showDock();
+      else show(false);
+    });
   }
+
+  desktop.addEventListener('change', function () {
+    if (!desktop.matches && popup) {
+      var hadFocus = popup.contains(document.activeElement);
+      dismiss({ remember: false, focus: hadFocus });
+    }
+    if (!popup) showDock();
+  });
+  document.addEventListener('pointerdown', function (event) {
+    if (popup && !desktop.matches && !popup.contains(event.target) &&
+        (!dock || !dock.contains(event.target))) dismiss({ focus: false });
+  });
 
   if ('requestIdleCallback' in window) requestIdleCallback(boot, { timeout: 4000 });
   else setTimeout(boot, 2500);

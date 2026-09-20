@@ -115,5 +115,16 @@
 .dispatch-dock[hidden] { display: none; }
 .dispatch-pop :is(a, button):focus-visible, .dispatch-dock:focus-visible { outline: 2px solid color-mix(in oklch, var(--pop-accent) 65%, oklch(96% .012 255)); outline-offset: 3px; }
 @keyframes dispatch-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@media (max-width: 899px) { .dispatch-pop, .dispatch-dock { display: none; } }
+.dispatch-pop__state { padding: 28px 20px; color: var(--dispatch-muted); font-size: .85rem; line-height: 1.6; }
+.dispatch-pop__retry { margin-top: 14px; min-height: 44px; padding: 8px 14px; border: 1px solid var(--dispatch-line); border-radius: 10px; color: inherit; background: transparent; font: inherit; cursor: pointer; }
+.dispatch-pop__retry:hover { border-color: var(--pop-accent); }
+@media (max-width: 899px) {
+  .dispatch-dock { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .dispatch-pop { left: 12px; right: 12px; bottom: calc(72px + env(safe-area-inset-bottom)); width: auto; max-height: calc(100dvh - 160px - env(safe-area-inset-bottom)); }
+  .dispatch-pop__close { width: 44px; height: 44px; }
+  .dispatch-story__title { font-size: .9rem; }
+  .dispatch-story__summary { font-size: .82rem; }
+  .dispatch-story__meta { font-size: .75rem; }
+  .dispatch-pop__footer { min-height: 44px; font-size: .82rem; align-items: center; }
+}
 @media (prefers-reduced-motion: reduce) { .dispatch-pop, .dispatch-story__arrow { animation: none; transition: none; } }
