@@ -282,8 +282,10 @@ Antenne dock. Reduced motion removes the entrance and arrow transitions.
 
 ### Explicit card previews
 
-With Card previews enabled, a small preview control appears beside each tool icon,
-including shelf echoes. The control has a 44px touch target. Pointer hover retains
+With Card previews enabled, an unboxed eye control appears beside each tool icon,
+including shelf echoes. Its rounded stroke and muted color match the star, and
+it aligns with the arrow. Desktop reveals it on card hover or keyboard focus;
+touch keeps it visible with a 44px target. Pointer hover retains
 its delay; keyboard and touch activation open immediately and focus the close
 control. Escape closes and returns focus. Tab leaves the preview without trapping
 focus. The overlay keeps the existing full-card crop and adds a quiet tool-name

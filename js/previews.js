@@ -104,7 +104,7 @@
   document.querySelectorAll('#tools .site-card[data-card-id]').forEach(card => {
     if (!PREVIEW_MAP[idFor(card)]) return;
     const button = control('card-preview-toggle', 'Preview ' + titleFor(card),
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 8 6 4-6 4Z"/></svg>');
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>');
     button.setAttribute('aria-pressed', 'false');
     const top = card.querySelector('.card-top');
     top.insertBefore(button, top.querySelector('.card-arrow, .external-badge'));
