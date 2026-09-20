@@ -11,7 +11,10 @@
     catch { return { ...defaults }; }
   }
 
-  function savePrefs(p) { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); }
+  function savePrefs(p) {
+    try { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); }
+    catch { /* Preferences still work for this visit when storage is unavailable. */ }
+  }
 
   const prefs = loadPrefs();
 
@@ -23,7 +26,10 @@
       const glow = document.getElementById('cursorGlow');
       if (glow) glow.style.display = val ? '' : 'none';
     }
-    if (key === 'previews') window._neoPreviewsEnabled = val;
+    if (key === 'previews') {
+      window._neoPreviewsEnabled = val;
+      document.dispatchEvent(new Event('neorgon:previews-change'));
+    }
   }
 
   function initToggle(id, key) {

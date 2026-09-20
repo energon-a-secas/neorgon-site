@@ -6,7 +6,7 @@
    thing it describes, so adding a tool needs no list kept in sync here.
 
    The rail renders *clones*. Clones carry `data-echo-id` instead of
-   `data-card-id` on purpose: search.js, previews.js and sortable.js all key on
+   `data-card-id` on purpose: search.js and sortable.js key on
    `data-card-id`, so renaming keeps the echo invisible to them and stops the
    same tool being counted twice in "N of M tools".
 ─────────────────────────────────────────────────────────────────────────────── */
@@ -26,6 +26,11 @@
      the calling shelf's business, and the two shelves disagree about it. */
   function makeEcho(card) {
     var echo = card.cloneNode(true);
+    // Transient previews never belong to a newly created shelf echo.
+    echo.querySelectorAll('.card-preview').forEach(function (el) { el.remove(); });
+    echo.classList.remove('is-previewing');
+    var previewButton = echo.querySelector('.card-preview-toggle');
+    if (previewButton) previewButton.setAttribute('aria-pressed', 'false');
 
     /* cloneNode copies inline styles, and js/entrance.js writes an
        `animation-delay` onto every catalog card. Inherited, that inline value

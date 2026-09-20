@@ -278,3 +278,17 @@ states, and outside-tap dismissal. Its height is capped to the viewport and its
 contents scroll on short screens. Automatic opening does not move focus. Explicit
 opening focuses the close button; closing or Escape returns focus to the labeled
 Antenne dock. Reduced motion removes the entrance and arrow transitions.
+
+
+### Explicit card previews
+
+With Card previews enabled, a small preview control appears beside each tool icon,
+including shelf echoes. The control has a 44px touch target. Pointer hover retains
+its delay; keyboard and touch activation open immediately and focus the close
+control. Escape closes and returns focus. Tab leaves the preview without trapping
+focus. The overlay keeps the existing full-card crop and adds a quiet tool-name
+caption, a loading message, and a readable failure message.
+
+Reduced motion uses a canvas still decoded from the existing GIF. The animated
+image never enters the DOM in that mode. Closing releases the image and layer;
+turning the preference off removes active previews and hides their controls.

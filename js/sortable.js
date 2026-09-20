@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
          card drag, so every one of those controls is competing with the gesture
          that moves the card it sits in. `filter` is the reason `.card-tag` can
          carry `cursor: pointer` honestly. */
-      filter: '.card-tag, .card-tag-more, .card-tools',
+      filter: '.card-tag, .card-tag-more, .card-tools, .card-preview-toggle, .card-preview-close',
       preventOnFilter: false,
       onStart() { if (window._neoSound) window._neoSound.dragStart(); },
       onEnd() { if (window._neoSound) window._neoSound.dropCard(); },
