@@ -1,0 +1,74 @@
+presentation:
+  title: "Neorgon UI debrief"
+  subtitle: "Antenne and catalog polish · September 20, 2026"
+  author: "Neorgon"
+  slides:
+    - type: title
+      heading: "The news box felt separate from the catalog"
+      subtitle: "Antenne and catalog polish · GPT-6 Astra session"
+      note: "Change readout from this session's diff and local captures. The model label comes from the user's brief; no model benchmark was run."
+    - type: image
+      heading: "The frame was louder than the stories"
+      src: "debrief-2026-09-20-img/before-desktop.png"
+      alt: "Original Neorgon homepage with a silver Antenne popup"
+      fit: contain
+      note: "Local baseline captured before editing, with the sibling Antenne archive supplied through a browser route."
+    - type: divider
+      heading: "Use the catalog's own visual language"
+      subtitle: "Local artwork, recognizable update types, quieter framing"
+    - type: image
+      heading: "Each story now has a recognizable tool"
+      src: "../post/astra-ui-review/png/01-antenne-comparison.png"
+      alt: "Before and after Antenne, using the same published stories"
+      fit: contain
+      note: "Tool icons inherit the catalog accent. Launch, feature, fix and note each have a distinct glyph and a text label. Miniatures stay static."
+    - type: image
+      heading: "The catalog gains clearer boundaries"
+      src: "debrief-2026-09-20-img/after-catalog.png"
+      alt: "Catalog with tinted borders and fine section rules"
+      fit: contain
+      note: "Group spacing increased from 24 to 32 pixels; card gaps from 11 to 14. Typography and per-tool colors remain."
+    - type: divider
+      heading: "A bulletin must behave like part of the page"
+      subtitle: "One feed, native links, keyboard dismissal"
+    - type: split
+      heading: "The hub now owns the small news view"
+      left:
+        heading: "Before"
+        bullets:
+          - "Fetch the feed, then load an iframe"
+          - "Remember only the newest publication date"
+      right:
+        heading: "After"
+        bullets:
+          - "Render three stories from the fetched feed"
+          - "Remember story IDs and dates"
+          - "Return focus when dismissing"
+      note: "The renderer validates required fields, treats text as text, and matches icons against existing catalog links. It does not load remote favicons."
+    - type: bullets
+      heading: "Checks cover failure states as well as appearance"
+      bullets:
+        - "Repository icon, count and preview checks pass"
+        - "Dismiss, reopen and same-day updates verified"
+        - "Malformed feeds and unavailable storage exercised"
+        - "Long titles and narrow viewports checked"
+      note: "Run scripts/check-bulletin.cjs against the local server. Read the companion report for exact browser coverage and harness limitations."
+    - type: bullets
+      heading: "The smaller view has maintenance costs"
+      bullets:
+        - "New story kinds need a renderer update"
+        - "Multi-tool stories show one matching icon"
+        - "Legacy dismissals can reopen once"
+      note: "An unknown tool gets the satellite. Unsupported kinds are skipped. The old date watermark is replaced by a versioned edition identifier."
+    - type: bullets
+      heading: "Live deployment remains open"
+      bullets:
+        - "Production feed and CORS still need a check"
+        - "No user study or speed benchmark recorded"
+        - "Existing GIF coverage gaps remain"
+      note: "The code is local and uncommitted. Preview lint reports six gaps and fifteen single-frame GIFs; this pass does not re-record previews."
+    - type: cta
+      heading: "Review the page and the model-review draft"
+      action: "Open the local preview"
+      subtext: "Compare the captures, then decide when to publish."
+      note: "The blog material is a draft, with session observations separated from broader model claims."
