@@ -17,7 +17,7 @@ for (const panel of panels) {
   body += `<image x="${panel.x}" y="248" width="560" height="590" preserveAspectRatio="xMinYMin meet" href="data:image/png;base64,${bytes.toString('base64')}"/>`;
 }
 body += `<text x="64" y="878" fill="${DIM}" font-size="19">Local browser captures · September 20, 2026 · Static icons with update-type badges</text>`;
-const svg = frame(1440, 920, body, { glow: false });
+const svg = frame(1440, 920, body, { glow: false }).replace(/[ \t]+$/gm, '');
 writeFileSync(new URL('01-antenne-comparison.svg', here), svg);
 await sharp(Buffer.from(svg), { density: 144 }).flatten({ background: '#040714' }).png().toFile(fileURLToPath(new URL('png/01-antenne-comparison.png', here)));
 console.log('Built comparison SVG and 2x PNG from the captured UI.');

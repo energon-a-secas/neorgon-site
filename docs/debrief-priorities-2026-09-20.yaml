@@ -1,0 +1,48 @@
+presentation:
+  title: "Neorgon priority refinements"
+  subtitle: "Mobile news, accessible previews, recognizable story sources"
+  author: "Neorgon"
+  slides:
+    - type: title
+      heading: "The visual pass left three usability gaps"
+      subtitle: "Three priorities, implemented in order"
+      note: "Mobile had no bulletin entry point, previews depended on hover, and multi-tool stories showed only one identity."
+    - type: image
+      heading: "News is one tap away on phones"
+      src: "priority-refinements-img/mobile-news.png"
+      alt: "Mobile Antenne panel opened explicitly from the dock"
+      fit: contain
+      note: "No feed request before activation. Loading, failure, empty and retry states share the same panel. Outside taps preserve the tapped control's focus."
+    - type: image
+      heading: "Previews work with keys, touch, and reduced motion"
+      src: "priority-refinements-img/still-preview.png"
+      alt: "Quiz preview rendered as a still with an explicit close control"
+      fit: contain
+      note: "Enabled in settings. Explicit activation focuses close; Escape returns focus. Reduced motion decodes off-DOM and paints a canvas still. Shelf echoes use delegated controls."
+    - type: image
+      heading: "Each linked tool has a name and an icon"
+      src: "priority-refinements-img/antenne-tools.png"
+      alt: "News stories with deduplicated catalog tool names and icons"
+      fit: contain
+      note: "Recognized primary site leads, repeated URLs deduplicate, unrelated GitHub repositories cannot borrow a catalog identity. Each story remains one link."
+    - type: bullets
+      heading: "Both browsers pass the behavior checks"
+      bullets:
+        - "56 bulletin assertions in Chromium and WebKit"
+        - "28 preview assertions in each browser"
+        - "Repository icon, count and preview checks pass"
+        - "Mobile and desktop captures visually inspected"
+      note: "The WebKit HTTP harness removes only the HTTPS-upgrade directive from the response. It does not change production HTML or certify production TLS."
+    - type: bullets
+      heading: "The remaining costs are explicit"
+      bullets:
+        - "Still previews currently download the source GIF"
+        - "Unrecognized story kinds need renderer support"
+        - "Existing preview gaps remain"
+        - "Manual screen-reader review is still open"
+      note: "No user-study, performance or model-ranking claim. Known GIF coverage remains six gaps and fifteen single-frame files."
+    - type: cta
+      heading: "Verify the release on the live site"
+      action: "Open neorgon.com"
+      subtext: "Try mobile news, a keyboard preview, and multi-tool headlines."
+      note: "Changes are grouped into one commit per priority. The initial UI release was already verified live before these follow-ups."
