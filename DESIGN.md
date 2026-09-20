@@ -252,3 +252,27 @@ Large panels (settings, terminal) use inset highlights (`0 8px 40px rgba(0,0,0,0
 - **Don't** flatten the hub into **corporate trust-center blandness**: removing accent discipline, killing per-card color coding, or replacing the grid with featureless gray tiles.
 - **Don't** use `border-left` or `border-right` thicker than 1px as a decorative accent stripe on cards or list rows; use full borders, glow, or background tint instead (impeccable shared law).
 - **Don't** add new gradient-text marketing spans outside the existing hero word treatment; prefer weight and color for emphasis elsewhere.
+
+
+## September 2026 catalog and Antenne refinement
+
+Scene: a returning builder scans the dark hub beside their editor and wants to
+recognize a tool before reading the entire headline. Keep the existing Avenir
+stack, void background, constellation, and per-tool colors. The color strategy
+remains tinted neutrals with the catalog's named tool accents.
+
+Catalog group spacing is 32px; the grid gap is 14px. Fine, category-tinted rules
+continue the section headings. Resting card borders mix 16% of the tool accent
+with a subdued blue-gray line. Existing favorite, pinned, archive, and alternate
+background states retain their own rules.
+
+Antenne uses an opaque dark surface with a 1px border, an 18px radius, and local
+catalog icons at 25px inside 38px tiles. The tool icon identifies the subject;
+a small shape badge and a written label identify Launch, Feature, Fix, or Note.
+The newest story includes a two-line summary. Static artwork keeps this small
+surface readable; GIF previews remain an opt-in catalog interaction.
+
+The bulletin stays desktop-only (900px and up), caps its height to the viewport,
+and scrolls on short screens. Automatic opening does not move focus. Explicit
+opening focuses the close button; closing or Escape returns focus to the labeled
+Antenne dock. Reduced motion removes the entrance and arrow transitions.

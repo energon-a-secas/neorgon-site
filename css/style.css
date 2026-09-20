@@ -20,8 +20,8 @@
   --glass-blur: blur(16px) saturate(170%);
   --layout-gutter: clamp(18px, 3.6vw, 32px);
   --layout-section-bottom: clamp(44px, 7vw, 64px);
-  --layout-stack-gap: 24px;
-  --layout-grid-gap: 11px;
+  --layout-stack-gap: 32px;
+  --layout-grid-gap: 14px;
   --layout-card-pad: 21px;
   --layout-card-inner-gap: 9px;
   --catalog-max-width: 1160px;
@@ -529,6 +529,13 @@ body.search-active .scroll-cue {
 .card-group {
   margin-bottom: var(--layout-stack-gap);
 }
+.card-group > .group-label::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  margin-left: 6px;
+  background: color-mix(in oklch, var(--group-color, var(--text-muted)) 20%, transparent);
+}
 .card-group:last-child {
   margin-bottom: 0;
 }
@@ -709,7 +716,7 @@ body.search-active #tools > .card-group.catalog-native-suppressed {
   background:
     linear-gradient(165deg, rgba(255,255,255,.045), rgba(255,255,255,0) 42%),
     rgba(0, 12, 24, .82);
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in oklch, var(--card-accent, #818cf8) 16%, oklch(70% .025 255 / .14));
   border-radius: 16px;
   padding: var(--layout-card-pad);
   text-decoration: none;
@@ -733,7 +740,8 @@ body.search-active #tools > .card-group.catalog-native-suppressed {
   z-index: 0;
   pointer-events: none;
 }
-.site-card:hover::before { opacity: 1; }
+.site-card:hover::before,
+.site-card:focus-visible::before { opacity: 1; }
 .site-card:hover {
   border-color: var(--card-glow-border, rgba(255,255,255,.2));
   box-shadow:
