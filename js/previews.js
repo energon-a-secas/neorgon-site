@@ -227,7 +227,11 @@
     if (active && active.card === card && !active.explicit) hide(false);
   });
   document.addEventListener('focusin', event => {
-    if (active && active.explicit && event.target !== active.close) hide(false);
+    if (active && event.target !== active.close &&
+        (active.explicit || !active.card.contains(event.target))) hide(false);
+  });
+  document.addEventListener('input', event => {
+    if (event.target.id === 'heroSearch') hide(false);
   });
   document.addEventListener('dragstart', () => hide(false), true);
   document.addEventListener('visibilitychange', () => { if (document.hidden) hide(false); });

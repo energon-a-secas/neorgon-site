@@ -68,6 +68,13 @@ async function prepare(page, enabled = false) {
     check(await quiz.locator('.card-preview-toggle').getAttribute('aria-pressed') === 'true', 'hover still works with a static preview');
     await page.mouse.move(0, 0);
     check(await quiz.locator('.card-preview').count() === 0, 'pointer exit cancels hover preview');
+    await quiz.hover(); await quiz.locator('.card-preview canvas').waitFor();
+    await page.locator('#heroSearch').focus();
+    check(await quiz.locator('.card-preview').count() === 0, 'moving keyboard focus away closes hover previews');
+    await page.mouse.move(0, 0); await quiz.hover();
+    await quiz.locator('.card-preview canvas').waitFor();
+    await page.locator('#heroSearch').fill('quiz ');
+    check(await quiz.locator('.card-preview').count() === 0, 'editing search releases previews before filtering');
     await quiz.locator('.fav-toggle').click();
     await page.locator('#heroSearch').fill('');
     const favorite = page.locator('#favShelf .site-card[data-echo-id="quiz"]');
