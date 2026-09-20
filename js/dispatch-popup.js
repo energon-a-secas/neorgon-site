@@ -69,9 +69,13 @@
 
   // Match destination URLs first: repository slugs and card IDs can differ.
   // Artwork comes only from our DOM, never a feed-supplied image URL.
-  function storyCard(post) {
+  function storyCards(post) {
     var links = Array.isArray(post.links) ? post.links : [];
     var cards = Array.from(document.querySelectorAll('#tools .site-card[data-card-id]'));
+    var matches = [];
+    var id = typeof post.site === 'string' ? post.site.replace(/-site$/, '') : '';
+    var primary = cards.find(function (card) { return card.dataset.cardId === id; });
+    if (primary) matches.push(primary);
     for (var i = 0; i < links.length; i++) {
       try {
         var url = new URL(links[i].url);
@@ -84,11 +88,10 @@
             (url.hostname.endsWith('.neorgon.com') ||
              destination.pathname.replace(/\/$/, '') === url.pathname.replace(/\/$/, ''));
         });
-        if (match) return match;
+        if (match && matches.indexOf(match) === -1) matches.push(match);
       } catch (e) { /* Malformed optional link: continue with the next. */ }
     }
-    var id = typeof post.site === 'string' ? post.site.replace(/-site$/, '') : '';
-    return cards.find(function (card) { return card.dataset.cardId === id; });
+    return matches;
   }
 
   function storyItem(post, index) {
@@ -97,7 +100,8 @@
     link.href = BASE + '#p=' + encodeURIComponent(post.id);
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    var card = storyCard(post);
+    var cards = storyCards(post);
+    var card = cards[0];
     var art = node('span', 'dispatch-story__art');
     art.setAttribute('aria-hidden', 'true');
     var icon = card && card.querySelector('.card-site-icon, .card-initial');
@@ -120,6 +124,24 @@
     meta.appendChild(time);
     copy.appendChild(meta);
     copy.appendChild(node('span', 'dispatch-story__title', post.title));
+    if (cards.length) {
+      var sources = node('span', 'dispatch-story__sources');
+      cards.forEach(function (sourceCard) {
+        var source = node('span', 'dispatch-story__source');
+        source.style.setProperty('--card-accent', getComputedStyle(sourceCard).getPropertyValue('--card-accent'));
+        var sourceIcon = sourceCard.querySelector('.card-site-icon, .card-initial');
+        if (sourceIcon) {
+          var mark = node('span', 'dispatch-story__source-icon');
+          mark.setAttribute('aria-hidden', 'true');
+          mark.appendChild(sourceIcon.cloneNode(true));
+          source.appendChild(mark);
+        }
+        var name = sourceCard.querySelector('.card-name');
+        source.appendChild(node('span', '', name ? name.textContent.trim() : sourceCard.dataset.cardId));
+        sources.appendChild(source);
+      });
+      copy.appendChild(sources);
+    }
     if (index === 0 && typeof post.summary === 'string' && post.summary.trim()) {
       copy.appendChild(node('span', 'dispatch-story__summary', post.summary));
     }

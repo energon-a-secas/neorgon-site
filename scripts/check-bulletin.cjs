@@ -52,6 +52,18 @@ function check(value, message) { assert.ok(value, message); checks++; }
     check(await page.locator('.dispatch-story__kind').first().textContent() === 'Note', 'same-day new story reopens');
     check(await page.locator('.dispatch-story').count() === 3, 'limit after new edition');
 
+    feed = { posts: [story('multi', 'feature', { site: 'runcible-site', links: [{ url: 'https://quiz.neorgon.com/' }, { url: 'https://rappel.neorgon.com/' }, { url: 'https://quiz.neorgon.com/?again=1' }, { url: 'https://unlisted.example/' }] })] };
+    await page.reload(); await ready();
+    const sourceNames = await page.locator('.dispatch-story__source').allTextContents();
+    check(sourceNames.length === 3, 'multi-tool stories deduplicate matching destinations');
+    check(sourceNames[0] === 'Runcible' && sourceNames.includes('Quiz') && sourceNames.includes('Rappel'), 'primary tool leads the named source list');
+    check(await page.locator('.dispatch-story__source .card-site-icon').count() === 3, 'every recognized source has local artwork');
+    check(await page.locator('.dispatch-story a').count() === 1, 'multi-tool story remains one link');
+    feed = { posts: [story('unknown-repository', 'note', { site: null, links: [{ url: 'https://github.com/unrelated/not-in-the-catalog' }] })] };
+    await page.reload(); await ready();
+    check(await page.locator('.dispatch-story__source').count() === 0, 'an unrelated repository does not acquire a catalog identity');
+    check(await page.locator('.dispatch-story__fallback').count() === 1, 'unrecognized sources keep the neutral satellite');
+
     const badTitle = '<img src=x onerror="window.injected=true">';
     feed = { posts: [null, {}, story('bad', 'unknown'), story('invalid-date', 'fix', { date: '2026-02-30' }), story('x', 'fix', { title: badTitle, site: null, links: [null, { url: 'javascript:alert(1)' }] }), story('x'), story('y', 'launch', { title: 'A'.repeat(250), site: null })] };
     await page.reload(); await ready();

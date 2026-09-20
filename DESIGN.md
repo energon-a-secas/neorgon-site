@@ -292,3 +292,12 @@ caption, a loading message, and a readable failure message.
 Reduced motion uses a canvas still decoded from the existing GIF. The animated
 image never enters the DOM in that mode. Closing releases the image and layer;
 turning the preference off removes active previews and hides their controls.
+
+
+### Stories spanning several tools
+
+The leading tile identifies the primary tool. Beneath the headline, a wrapping
+source line names every recognized tool linked by the story, each with its local
+favicon at 13px. Repeated destinations appear once. These are labels inside the
+story link, so the entire row remains one keyboard target. Unknown destinations
+never borrow another tool's artwork; stories with no match keep the satellite.
