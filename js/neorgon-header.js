@@ -241,10 +241,13 @@
     openMenu = menu;
     openTrigger = trigger;
   }
+  /* Visible and enabled: a disabled control cannot take focus, so an Undo
+     greyed out at the top of the ⋯ panel used to swallow the first focus
+     and every ArrowDown after it, and the rest of the panel was unreachable. */
   function menuItems(menu) {
     return Array.prototype.filter.call(
       menu.querySelectorAll('button, a, [role="menuitem"], [role="menuitemradio"]'),
-      function (el) { return el.offsetParent !== null; }
+      function (el) { return el.offsetParent !== null && !el.disabled && el.getAttribute('aria-disabled') !== 'true'; }
     );
   }
 
@@ -276,7 +279,15 @@
       e.preventDefault();
       items[items.length - 1] && items[items.length - 1].focus();
     } else if (e.key === 'Tab') {
-      closeMenu();
+      /* Tab from the trigger goes into the open panel; Tab past its last item
+         (Shift+Tab before its first, or from anywhere outside it) leaves and
+         closes it. Closing on every Tab shut the panel before focus got in. */
+      if (document.activeElement === openTrigger && !e.shiftKey && items.length) {
+        e.preventDefault();
+        items[0].focus();
+        return;
+      }
+      if (idx === -1 || (!e.shiftKey && idx === items.length - 1) || (e.shiftKey && idx === 0)) closeMenu();
     }
   });
 
