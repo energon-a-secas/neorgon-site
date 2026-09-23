@@ -5,9 +5,15 @@
   if (window.__neoDispatchPopup) return;
   window.__neoDispatchPopup = true;
 
+  // The site moved from dispatch.neorgon.com to antenne.neorgon.com on 2026-09-23.
+  // KEY keeps the old spelling on purpose: it holds every visitor's dismissal
+  // state, renaming it discards that state silently and reopens the bulletin for
+  // everyone, and there is no migration path back. publishing.md section 11
+  // forbids renaming a live site's storage key. Same reason this file and its
+  // CSS keep their names. Port 8873 is the dev half and did not move.
   var KEY = 'neorgon-dispatch-seen';
   var local = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  var BASE = local ? 'http://localhost:8873/' : 'https://dispatch.neorgon.com/';
+  var BASE = local ? 'http://localhost:8873/' : 'https://antenne.neorgon.com/';
   var desktop = window.matchMedia('(min-width: 900px)');
   var kinds = {
     launch: { label: 'Launch', path: 'M3 6l9-4 9 4v12l-9 4-9-4V6zm0 0l9 4 9-4M12 10v12M7.5 4l9 4' },
@@ -45,7 +51,7 @@
   }
 
   function accentInto(el) {
-    var card = document.querySelector('#tools [data-card-id="dispatch"]');
+    var card = document.querySelector('#tools [data-card-id="antenne"]');
     var accent = card && getComputedStyle(card).getPropertyValue('--card-accent').trim();
     el.style.setProperty('--pop-accent', accent || '#3b82f6');
   }
