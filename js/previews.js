@@ -5,7 +5,7 @@
     portent: 'portent.gif',
     gamme: 'gamme.gif',
     aficion: 'aficion.gif',
-    dispatch: 'dispatch.gif',
+    antenne: 'antenne.gif',
     vitrina: 'vitrina.gif',
     pixeldoll: 'pixeldoll.gif',
     boardwright: 'boardwright.gif',
