@@ -28,3 +28,8 @@ __pycache__/
 *.py[cod]
 skills-archived/
 *.log
+
+# ── Claude Code local settings ───────────────────────────────────────────────
+# Personal, machine-local permissions and paths. Shared settings belong in
+# .claude/settings.json.
+.claude/settings.local.json
