@@ -299,7 +299,10 @@
     if (!desktop.matches) { showDock(); return; }
     loadFeed().then(function () {
       if (!desktop.matches) { if (!popup) showDock(); return; }
-      if (interacted || feedState !== 'ready') return;
+      if (interacted) return;
+      // A failed or empty feed still leaves the dock, so the bulletin never
+      // vanishes without a trace; the dock opens it on the retry state.
+      if (feedState !== 'ready') { showDock(); return; }
       var seen;
       try { seen = localStorage.getItem(KEY); } catch (e) { /* Storage is optional. */ }
       if (seen === edition) showDock();
