@@ -2,7 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://agentlore.neorgon.com/</loc></url>
   <url><loc>https://agentlore.neorgon.com/path/</loc></url>
-  <url><loc>https://anatomy.neorgon.com/</loc></url>
   <url><loc>https://autopilot.neorgon.com/</loc></url>
   <url><loc>https://awesomesites.neorgon.com/</loc></url>
   <url><loc>https://buyhacks.neorgon.com/</loc></url>
@@ -36,6 +35,7 @@
   <url><loc>https://stackrank.neorgon.com/</loc></url>
   <url><loc>https://teamplay.neorgon.com/</loc></url>
   <url><loc>https://tubestack.neorgon.com/</loc></url>
+  <url><loc>https://uianatomy.neorgon.com/</loc></url>
   <url><loc>https://neorgon.com/privacy/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://neorgon.com/tos/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
