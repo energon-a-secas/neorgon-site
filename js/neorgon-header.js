@@ -636,7 +636,13 @@
       };
       var gc = document.createElement('script');
       gc.async = true;
-      gc.src = 'https://gc.zgo.at/count.js';
+      /* Pinned: count.v5.js with GoatCounter's published SRI hash, so a
+         changed file on gc.zgo.at is refused instead of run on every
+         site. Bump both lines together from
+         https://www.goatcounter.com/help/countjs-versions */
+      gc.src = 'https://gc.zgo.at/count.v5.js';
+      gc.integrity = 'sha384-atnOLvQb9t+jTSipvd75X2yginT4PjVbqDdlJAmxMm+wYElFmeR6EmLP5bYeoRVQ';
+      gc.crossOrigin = 'anonymous';
       gc.setAttribute('data-goatcounter', GOATCOUNTER);
       if (arrival) {
         gc.addEventListener('load', function () {
