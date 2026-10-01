@@ -357,7 +357,90 @@
     return trigger;
   }
 
-  /* ── Back to top ─────────────────────────────────────────────────── */
+  /* ── Back to top ─────────────────────────────────────────────────────
+     Yielding. The button floats over whatever the page keeps in its
+     bottom-right corner, and on a phone that corner is where a drill puts its
+     Done and Next: Runcible at 390px (2026-09-28) had the 38px circle over the
+     right half of a 65px Next button, so a thumb aimed at Next scrolled the
+     page to the top instead. So the button looks at what it is sitting on and
+     steps aside while that is something a person could press: it fades out and
+     stops taking taps until the corner is clear again.
+
+     Hidden rather than moved. A button shifted up lands on the next control
+     up, and the corner belongs to the page; back-to-top is a convenience. The
+     same rule keeps it off the beacon kit's bottom-left control, which is a
+     link, on any viewport narrow enough for the two to meet.
+
+     What counts is deliberately generous. A false positive costs the
+     convenience for as long as the corner is busy; a false negative costs a
+     tap. cursor:pointer catches the div with a click listener that none of the
+     selectors name. */
+  var PRESSABLE = 'a[href], button, input, select, textarea, summary, label, iframe, ' +
+    'audio[controls], video[controls], .neo-beacon-link, ' +
+    '[contenteditable]:not([contenteditable="false"]), [tabindex]:not([tabindex="-1"]), ' +
+    '[role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="switch"], ' +
+    '[role="tab"], [role="option"], [role="slider"], [role="textbox"], ' +
+    '[role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]';
+  /* Samples per axis over the button's box plus PROBE_PAD of thumb slop. Four
+     across a 46px box are 15px apart, so any target at least that size that
+     touches the box is seen. */
+  var PROBE_GRID = 4;
+  var PROBE_PAD = 4;
+  /* Mutations arrive in bursts, so the page changing under the button is
+     looked at no more than once per SETTLE_MS. */
+  var SETTLE_MS = 120;
+  /* Once out of the way it stays out until scrolling has stopped this long,
+     so a list of rows sliding under it does not blink it on and off. Leaving
+     is never delayed: the tap it would steal can come at any moment. */
+  var RETURN_MS = 180;
+
+  function pressable(node) {
+    if (!node || node === document.body || node === document.documentElement) return false;
+    if (node.closest && node.closest(PRESSABLE)) return true;
+    return window.getComputedStyle(node).cursor === 'pointer';
+  }
+
+  /* What a tap at (x, y) would reach if the button were not there:
+     elementsFromPoint lists the whole stack top-down, so it is the first entry
+     that is not the button or its icon. */
+  function beneath(btn, x, y) {
+    var stack = document.elementsFromPoint(x, y);
+    for (var i = 0; i < stack.length; i++) {
+      if (!btn.contains(stack[i])) return stack[i];
+    }
+    return null;
+  }
+
+  /* The show/hide transition translates the button by 8px. The probe reads
+     where it rests, not where it happens to be mid-fade. */
+  function translation(node) {
+    var t = window.getComputedStyle(node).transform;
+    if (!t || t === 'none' || typeof window.DOMMatrixReadOnly !== 'function') return { x: 0, y: 0 };
+    var m = new window.DOMMatrixReadOnly(t);
+    return { x: m.e, y: m.f };
+  }
+
+  function overControl(btn) {
+    if (typeof document.elementsFromPoint !== 'function') return false;
+    var box = btn.getBoundingClientRect();
+    if (!box.width || !box.height) return false;
+    var shift = translation(btn);
+    var left = box.left - shift.x - PROBE_PAD;
+    var top = box.top - shift.y - PROBE_PAD;
+    var w = box.width + PROBE_PAD * 2;
+    var h = box.height + PROBE_PAD * 2;
+    var seen = [];
+    for (var i = 0; i < PROBE_GRID; i++) {
+      for (var j = 0; j < PROBE_GRID; j++) {
+        var node = beneath(btn, left + w * i / (PROBE_GRID - 1), top + h * j / (PROBE_GRID - 1));
+        if (!node || seen.indexOf(node) !== -1) continue;
+        if (pressable(node)) return true;
+        seen.push(node);
+      }
+    }
+    return false;
+  }
+
   function buildBackToTop(footer) {
     if (footer.getAttribute('data-footer-top') === 'off') return;
 
@@ -382,15 +465,58 @@
     document.body.appendChild(btn);
 
     var ticking = false;
+    var yielding = false;
+    var lastScroll = 0;
+    var settle = 0;
+    var back = 0;
+
     function update() {
-      btn.classList.toggle('is-visible', window.scrollY > TOP_THRESHOLD);
       ticking = false;
+      var past = window.scrollY > TOP_THRESHOLD;
+      /* Focus means a keyboard user is on it, and a key press is not a tap
+         that could land on the wrong thing, so it never yields from under
+         them. */
+      var blocked = past && document.activeElement !== btn && overControl(btn);
+      if (blocked) {
+        yielding = true;
+      } else if (yielding && past && Date.now() - lastScroll < RETURN_MS) {
+        clearTimeout(back);
+        back = setTimeout(schedule, RETURN_MS);
+      } else {
+        yielding = false;
+      }
+      btn.classList.toggle('is-visible', past && !yielding);
+      btn.classList.toggle('is-yielding', past && yielding);
     }
-    window.addEventListener('scroll', function () {
+    function schedule() {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(update);
+    }
+    /* The page can put a control under the button with no scroll at all: a
+       drill draws its next card, a panel opens, an embed finishes loading. */
+    function soon() {
+      if (settle) return;
+      settle = setTimeout(function () { settle = 0; schedule(); }, SETTLE_MS);
+    }
+
+    window.addEventListener('scroll', function () {
+      lastScroll = Date.now();
+      schedule();
     }, { passive: true });
+    window.addEventListener('resize', schedule);
+    document.addEventListener('transitionend', soon, true);
+    document.addEventListener('animationend', soon, true);
+    if (window.MutationObserver) {
+      new MutationObserver(function (records) {
+        for (var i = 0; i < records.length; i++) {
+          if (!btn.contains(records[i].target)) { soon(); return; }
+        }
+      }).observe(document.body, {
+        childList: true, subtree: true, attributes: true,
+        attributeFilter: ['class', 'style', 'hidden', 'open', 'disabled'],
+      });
+    }
     update();
     return btn;
   }

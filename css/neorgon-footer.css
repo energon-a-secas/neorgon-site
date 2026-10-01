@@ -359,11 +359,16 @@ body.neo-footer-root {
   opacity: 0;
   visibility: hidden;
   transform: translateY(8px);
+  /* visibility waits out the fade before it flips, so for 200ms a leaving
+     button would still take the tap it is leaving to avoid. pointer-events
+     flips at once. footer.js also hides it (.is-yielding) while it sits over
+     a control; see "Yielding" there. */
+  pointer-events: none;
   transition: opacity var(--dur, 200ms) ease, transform var(--dur, 200ms) ease, visibility var(--dur, 200ms);
 }
-.neo-top.is-visible { opacity: .9; visibility: visible; transform: none; }
+.neo-top.is-visible { opacity: .9; visibility: visible; transform: none; pointer-events: auto; }
 .neo-top:hover { opacity: 1; background: var(--footer-hover); color: var(--header-text, #f9f9f9); }
-.neo-top:focus-visible { outline: 2px solid var(--footer-accent); outline-offset: 3px; opacity: 1; visibility: visible; transform: none; }
+.neo-top:focus-visible { outline: 2px solid var(--footer-accent); outline-offset: 3px; opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
 .neo-top svg { width: 18px; height: 18px; display: block; }
 
 /* ── Mobile ───────────────────────────────────────────────────── */
