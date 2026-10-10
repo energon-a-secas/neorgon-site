@@ -35,6 +35,7 @@ Neorgon tools cover planning and strategy, developer utilities, hiring and inter
 - [Parla](https://parla.neorgon.com/): Latin American slang translator with visual word mapping
 - [Pathfinder](https://pathfinder.neorgon.com/): Visual strategy canvas with gap detection and AI prompt export
 - [Playbook](https://playbook.neorgon.com/): Career advice for people in tech, bilingual ES/EN with series navigation
+- [Playtrace](https://playtrace.neorgon.com/): Discover games shared on r/aigamedev, browse previews, and explore creator updates by genre and development stage
 - [Presentation Sage](https://slides.neorgon.com/): YAML-driven slide editor with PPTX/HTML/Marp export
 - [Primer](https://primer.neorgon.com/): Learn ML, LLMs, and data insights by building small local projects with tested copy-paste code, then scale to the pro stack
 - [Prompt Forge](https://promptforge.neorgon.com/): Prompt engineering workspace and reusable prompt library
