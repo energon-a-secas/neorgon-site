@@ -887,6 +887,27 @@
         </div>
       </div>
 
+      <!-- Dossier (soon: built and registered, no repo and no DNS yet. Ship it the
+           same way as the others: div to anchor, badge to arrow, drop data-status,
+           add data-added) -->
+      <div class="site-card soon-card" data-card-id="dossier" data-status="soon"
+           style="--card-glow: rgba(165,180,252,.3); --card-glow-border: rgba(165,180,252,.35); --card-accent: #a5b4fc;">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="card-icon-wrap"><span class="card-site-icon" aria-hidden="true" style="--icon: url('/assets/icons/dossier.svg')"></span></div>
+            <span class="soon-badge">Soon</span>
+          </div>
+          <div class="card-domain">dossier.neorgon.com</div>
+          <h3 class="card-name">Dossier</h3>
+          <div class="card-desc">Hand it the JSON an agent wrote and read the work: metric tiles with derived deltas, charts, before and after comparisons, and the evidence behind every claim.</div>
+          <div class="card-tags">
+            <span class="card-tag">Reports</span>
+            <span class="card-tag">Agents</span>
+            <span class="card-tag">Local-first</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Overworld (soon: published and serving over HTTP, waiting on the Let's Encrypt
            certificate GitHub has queued. Ship it the moment the cert is approved:
            div to anchor, badge to arrow, drop data-status, add data-added) -->
