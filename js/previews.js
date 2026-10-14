@@ -2,6 +2,7 @@
   const HOVER_DELAY = 1200;
   const PREVIEW_PATH = 'assets/previews/';
   const PREVIEW_MAP = {
+    bouquin: 'bouquin.gif',
     playtrace: 'playtrace.gif',
     portent: 'portent.gif',
     gamme: 'gamme.gif',

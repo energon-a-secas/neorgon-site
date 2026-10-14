@@ -53,11 +53,11 @@ boxes. `make gifs-all` in that repo re-records every live card, `make gifs` fill
 gaps. A page the generic clip records badly gets `og-studio-site/scenarios/<card-id>.json`,
 which is how hand-tuning survives the next batch; five cards have one today and the 15 STILL
 cards are the queue for the next. Do not hand-optimise a GIF in this repo, it will be
-overwritten by the next run. Two cards are excluded from the recorder on purpose and always
-will be: `bouquin` (its GitHub Pages certificate was never provisioned, so the load fails on
-`ERR_CERT_COMMON_NAME_INVALID`) and `chasqui` (parked, its card links to the repo because the
-subdomain was never created, and the recorder keys off the displayed domain, so that display
-string has to keep agreeing with the href or the batch acquires a card that can only fail).
+overwritten by the next run. One card is excluded from the recorder on purpose: `chasqui`
+(parked, its card links to the repo because the subdomain was never created, and the recorder
+keys off the displayed domain, so that display string has to keep agreeing with the href or the
+batch acquires a card that can only fail). `bouquin` was the second until its GitHub Pages
+certificate was provisioned; it was recorded on 2026-10-14 with a scenario of its own.
 
 No build step: open `index.html` directly or serve via `make serve`. ES modules are not used here; all scripts are plain `<script>` tags loaded in `index.html`.
 
