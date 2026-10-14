@@ -51,8 +51,8 @@ The previews themselves are **generated, not hand-made**. Canonical recorder:
 `../og-studio-site/scripts/record-gif.mjs`, whose format (646x462) is derived from these card
 boxes. `make gifs-all` in that repo re-records every live card, `make gifs` fills only the
 gaps. A page the generic clip records badly gets `og-studio-site/scenarios/<card-id>.json`,
-which is how hand-tuning survives the next batch; five cards have one today and the 15 STILL
-cards are the queue for the next. Do not hand-optimise a GIF in this repo, it will be
+which is how hand-tuning survives the next batch; 22 cards have one since 2026-10-14, and the
+only STILL left is skillmap, archived and still on purpose. Do not hand-optimise a GIF in this repo, it will be
 overwritten by the next run. One card is excluded from the recorder on purpose: `chasqui`
 (parked, its card links to the repo because the subdomain was never created, and the recorder
 keys off the displayed domain, so that display string has to keep agreeing with the href or the
