@@ -2589,7 +2589,7 @@ body.evangelion-bg .hero-search-icon { color: rgba(128,0,255,.3); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+    transition: none !important;
   }
 
   /* Disable starfield */
