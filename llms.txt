@@ -23,6 +23,7 @@ Neorgon tools cover planning and strategy, developer utilities, hiring and inter
 - [Guild Hall](https://guildhall.neorgon.com/): Monster Hunter-inspired quest board with ranks, badges, and hunter cards
 - [HeadPain](https://headpain.neorgon.com/): Map head pain on an interactive 3D head — intensity, depth, notes, local episode diary, JSON export, fully private
 - [Hiring Pack](https://hiringpack.neorgon.com/): Interview kits and hiring resources for engineering managers
+- [Hobby Orbit](https://hobbyorbit.neorgon.com/): Nested hobby wheel, moods and trigger check-ins, observed patterns and a private offline journal
 - [Incident Runbook](https://runbook.neorgon.com/): Quick-reference incident response runbooks for on-call engineers
 - [Infra Drills](https://infradrills.neorgon.com/): Local AWS, K8s, GitLab CI break-fix challenges
 - [JSON Studio](https://jsonstudio.neorgon.com/): Visual drag-and-drop JSON block editor
