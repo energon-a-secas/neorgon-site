@@ -823,9 +823,16 @@
     staticDirty = true;
   }
 
+  /* The loop also stops while the constellation is scrolled out of view
+     (init() observes the box), so reading the catalog repaints nothing up
+     here. Coming back into view resumes it. */
+  var boxInView = true;
+  var ticking = false;
+
   function tick(now) {
     drawRoutes(now || performance.now());
-    if (!reducedMotion.matches) requestAnimationFrame(tick);
+    ticking = !reducedMotion.matches && boxInView;
+    if (ticking) requestAnimationFrame(tick);
   }
 
   /* ── Search / filter ────────────────────────────────────────── */
@@ -1302,6 +1309,12 @@
     buildConnections();
     startSonar();
     tick();
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        boxInView = entries[entries.length - 1].isIntersecting;
+        if (boxInView && !ticking) tick();
+      }).observe(box);
+    }
   }
 
   /* Wait for box to have real dimensions — poll via rAF, no need to wait for full window.load */

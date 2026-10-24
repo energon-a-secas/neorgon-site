@@ -294,8 +294,12 @@
   function isOpen() { return overlay.classList.contains('open'); }
 
   let bannerShown = false;
+  /* Where focus was when the terminal opened, so closing it hands focus back
+     instead of dropping the visitor at the top of the page. */
+  let opener = null;
 
   function openTerm() {
+    if (!isOpen()) opener = document.activeElement;
     overlay.classList.add('open');
     if (window._neoSound) window._neoSound.termOpen();
     /* Once per page load, like a login. Reprint on demand with "banner". */
@@ -303,9 +307,22 @@
     setTimeout(() => input.focus(), 50);
   }
 
-  function closeTerm() {
+  /* `handBack` is false for commands that send the visitor somewhere (open,
+     search): they place focus themselves, and handing it back to the opener
+     would make the next Tab jump to wherever the terminal was opened from.
+     Focus counts as ours while it is in the terminal or has fallen to <body>
+     (a click on the backdrop); focus already elsewhere is left alone, which is
+     what keeps the Auth Kit's sign-in dialog working on top of it. */
+  function closeTerm(handBack = true) {
+    const here = document.activeElement;
+    const ours = !here || here === document.body || overlay.contains(here);
     overlay.classList.remove('open');
     if (window._neoSound) window._neoSound.termClose();
+    if (ours) {
+      if (handBack && opener && opener !== document.body && opener.isConnected) opener.focus();
+      else if (overlay.contains(here)) here.blur();
+    }
+    opener = null;
   }
 
   let escCount = 0;
@@ -600,7 +617,7 @@
       if (!match) { addLine(`No category matches "${q}". Try "categories".`, 'err'); return; }
       const label = ((match.querySelector('.group-label') || {}).textContent || '').trim();
       addLine(`Jumping to ${label}\u2026`, 'sys');
-      closeTerm();
+      closeTerm(false);
       /* catnav.js gives every group a `scroll-margin-top` covering the sticky
          header + rail, so scrollIntoView lands correctly without repeating that
          arithmetic here — one owner for the offset, not two that can drift. */
@@ -610,6 +627,9 @@
            rather than writing the attribute from here. */
         if (window._neoCollapse) window._neoCollapse.expand(match.id);
         match.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        /* Focus follows the jump, so the next Tab continues from there. */
+        const first = match.querySelector('.site-card[data-card-id]');
+        if (first) first.focus({ preventScroll: true });
       }, 220);
     },
     /* Types the query into the hero search rather than reimplementing filtering,
@@ -619,7 +639,7 @@
       if (!q) { addLine('Usage: search <query>', 'err'); return; }
       const field = document.getElementById('heroSearch');
       if (!field) { addLine('Search not available on this page.', 'err'); return; }
-      closeTerm();
+      closeTerm(false);
       setTimeout(() => {
         field.value = q;
         field.dispatchEvent(new Event('input', { bubbles: true }));
@@ -908,6 +928,9 @@
         if (result.ok) {
           authedUser = result.username;
           authToken = result.token || null;
+          /* The receiver waits 20s after load; an admin's own tab should feel
+             its own `interfere` at once, so it subscribes now. */
+          if (window._neoInterference && window._neoInterference.connect) window._neoInterference.connect();
           resetClientRateLimit();
           updatePrompt();
           addLine(`Welcome back, ${authedUser}.`, 'sys');
@@ -1223,7 +1246,15 @@
 
   /* ── Input handling ── */
   input.addEventListener('keydown', e => {
-    if (e.key === 'Tab') {
+    /* Completion only while the terminal is open, and never on Shift+Tab: the
+       input used to sit invisible in the tab order, and a Tab that always
+       completes was a trap anyone tabbing through the page fell into. */
+    if (e.key === 'Tab' && e.shiftKey && isOpen()) {
+      /* Shift+Tab leaves the terminal: close it and go back to the opener,
+         rather than to whatever precedes the overlay at the end of <body>. */
+      e.preventDefault();
+      closeTerm();
+    } else if (e.key === 'Tab' && isOpen()) {
       e.preventDefault();
       complete();
     } else if (e.key === 'Enter') {

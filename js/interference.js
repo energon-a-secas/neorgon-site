@@ -10,13 +10,12 @@
    untouched by anything here.
 
    The cost is real and worth stating plainly: a receiver has to be listening to
-   receive, so EVERY visitor pays for this feature, not just an admin. Measured
-   on a fresh load with the terminal never opened: 15 cross-origin requests to
-   esm.sh and one open WebSocket. `schedule()` below defers it to idle, which
-   moves the cost off the critical path but does not remove it. Visibility
-   gating was considered and rejected for the reason the setTimeout floor
-   exists: a hub left in a background tab is the normal case for this feature,
-   and that is precisely the tab requestIdleCallback will not wake.
+   receive, so every visitor who stays pays for this feature, not just an
+   admin. Measured with the terminal never opened: 15 cross-origin requests to
+   esm.sh and one open WebSocket. `schedule()` below waits 20s before paying
+   it, so a visit that finds a tool and leaves pays nothing. Visibility
+   gating was considered and rejected: a hub left in a background tab is the
+   normal case for this feature, and that is the tab it must still reach.
 
    Precedence is the header kit's: visitor > season > opt-out > skin >
    default. Interference sits BELOW the visitor, so a tab opened with
@@ -229,23 +228,26 @@
     }).catch(fail('convex import'));
   }
 
+  /* Who this is for: a hub left open, very often in a background tab. Who it
+     is not for: the visit that finds a tool and leaves, which used to pay 15
+     requests to esm.sh and a WebSocket within seconds of load. So it waits
+     20s. A plain timer, not idle time: requestIdleCallback is not guaranteed
+     to run in a hidden tab, and a hidden tab is the normal case here.
+     Background timers are throttled, so a parked tab may connect up to a
+     minute later, which this feature can afford. */
+  var CONNECT_AFTER_MS = 20000;
+
   function schedule() {
-    /* Idle time is the right moment, but requestIdleCallback is not guaranteed
-       to run in a hidden tab, and a hub left open in a background tab is the
-       normal case for this feature. The timer is the floor under it; connect()
-       is idempotent so whichever arrives first wins. */
-    if (typeof window.requestIdleCallback === 'function') {
-      window.requestIdleCallback(connect, { timeout: 3000 });
-      setTimeout(connect, 3500);
-    } else {
-      setTimeout(connect, 1500);
-    }
+    setTimeout(connect, CONNECT_AFTER_MS);
   }
 
   if (document.readyState === 'complete') schedule();
   else window.addEventListener('load', schedule, { once: true });
 
   window._neoInterference = {
+    /* Subscribe now rather than at the 20s mark. terminal.js calls it on an
+       admin login. connect() is idempotent. */
+    connect: connect,
     /* `play(theme)` is one delivery without the bookkeeping: burst, then land
        that theme, or release when it is null. The terminal and the headless
        proof both use it; the real path is the subscription above. */

@@ -140,18 +140,16 @@ body {
   text-transform: uppercase;
   margin-bottom: 20px;
 }
+/* The badge no longer rotates; the fade stays for codes.js (HESOYAM). */
 #badgeText {
   transition: opacity .4s ease;
 }
+/* Still on purpose. The fold allows one ambient layer, the starfield; every
+   other glow on the page answers a state (hover, focus, a matched search). */
 .badge-dot {
   width: 6px; height: 6px;
   border-radius: 50%;
   background: #c084fc;
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: .5; transform: scale(.7); }
 }
 
 .hero-heading {
@@ -162,18 +160,15 @@ body {
   margin-bottom: 14px;
   color: var(--text-primary);
 }
+/* The three-stop gradient is the signature; it holds still and does not glow.
+   Static text should never read brighter than the controls (Glow-Is-State). */
 .hero-heading .neon-word {
-  background: linear-gradient(90deg, #818cf8, #c084fc, #e879f9, #c084fc, #818cf8);
-  background-size: 220% auto;
+  background: linear-gradient(90deg, #818cf8, #c084fc, #e879f9);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 22px rgba(192,132,252,.32));
-  animation: neonFlow 7s linear infinite;
 }
-@keyframes neonFlow {
-  to { background-position: 220% center; }
-}
+.hero-heading { text-wrap: balance; }
 .hero-sub {
   font-size: 1.1rem;
   color: var(--text-secondary);
@@ -198,7 +193,9 @@ body {
   -webkit-backdrop-filter: var(--glass-blur);
   color: var(--text-primary);
   font-family: var(--font);
-  font-size: .95rem;
+  /* 16px at every width: under that, iOS zooms the page when the field takes
+     focus. Only the placeholder may be smaller. */
+  font-size: 1rem;
   outline: none;
   box-shadow: 0 2px 8px rgba(0,0,0,.22), 0 14px 34px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.06);
   transition: border-color .25s, box-shadow .25s, background .25s;
@@ -431,69 +428,6 @@ body {
   45%      { scale: calc(var(--pill-depth, 1) * 1.4); }
 }
 
-/* ── Scroll cue ───────────────────────────────────────────────────────
-   Two chevrons on the same loop, a beat apart, so the pair reads as one thing
-   moving down rather than as two arrows blinking. It goes for good on the
-   first scroll — a cue that keeps asking after you have complied is nagging,
-   and it is in the way of the catalog it was pointing at. */
-.scroll-cue {
-  display: block;
-  margin: 14px auto 0;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  border: 0;
-  background: none;
-  color: color-mix(in srgb, #c084fc 62%, transparent);
-  cursor: pointer;
-  transition: opacity .45s ease, transform .45s ease, color .2s ease;
-}
-.scroll-cue:hover { color: #c084fc; }
-.scroll-cue:focus-visible {
-  outline: 2px solid rgba(192,132,252,.6);
-  outline-offset: 4px;
-  border-radius: 8px;
-}
-.scroll-cue svg {
-  display: block;
-  width: 22px;
-  height: 22px;
-  margin: 0 auto;
-  opacity: 0;
-  animation: scroll-cue-drift 1.9s var(--ease-out, ease) infinite;
-}
-.scroll-cue svg + svg {
-  margin-top: -14px;
-  animation-delay: .18s;
-}
-/* The chevron holds its lit phase instead of only touching it in passing. It
-   used to reach full opacity at one instant (30%) and immediately start
-   fading, so the thing the reader is meant to notice was never actually
-   still. Now it lights by 18% and holds to 55%: sooner than before in
-   absolute time (342ms against 510ms) and lit for ~0.7s rather than none. */
-@keyframes scroll-cue-drift {
-  0%   { opacity: 0;   transform: translateY(-5px); }
-  18%  { opacity: .95; transform: translateY(-1px); }
-  55%  { opacity: .95; transform: translateY(4px); }
-  78%  { opacity: 0;   transform: translateY(9px); }
-  100% { opacity: 0;   transform: translateY(9px); }
-}
-
-/* Taken the hint, or asking for something specific — either way it is done. */
-.scroll-cue.is-gone,
-body.search-active .scroll-cue {
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scroll-cue svg { animation: none; opacity: .7; }
-  .scroll-cue svg + svg { opacity: .35; }
-  .scroll-cue { transition: opacity .2s ease; }
-  .scroll-cue.is-gone { transform: none; }
-}
-
 /* ── Card filter: hide non-matches ─────────────────────────────────── */
 .sites-grid .site-card.search-hidden {
   display: none !important;
@@ -647,7 +581,7 @@ body.search-active .scroll-cue {
    it loses is the argument: no accent glow, a desaturated icon, and a line
    naming what replaced it. It reads as a record, not an offer. */
 .site-card.archived-card {
-  /* Read by the shared `.card-content` dim above, not applied here: see the
+  /* Read by the shared icon-tile dim further down, not applied here: see the
      note there for why `opacity` on the card itself is inert. A shade below
      Soon, because "superseded" is a weaker invitation than "not yet". */
   --card-rest-dim: .72;
@@ -726,6 +660,22 @@ body.search-active #tools > .card-group.catalog-native-suppressed {
   overflow: hidden;
   transition: border-color .2s, box-shadow .35s var(--ease-out), opacity .35s ease, transform .35s var(--ease-out);
   box-shadow: var(--shadow-card);
+  /* Text in the tool's own colour (domain, tags, Soon/New badges, shipped
+     stamp) reads `--card-ink`, never the raw accent. The accent is picked for
+     the icon and the glow, and as 10 to 12px text on this surface a third of
+     them fell under 4.5:1. Ink keeps the accent's hue and chroma and lifts
+     only its lightness to a floor, so light accents are untouched.
+     scripts/contrast-lint.py reproduces both lines below and checks every
+     accent in index.html; change one and change the other. */
+  --card-ink: color-mix(in oklch, var(--card-accent, #818cf8) 62%, #fff);
+}
+/* The Antenne bulletin borrows a card's accent for its icon tiles. */
+.dispatch-story__art,
+.dispatch-story__source { --card-ink: color-mix(in oklch, var(--card-accent, #818cf8) 62%, #fff); }
+@supports (color: oklch(from #000 l c h)) {
+  .site-card,
+  .dispatch-story__art,
+  .dispatch-story__source { --card-ink: oklch(from var(--card-accent, #818cf8) max(l, .74) c h); }
 }
 
 /* Neon glow on hover via custom prop */
@@ -847,7 +797,7 @@ span.card-site-icon {
 .card-initial {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--card-accent, #818cf8);
+  color: var(--card-ink, #a5b4fc);
   line-height: 1;
 }
 /* A pointer control, not just an ornament: clicking it opens the tool in a
@@ -892,7 +842,7 @@ span.card-site-icon {
   font-weight: 600;
   letter-spacing: .06em;
   text-transform: uppercase;
-  color: var(--card-accent, #818cf8);
+  color: var(--card-ink, #a5b4fc);
   margin-top: 2px;
 }
 .card-name {
@@ -950,7 +900,7 @@ span.card-site-icon {
   padding: 3px 8px;
   border-radius: 10px;
   border: 1px dashed color-mix(in srgb, var(--card-accent, #818cf8) 40%, transparent);
-  color: color-mix(in srgb, var(--card-accent, #818cf8) 85%, #fff);
+  color: var(--card-ink, #a5b4fc);
   background: color-mix(in srgb, var(--card-accent, #818cf8) 12%, rgba(8, 12, 26, .9));
   transition: background .2s ease, border-color .2s ease;
 }
@@ -991,7 +941,7 @@ span.card-site-icon {
   padding: 3px 8px;
   border-radius: 10px;
   border: 1px solid;
-  color: var(--card-accent, #818cf8);
+  color: var(--card-ink, #a5b4fc);
   border-color: color-mix(in srgb, var(--card-accent, #818cf8) 30%, transparent);
   background: color-mix(in srgb, var(--card-accent, #818cf8) 8%, transparent);
 }
@@ -1121,11 +1071,17 @@ span.card-site-icon {
   padding: 20px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity .2s ease;
+  visibility: hidden; /* its links are not Tab stops until it opens */
+  transition: opacity .2s ease, visibility 0s linear .2s;
   z-index: 10;
   justify-content: center;
 }
-.site-card.popup-open .card-subtool-popup { opacity: 1; pointer-events: auto; }
+.site-card.popup-open .card-subtool-popup {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition: opacity .2s ease, visibility 0s;
+}
 .subtool-item {
   display: flex;
   flex-direction: column;
@@ -1251,14 +1207,21 @@ span.card-site-icon {
   overflow: hidden;
   opacity: 0;
   transform: translateY(20px);
+  visibility: hidden; /* the ghost cards are not Tab stops until revealed */
   transition: max-height .8s cubic-bezier(0.22, 1, 0.36, 1),
               opacity .6s ease .15s,
-              transform .6s cubic-bezier(0.22, 1, 0.36, 1) .15s;
+              transform .6s cubic-bezier(0.22, 1, 0.36, 1) .15s,
+              visibility 0s linear .8s;
 }
 .secret-section.revealed {
   max-height: 600px;
   opacity: 1;
   transform: translateY(0);
+  visibility: visible;
+  transition: max-height .8s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity .6s ease .15s,
+              transform .6s cubic-bezier(0.22, 1, 0.36, 1) .15s,
+              visibility 0s;
 }
 .secret-section .section-label {
   color: rgba(251,191,36,.35);
@@ -1366,26 +1329,27 @@ span.card-site-icon {
   box-shadow: var(--shadow-card);
 }
 
-/* ── Resting dim, on the content rather than the card ─────────────────────
+/* ── Resting dim, on the icon tile rather than the card ───────────────────
    `opacity: .78` on `.soon-card` itself never rendered. Every catalog card
    runs `cardEnter … forwards`, and a filling animation's `to { opacity: 1 }`
    outranks a normal declaration on the same element, so the card sat at 1 and
    the hover rule that "restored" it was restoring nothing. The dim shipped
    dead for as long as Soon cards have existed.
 
-   `.card-content` is not a target of that animation, so dimming there is the
-   same intent expressed where nothing overrides it, and hover can genuinely
-   take it back. Both secondary states use it: Soon has not arrived, archived
-   has been superseded, and neither should out-read a live tool in the grid. */
-.soon-card .card-content,
-.site-card.archived-card .card-content {
+   It then moved to `.card-content`, which worked, and dimmed every word on
+   the card with it: the domain, tags and badges fell under 4.5:1 at rest. So
+   it lives on the icon tile now. Both secondary states still read as quieter
+   than a live tool (dimmed, desaturated icon, the badge, archived's dashed
+   border) while their text stays legible. Hover and focus take it back. */
+.soon-card .card-icon-wrap,
+.site-card.archived-card .card-icon-wrap {
   opacity: var(--card-rest-dim, .78);
   transition: opacity .3s;
 }
-.soon-card:hover .card-content,
-.soon-card:focus-within .card-content,
-.site-card.archived-card:hover .card-content,
-.site-card.archived-card:focus-within .card-content {
+.soon-card:hover .card-icon-wrap,
+.soon-card:focus-within .card-icon-wrap,
+.site-card.archived-card:hover .card-icon-wrap,
+.site-card.archived-card:focus-within .card-icon-wrap {
   opacity: 1;
 }
 .soon-card:hover::before,
@@ -1407,7 +1371,7 @@ span.card-site-icon {
   text-transform: uppercase;
   padding: 3px 8px;
   border-radius: 6px;
-  color: var(--card-accent, #818cf8);
+  color: var(--card-ink, #a5b4fc);
   background: color-mix(in srgb, var(--card-accent, #818cf8) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--card-accent, #818cf8) 32%, transparent);
 }
@@ -1609,11 +1573,17 @@ body.warp-active .orb {
   background: rgba(0,0,0,.5);
   opacity: 0;
   pointer-events: none;
-  transition: opacity .25s;
+  /* Hidden, not just transparent: an invisible input in the tab order was a
+     keyboard trap (its Tab completion held focus forever). The visibility
+     switch waits out the fade on close and flips at once on open. */
+  visibility: hidden;
+  transition: opacity .25s, visibility 0s linear .25s;
 }
 .term-overlay.open {
   opacity: 1;
   pointer-events: auto;
+  visibility: visible;
+  transition: opacity .25s, visibility 0s;
 }
 .term-box {
   width: min(640px, 90vw);
@@ -1733,7 +1703,8 @@ body.warp-active .orb {
   .card-group { margin-bottom: 22px; }
 
   .hero-search-wrap { margin-top: 18px; }
-  .hero-search { font-size: .88rem; padding: 12px 40px; }
+  .hero-search { padding: 12px 40px; }
+  .hero-search::placeholder { font-size: .88rem; }
   .search-hint { display: none; }
 
   /* Pills: physics constellation → scrollable row on mobile.
@@ -1775,8 +1746,6 @@ body.warp-active .orb {
      thing the physics says on a desktop by moving. */
   body.search-active .tag-pill.repelled { display: none; }
 
-  /* Settings panel — full width on mobile */
-  .settings-panel { left: 12px; right: 12px; width: auto; }
 
   /* Konami + Cheat HUD — scale down */
   .konami-hud { bottom: 72px; gap: 4px; padding: 8px 10px; }
@@ -1785,10 +1754,6 @@ body.warp-active .orb {
   .cheat-hud { bottom: 72px; padding: 8px 10px; }
   .cheat-hud-keys .konami-key { width: 22px; height: 22px; font-size: .55rem; }
 
-  /* Music + settings buttons */
-  .music-toggle, .settings-btn { bottom: 14px; }
-  .music-toggle { left: 14px; }
-  .settings-btn { left: 54px; }
 }
 
 /* ── Drag-and-drop ──────────────────────────────────────────────────── */
@@ -1895,21 +1860,6 @@ button:active, .btn:active {
   animation: cardEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* ── Hero typing cursor ────────────────────────────────────── */
-.typing-cursor {
-  display: inline-block;
-  width: 3px;
-  height: 1em;
-  background: #e879f9;
-  margin-left: 2px;
-  vertical-align: text-bottom;
-  animation: blink 0.6s step-end infinite;
-}
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0; }
-}
-
 /* ── Ambient music toggle ──────────────────────────────────── */
 @keyframes musicRing {
   0%   { transform: scale(1);   opacity: .7; }
@@ -1920,19 +1870,17 @@ button:active, .btn:active {
   50%       { box-shadow: 0 0 26px rgba(192,132,252,.65), 0 0 52px rgba(192,132,252,.18); }
 }
 
+/* A row in the settings panel now, beside its label; it used to float at the
+   bottom-left of every screen. The rings below still anchor to it. */
 .music-toggle {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 9998;
-  width: 36px;
-  height: 36px;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.1);
-  background: rgba(4,7,20,.6);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  color: rgba(255,255,255,.3);
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.62);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1955,8 +1903,12 @@ button:active, .btn:active {
   transition: opacity .3s;
 }
 .music-toggle:hover {
-  color: rgba(255,255,255,.6);
-  border-color: rgba(255,255,255,.2);
+  color: rgba(255,255,255,.85);
+  border-color: rgba(255,255,255,.28);
+}
+.music-toggle:focus-visible {
+  outline: 2px solid #818cf8;
+  outline-offset: 2px;
 }
 .music-toggle.playing {
   color: #c084fc;
@@ -2084,56 +2036,57 @@ body.intervention-bg .music-toggle.playing { animation: none; box-shadow: none; 
 .cheat-hud[data-code="hesoyam"] .konami-key.hit { color: #f59e0b; border-color: rgba(245,158,11,.5); background: rgba(245,158,11,.12); box-shadow: 0 0 10px rgba(245,158,11,.25); }
 
 /* ── Settings panel ────────────────────────────────────────── */
-.settings-btn {
-  position: fixed;
-  bottom: 20px;
-  left: 64px;
-  z-index: 9998;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.1);
-  background: rgba(4,7,20,.6);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  color: rgba(255,255,255,.3);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-float);
-  transition: color .2s, border-color .2s, transform .3s;
-  padding: 0;
+/* The button lives in the header's .header-actions, so the Header Kit owns its
+   size and box (it collapses into nothing on phones; data-keep-mobile keeps it
+   in the bar). It used to float at the bottom-left with the music button,
+   where both sat on top of card text on every phone screen. */
+.settings-btn svg {
+  width: 20px;
+  height: 20px;
+  transition: transform .3s var(--ease-out);
 }
-.settings-btn:hover {
-  color: rgba(255,255,255,.6);
-  border-color: rgba(255,255,255,.2);
-}
-.settings-btn.open { transform: rotate(90deg); }
-.settings-btn svg { width: 16px; height: 16px; }
+/* .page is a stacking context at z-index 10 and the Antenne bulletin and dock
+   are body children at 150, so they covered the open panel (and on a landscape
+   phone a tap meant for a switch opened the bulletin). While settings is open
+   the Antenne layer steps aside; it comes back when settings closes. */
+body.settings-open .dispatch-pop,
+body.settings-open .dispatch-dock { visibility: hidden; }
+.settings-btn[aria-expanded="true"] svg { transform: rotate(90deg); }
 
 .settings-panel {
   position: fixed;
-  bottom: 64px;
-  left: 20px;
+  /* Just under the bar. The hub header's backdrop-filter makes it this
+     panel's containing block, so the panel leaves with the bar when it
+     auto-hides; the header-height token keeps the offset right either way. */
+  top: calc(var(--header-h, 68px) + 8px);
+  right: max(16px, env(safe-area-inset-right, 0px));
   z-index: 9997;
-  width: 260px;
-  background: rgba(4,7,20,.88);
-  backdrop-filter: blur(20px) saturate(170%);
-  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  width: 280px;
+  max-height: calc(100dvh - var(--header-h, 68px) - 32px);
+  overflow-y: auto;
+  overflow-x: hidden; /* the music rings must not grow a sideways scrollbar */
+  overscroll-behavior: contain;
+  text-align: left;
+  /* Opaque on purpose. Inside the header, which has its own backdrop-filter,
+     a nested blur only sees the bar, so a glass panel showed the cards, the
+     headline and the bulletin straight through its text. */
+  background: rgb(6, 10, 24);
   border: 1px solid rgba(255,255,255,.1);
   border-radius: 16px;
   padding: 20px;
   box-shadow: var(--shadow-panel);
   opacity: 0;
   pointer-events: none;
-  transform: translateY(8px);
-  transition: opacity .25s, transform .25s var(--ease-snap);
+  transform: translateY(-8px);
+  visibility: hidden; /* closed means out of the tab order too */
+  transition: opacity .25s, transform .25s var(--ease-out), visibility 0s linear .25s;
 }
 .settings-panel.open {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
+  visibility: visible;
+  transition: opacity .25s, transform .25s var(--ease-out), visibility 0s;
 }
 .settings-title {
   font-size: .72rem;
@@ -2151,6 +2104,9 @@ body.intervention-bg .music-toggle.playing { animation: none; box-shadow: none; 
   border-bottom: 1px solid rgba(255,255,255,.04);
 }
 .settings-row:last-child { border-bottom: none; }
+/* The track row below it is usually hidden, and on touch so is the legend,
+   which left this row's rule hanging under nothing. */
+.settings-row:has(#togMusicMatch) { border-bottom: none; }
 .settings-label {
   font-size: .82rem;
   color: var(--text-secondary);
@@ -2187,9 +2143,29 @@ body.intervention-bg .music-toggle.playing { animation: none; box-shadow: none; 
 }
 .settings-hint {
   font-size: .7rem;
-  color: rgba(255,255,255,.2);
+  color: rgba(255,255,255,.55);
   line-height: 1.6;
   margin-top: 8px;
+}
+/* A 36x20 switch is under the 24px target floor; the hit area grows, the
+   drawing does not. */
+.settings-toggle::before {
+  content: '';
+  position: absolute;
+  inset: -8px; /* no more than half the row gap, so neighbours never overlap */
+}
+/* Phones: the panel spans the width under the header, and the two rows that
+   only mean something with a pointer and a keyboard step aside. */
+@media (max-width: 600px) {
+  .settings-panel { left: 12px; right: 12px; width: auto; }
+}
+@media (pointer: coarse) {
+  .term-input { font-size: 1rem; } /* the same iOS focus zoom as the search field */
+}
+@media (hover: none) {
+  .settings-row--pointer,
+  .settings-hint,
+  .settings-divider:has(+ .settings-hint) { display: none; }
 }
 .settings-seg {
   display: flex;
@@ -2311,7 +2287,6 @@ body.intervention-bg .hero-badge .badge-dot { background: #333; }
 body.intervention-bg .hero { text-shadow: none; }
 body.intervention-bg .hero h1 { color: #111; }
 body.intervention-bg .hero .hero-sub { color: #555; }
-body.intervention-bg .hero .typing-cursor { background: #333; }
 
 /* Cards */
 body.intervention-bg .site-card {
@@ -2325,11 +2300,21 @@ body.intervention-bg .site-card:hover {
 }
 body.intervention-bg .site-card .card-title { color: #111; }
 body.intervention-bg .site-card .card-desc { color: #444; }
+/* On paper the ink needs a ceiling, not a floor (contrast-lint checks both). */
+body.intervention-bg .site-card { --card-ink: color-mix(in oklch, var(--card-accent, #818cf8) 55%, #000); }
+@supports (color: oklch(from #000 l c h)) {
+  body.intervention-bg .site-card { --card-ink: oklch(from var(--card-accent, #818cf8) min(l, .45) c h); }
+}
 body.intervention-bg .site-card .card-domain { color: #666; }
 body.intervention-bg .site-card .card-tag {
   background: rgba(0, 0, 0, .05);
   color: #444;
   border-color: rgba(0, 0, 0, .1);
+}
+body.intervention-bg .site-card .card-tag-more {
+  background: rgba(0, 0, 0, .05);
+  color: #444;
+  border-color: rgba(0, 0, 0, .18);
 }
 body.intervention-bg .site-card .card-arrow { color: #666; }
 /* The accent hover reads on the void, not on paper; give it ink instead. */
@@ -2356,20 +2341,18 @@ body.intervention-bg .secret-btn { border-color: rgba(0,0,0,.1); }
 body.intervention-bg .secret-btn .icon-warning { filter: brightness(0.3); }
 body.intervention-bg .orb { display: none; }
 
-/* Bottom buttons + settings panel */
-body.intervention-bg .music-toggle,
-body.intervention-bg .settings-btn {
+/* Music button + settings panel (the gear is a .header-link, themed above) */
+body.intervention-bg .music-toggle {
   background: rgba(0, 0, 0, .06);
   color: #444;
   border-color: rgba(0, 0, 0, .1);
 }
-body.intervention-bg .music-toggle:hover,
-body.intervention-bg .settings-btn:hover {
+body.intervention-bg .music-toggle:hover {
   background: rgba(0, 0, 0, .1);
   color: #222;
 }
 body.intervention-bg .settings-panel {
-  background: rgba(255, 255, 255, .92);
+  background: rgb(255, 255, 255);
   border-color: rgba(0, 0, 0, .1);
   backdrop-filter: blur(16px);
 }
@@ -2413,7 +2396,6 @@ body.evangelion-bg .hero-badge { background: rgba(128,0,255,.15); color: #c084fc
 body.evangelion-bg .hero-badge .badge-dot { background: #c084fc; }
 body.evangelion-bg .hero h1 { color: #e8d5ff; }
 body.evangelion-bg .hero .hero-sub { color: rgba(180,140,255,.6); }
-body.evangelion-bg .hero .typing-cursor { background: #8000ff; }
 
 body.evangelion-bg .site-card {
   background: rgba(20, 0, 50, .75);
@@ -2439,14 +2421,12 @@ body.evangelion-bg .grid-bg {
     linear-gradient(90deg, rgba(128,0,255,.03) 1px, transparent 1px);
 }
 
-body.evangelion-bg .music-toggle,
-body.evangelion-bg .settings-btn {
+body.evangelion-bg .music-toggle {
   background: rgba(20, 0, 50, .7);
   color: rgba(180,140,255,.4);
   border-color: rgba(128,0,255,.2);
 }
-body.evangelion-bg .music-toggle:hover,
-body.evangelion-bg .settings-btn:hover {
+body.evangelion-bg .music-toggle:hover {
   color: rgba(180,140,255,.7);
   border-color: rgba(128,0,255,.4);
 }
@@ -2455,7 +2435,7 @@ body.evangelion-bg .music-toggle::after { border-color: rgba(128,0,255,.4); }
 body.evangelion-bg .music-toggle.playing { animation: none; box-shadow: 0 0 12px rgba(128,0,255,.3); }
 
 body.evangelion-bg .settings-panel {
-  background: rgba(20, 0, 50, .92);
+  background: rgb(20, 0, 50);
   border-color: rgba(128,0,255,.2);
 }
 body.evangelion-bg .settings-title { color: rgba(180,140,255,.5); }
@@ -2564,6 +2544,10 @@ body.evangelion-bg .hero-search-icon { color: rgba(128,0,255,.3); }
   letter-spacing: .15em;
   color: rgba(255,255,255,.5);
   margin-top: 12px;
+}
+/* Only while the warning shows; it used to blink forever inside the hidden
+   overlay on every visit. */
+.nerv-warning-overlay.active .nerv-warning-type {
   animation: nervTypeBlink 1s step-end infinite;
 }
 @keyframes nervTypeBlink {
@@ -2587,13 +2571,16 @@ body.evangelion-bg .hero-search-icon { color: rgba(128,0,255,.3); }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* The iteration cap matters: a 0.01ms `infinite` animation still runs, it
+     just flickers instead of pulsing. */
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition: none !important;
   }
 
-  /* Disable starfield */
-  #starfield { display: none !important; }
+  /* The starfield stays, as one still frame (starfield.js stops its loop),
+     so the void keeps its identity without anything moving. */
 
   /* Disable matrix rain, intervention, and evangelion canvases */
   #matrixCanvas, #interventionCanvas, #evangelionCanvas { display: none !important; }
@@ -3332,7 +3319,7 @@ body.search-active #tools {
   font-weight: 600;
   letter-spacing: .04em;
   text-transform: uppercase;
-  color: var(--card-accent, #818cf8);
+  color: var(--card-ink, #a5b4fc);
 }
 .card-shipped-dot {
   width: 6px;
@@ -3341,14 +3328,9 @@ body.search-active #tools {
   background: currentColor;
   box-shadow: 0 0 8px currentColor;
   flex-shrink: 0;
-  animation: shippedPulse 2.6s ease-in-out infinite;
-}
-@keyframes shippedPulse {
-  0%, 100% { opacity: .45; transform: scale(.85); }
-  50%      { opacity: 1;   transform: scale(1.15); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .card-shipped-dot { animation: none; opacity: .9; }
+  /* Six of these sit in the fold; a pulse on each was six more things moving
+     that nobody can click. */
+  opacity: .9;
 }
 
 /* ── NEW badge (on the canonical card, self-expiring via js/recent.js) ────
@@ -3372,7 +3354,7 @@ body.search-active #tools {
   text-transform: uppercase;
   padding: 3px 8px;
   border-radius: 6px;
-  color: var(--card-accent, #818cf8);
+  color: var(--card-ink, #a5b4fc);
   background: color-mix(in srgb, var(--card-accent, #818cf8) 18%, transparent);
   border: 1px solid color-mix(in srgb, var(--card-accent, #818cf8) 55%, transparent);
   white-space: nowrap;

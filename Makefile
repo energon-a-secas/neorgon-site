@@ -20,10 +20,13 @@ stop: ## Kill process using the dev server port
 ## whole check exists to prevent. Same reasoning covers PREVIEW_MAP: a preview
 ## whose GIF is missing dies through `img.onerror` with nothing logged, and the
 ## hardcoded tool counts in the meta and JSON-LD descriptions, which no visitor
-## can see going stale because the hero computes the copy they do see.
+## can see going stale because the hero computes the copy they do see. And the
+## accent text: a new card whose colour is too dark to read as small text fails
+## here rather than in a contrast audit months later.
 check:
 	@python3 scripts/preview-lint.py
 	@python3 scripts/count-lint.py
+	@python3 scripts/contrast-lint.py
 	@python3 scripts/icon-lint.py
 	@python3 scripts/icon-sheet.py >/dev/null
 	@if git ls-files --error-unmatch docs/icon-sheet.html >/dev/null 2>&1; then \

@@ -274,6 +274,12 @@
       pin.setAttribute('aria-pressed', pinned ? 'true' : 'false');
       pin.setAttribute('aria-label', (pinned ? 'Unpin ' : 'Pin ') + name);
       pin.setAttribute('title', pinned ? 'Unpin' : 'Pin to the front');
+      /* Pinning only means something for a saved tool, and on an unsaved card
+         the pin is collapsed to zero width. It was still a Tab stop there:
+         86 of them, each one focus nobody could see. */
+      pin.setAttribute('tabindex', saved ? '0' : '-1');
+      if (saved) pin.removeAttribute('aria-hidden');
+      else pin.setAttribute('aria-hidden', 'true');
     });
   }
 

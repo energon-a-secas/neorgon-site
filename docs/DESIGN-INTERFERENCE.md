@@ -47,7 +47,7 @@ The token lives in the closure only, never in storage, the same lifetime `authed
 `neorgon-header.js`. It never touches `js/terminal.js`'s `ConvexHttpClient`; it owns a second
 client:
 
-- On `requestIdleCallback` after load (fallback `setTimeout 1500`), `import('https://esm.sh/convex@1.21.0/browser')`
+- 20 seconds after load on a plain `setTimeout` (changed 2026-10-24 from idle time, so a visit that finds a tool and leaves pays nothing; a successful admin `login` connects at once through `window._neoInterference.connect()`), `import('https://esm.sh/convex@1.21.0/browser')`
   and construct `new ConvexClient(CONVEX_URL)`. Same package the terminal lazy-loads, cached.
 - `client.onUpdate('interference:get', {}, apply)`, the string form terminal.js already uses;
   `anyApi` from the same package is the fallback if the WebSocket client refuses a string.

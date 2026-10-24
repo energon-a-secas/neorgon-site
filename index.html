@@ -129,6 +129,77 @@
     </div>
     <div class="header-right">
       <div class="header-actions">
+        <button type="button" class="header-link settings-btn" id="settingsBtn" data-keep-mobile
+                aria-label="Settings" aria-expanded="false" aria-controls="settingsPanel" title="Settings (,)">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+        <!-- Settings panel: straight after its button, so Tab from the open button
+             lands inside it and a screen reader meets it in the same place. It is
+             position: fixed, and the hub header's backdrop-filter makes the header its
+             containing block, so it hangs under the bar and leaves with it. Closed, it
+             is visibility: hidden and never a Tab stop (js/settings.js). -->
+        <div class="settings-panel" id="settingsPanel" data-keep-mobile role="group" aria-labelledby="settingsTitle">
+          <div class="settings-title" id="settingsTitle">Settings</div>
+          <div class="settings-row" id="musicRow">
+            <span class="settings-label" id="musicLabel">Ambient music</span>
+            <button type="button" class="music-toggle" id="musicToggle" aria-labelledby="musicLabel" aria-pressed="false" title="Ambient music (M)">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"/>
+                <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <div class="settings-row">
+            <span class="settings-label">Sound effects</span>
+            <button class="settings-toggle on" id="togSound" role="switch" aria-checked="true" aria-label="Toggle sound"></button>
+          </div>
+          <div class="settings-row settings-row--pointer">
+            <span class="settings-label">Cursor glow</span>
+            <button class="settings-toggle on" id="togGlow" role="switch" aria-checked="true" aria-label="Toggle glow"></button>
+          </div>
+          <div class="settings-row">
+            <span class="settings-label">Card previews</span>
+            <button class="settings-toggle" id="togPreviews" role="switch" aria-checked="false" aria-label="Toggle card previews" aria-describedby="previewHelp"></button>
+          </div>
+          <p class="settings-help" id="previewHelp">Hover or use a card’s preview button. Reduced motion shows a still image.</p>
+          <div class="settings-divider"></div>
+          <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
+            <span class="settings-label">Background</span>
+            <div class="settings-seg" id="bgPicker">
+              <button data-bg="stars" class="active">Stars</button>
+              <button data-bg="matrix">Matrix</button>
+              <button data-bg="intervention">L</button>
+              <button data-bg="evangelion">EVA</button>
+              <button data-bg="egg">Egg</button>
+            </div>
+          </div>
+          <div class="settings-divider"></div>
+          <div class="settings-row">
+            <span class="settings-label">Auto-match music</span>
+            <button class="settings-toggle on" id="togMusicMatch" role="switch" aria-checked="true" aria-label="Toggle auto-match music to theme"></button>
+          </div>
+          <div class="settings-row" id="musicTrackRow" style="flex-direction:column;align-items:stretch;gap:8px;display:none;">
+            <span class="settings-label">Music track</span>
+            <div class="settings-seg" id="musicPicker">
+              <button data-track="stars">Cosmic</button>
+              <button data-track="matrix">Digital</button>
+              <button data-track="intervention">L</button>
+              <button data-track="evangelion">EVA</button>
+              <button data-track="egg">Egg</button>
+            </div>
+          </div>
+          <div class="settings-divider"></div>
+          <div class="settings-hint">
+            <kbd>M</kbd> Music &nbsp;·&nbsp; <kbd>,</kbd> Settings<br>
+            <kbd>⌘K</kbd> Jump to a tool &nbsp;·&nbsp; <kbd>/</kbd> Search<br>
+            <kbd>↑</kbd><kbd>↓</kbd> Walk results &nbsp;·&nbsp; <kbd>↵</kbd> Open<br>
+            <kbd>Esc</kbd> <kbd>Esc</kbd> Terminal<br>
+            <kbd>↑↑↓↓←→←→BA</kbd> Warp drive<br>
+            Terminal: <kbd>new</kbd> <kbd>random</kbd> <kbd>theme</kbd> <kbd>whois</kbd> <kbd>help</kbd>
+          </div>
+        </div>
         <a class="header-link" data-keep-mobile href="https://github.com/energon-a-secas" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
           <svg width="26" height="26" viewBox="0 0 98 96" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
         </a>
@@ -142,9 +213,11 @@
       <span class="badge-dot" aria-hidden="true"></span>
       <span id="badgeText">Free · Local · No account</span>
     </div>
+    <!-- One headline, complete in the HTML and the same as <title> and
+         og:title. It used to be typed out, one of four endings per load. -->
     <h1 class="hero-heading">
       Made to fit<br>
-      <span class="neon-word" id="heroTyping"></span><span class="typing-cursor" id="typingCursor"></span>
+      <span class="neon-word">the exact problem</span>
     </h1>
     <p class="hero-sub">
       <span id="toolCount">74</span> tools, each cut for one job. Free, local,
@@ -159,16 +232,7 @@
     <div class="constellation-box" id="constellationBox">
       <canvas class="constellation-canvas" id="constellationCanvas"></canvas>
     </div>
-    <!-- Scroll cue. The hero ends within a pixel of the fold, so there was no
-         evidence a catalog existed below it. Fades in, drifts down, fades out,
-         and leaves for good the moment the reader takes the hint (js/hero.js).
-         A button rather than an ornament: the affordance may as well work. -->
-    <button type="button" class="scroll-cue" id="scrollCue" aria-label="Scroll to the tools">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-    </button>
   </section>
-  <script defer src="js/hero.js"></script>
 
   <!-- Favorites: the visitor's own shelf, built by js/favorites.js from
        localStorage. Hidden until something is saved, so a first visit is
@@ -2186,72 +2250,6 @@
   <div class="cheat-hud-keys" id="cheatHudKeys"></div>
 </div>
 
-<!-- Ambient music toggle -->
-<button class="music-toggle" id="musicToggle" aria-label="Ambient music" aria-pressed="false" title="Ambient music">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M9 18V5l12-2v13"/>
-    <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
-  </svg>
-</button>
-
-<!-- Settings -->
-<button class="settings-btn" id="settingsBtn" aria-label="Settings" title="Settings">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-  </svg>
-</button>
-<div class="settings-panel" id="settingsPanel">
-  <div class="settings-title">Settings</div>
-  <div class="settings-row">
-    <span class="settings-label">Sound effects</span>
-    <button class="settings-toggle on" id="togSound" role="switch" aria-checked="true" aria-label="Toggle sound"></button>
-  </div>
-  <div class="settings-row">
-    <span class="settings-label">Cursor glow</span>
-    <button class="settings-toggle on" id="togGlow" role="switch" aria-checked="true" aria-label="Toggle glow"></button>
-  </div>
-  <div class="settings-row">
-    <span class="settings-label">Card previews</span>
-    <button class="settings-toggle" id="togPreviews" role="switch" aria-checked="false" aria-label="Toggle card previews" aria-describedby="previewHelp"></button>
-  </div>
-  <p class="settings-help" id="previewHelp">Hover or use a card’s preview button. Reduced motion shows a still image.</p>
-  <div class="settings-divider"></div>
-  <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
-    <span class="settings-label">Background</span>
-    <div class="settings-seg" id="bgPicker">
-      <button data-bg="stars" class="active">Stars</button>
-      <button data-bg="matrix">Matrix</button>
-      <button data-bg="intervention">L</button>
-      <button data-bg="evangelion">EVA</button>
-      <button data-bg="egg">Egg</button>
-    </div>
-  </div>
-  <div class="settings-divider"></div>
-  <div class="settings-row">
-    <span class="settings-label">Auto-match music</span>
-    <button class="settings-toggle on" id="togMusicMatch" role="switch" aria-checked="true" aria-label="Toggle auto-match music to theme"></button>
-  </div>
-  <div class="settings-row" id="musicTrackRow" style="flex-direction:column;align-items:stretch;gap:8px;display:none;">
-    <span class="settings-label">Music track</span>
-    <div class="settings-seg" id="musicPicker">
-      <button data-track="stars">Cosmic</button>
-      <button data-track="matrix">Digital</button>
-      <button data-track="intervention">L</button>
-      <button data-track="evangelion">EVA</button>
-      <button data-track="egg">Egg</button>
-    </div>
-  </div>
-  <div class="settings-divider"></div>
-  <div class="settings-hint">
-    <kbd>M</kbd> Music &nbsp;·&nbsp; <kbd>,</kbd> Settings<br>
-    <kbd>⌘K</kbd> Jump to a tool &nbsp;·&nbsp; <kbd>/</kbd> Search<br>
-    <kbd>↑</kbd><kbd>↓</kbd> Walk results &nbsp;·&nbsp; <kbd>↵</kbd> Open<br>
-    <kbd>Esc</kbd> <kbd>Esc</kbd> Terminal<br>
-    <kbd>↑↑↓↓←→←→BA</kbd> Warp drive<br>
-    Terminal: <kbd>new</kbd> <kbd>random</kbd> <kbd>theme</kbd> <kbd>whois</kbd> <kbd>help</kbd>
-  </div>
-</div>
-
 <!-- Command palette (Cmd/Ctrl+K) -->
 <div class="pal-overlay" id="paletteOverlay" role="dialog" aria-modal="true" aria-label="Search tools" hidden>
   <div class="pal-box">
@@ -2272,7 +2270,7 @@
 </div>
 
 <!-- Terminal -->
-<div class="term-overlay" id="termOverlay">
+<div class="term-overlay" id="termOverlay" role="dialog" aria-label="Terminal">
   <div class="term-box">
     <div class="term-titlebar">
       <span class="term-dot term-dot-r"></span>

@@ -168,7 +168,7 @@
 
   /* ── Button ─────────────────────────────────────────────────────── */
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    btn.style.display = 'none';
+    (btn.closest('.settings-row') || btn).style.display = 'none';
     return;
   }
 

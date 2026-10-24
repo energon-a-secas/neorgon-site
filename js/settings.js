@@ -149,17 +149,43 @@
   if (window._neoSoundEnabled === undefined) window._neoSoundEnabled = prefs.sound;
   if (window._neoPreviewsEnabled === undefined) window._neoPreviewsEnabled = prefs.previews;
 
-  btn.addEventListener('click', () => {
-    const open = panel.classList.toggle('open');
-    btn.classList.toggle('open', open);
+  /* A disclosure: the button says whether the panel is open, Escape closes it
+     and hands focus back to the button. The panel itself leaves the tab order
+     when closed (visibility in style.css), so it is never a Tab stop nobody
+     can see. */
+  function setOpen(open) {
+    const focusInside = panel.contains(document.activeElement);
+    panel.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    /* Lifts the page above the Antenne layer while open (style.css). */
+    document.body.classList.toggle('settings-open', open);
+    /* Closing hides the panel, so focus inside it would drop to <body>. */
+    if (!open && focusInside) btn.focus();
+  }
+
+  btn.addEventListener('click', e => {
+    const open = !panel.classList.contains('open');
+    setOpen(open);
+    /* A pointer close should not leave focus parked on the button: the header
+       kit keeps the bar on screen for as long as it holds focus. */
+    if (!open && e.detail > 0) btn.blur();
   });
 
   document.addEventListener('click', e => {
-    if (!panel.contains(e.target) && !btn.contains(e.target)) {
-      panel.classList.remove('open');
-      btn.classList.remove('open');
-    }
+    if (!panel.contains(e.target) && !btn.contains(e.target)) setOpen(false);
   });
+
+  /* Escape closes the panel wherever focus is, including after the "," key
+     opened it without moving focus. Capture phase, so it runs before
+     terminal.js counts Escapes toward opening the terminal. */
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || !panel.classList.contains('open')) return;
+    e.stopPropagation();
+    const here = document.activeElement;
+    const giveBack = here === btn || here === document.body || panel.contains(here);
+    setOpen(false);
+    if (giveBack) btn.focus();
+  }, true);
 
   /* ── Keyboard shortcut: , ───────────────────────────────────────── */
   document.addEventListener('keydown', e => {

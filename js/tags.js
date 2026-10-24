@@ -129,6 +129,14 @@
     input.focus();
   }
 
+  /* A tag search is a pointer gesture only. On a phone the tags fill a card's
+     bottom row, right where a thumb aimed at the card lands, and one near miss
+     swapped a long browse for search results at the top of the page (and,
+     through focus(), raised the keyboard). A touch on a tag now does what a
+     touch anywhere else on the card does: it opens the tool. */
+  var lastPointer = 'mouse';
+  document.addEventListener('pointerdown', function (e) { lastPointer = e.pointerType; }, true);
+
   document.addEventListener('click', function (e) {
     if (!e.target.closest) return;
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
@@ -145,6 +153,7 @@
 
     var tag = e.target.closest('.card-tag');
     if (!tag) return;
+    if (lastPointer === 'touch' || lastPointer === 'pen') return;
     var text = tag.textContent.trim();
     if (!text) return;
     e.preventDefault();

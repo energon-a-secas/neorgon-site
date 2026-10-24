@@ -132,18 +132,34 @@ let warpIntensity = 0;
         ctx.fill();
       }
     });
+  }
 
-    requestAnimationFrame(draw);
+  /* The loop runs only while motion is allowed. Under reduced motion the
+     field is drawn once and stays still; it used to keep repainting every
+     frame behind a stylesheet that hid it. */
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let running = false;
+
+  function loop(t) {
+    draw(t);
+    running = !reduce.matches;
+    if (running) requestAnimationFrame(loop);
+  }
+
+  function start() {
+    if (running) return;
+    if (reduce.matches) { draw(0); return; }
+    running = true;
+    requestAnimationFrame(loop);
   }
 
   resize();
-  window.addEventListener('resize', resize);
-
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    requestAnimationFrame(draw);
-  } else {
-    draw(0);
-  }
+  window.addEventListener('resize', function () {
+    resize();
+    if (reduce.matches) draw(0); /* resizing a canvas clears it */
+  });
+  reduce.addEventListener('change', start);
+  start();
 })();
 
 /* ── Shared code-input lock ────────────────────────────────────────────────── */

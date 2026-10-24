@@ -113,7 +113,7 @@ This system rejects what PRODUCT.md calls **generic SaaS landing patterns**, **i
 
 - Per-tool **accent injection** through CSS variables on each card; default fallback indigo `#818cf8`.
 - **Tonal depth** from true void `#000912` through semi-opaque card shells and soft borders, not from heavy skeuomorphic chrome.
-- **Glass touches** reserved for the hero search and small floating controls (blur 8-12px), always in service of legibility.
+- **Glass touches** reserved for the hero search and small panels (blur 8-12px), always in service of legibility.
 - **Focus and skip** use the same indigo language as default accents (`:focus-visible`, skip link).
 - **Typography** is a single humanist-geometric sans stack (Avenir Next with system fallbacks) with a steep weight ladder on the hero.
 
@@ -131,7 +131,7 @@ The palette is **void neutrals plus many satellite accents**: one cold void fiel
 
 ### Tertiary
 
-- **Hyper Fuchsia** (`#e879f9`): Hero `.neon-word` gradient endpoint, typing cursor block. Pairs with indigo and plasma in the hero gradient band.
+- **Hyper Fuchsia** (`#e879f9`): Hero `.neon-word` gradient endpoint. Pairs with indigo and plasma in the hero gradient band.
 
 ### Neutral
 
@@ -188,7 +188,7 @@ Large panels (settings, terminal) use inset highlights (`0 8px 40px rgba(0,0,0,0
 ### Hero badge
 
 - **Shape:** Pill (`border-radius: 20px`).
-- **Fill / stroke:** Translucent plasma fill, plasma-tinted border (`rgba(160,80,255,0.25)`), uppercase microcopy, pulsing dot.
+- **Fill / stroke:** Translucent plasma fill, plasma-tinted border (`rgba(160,80,255,0.25)`), uppercase microcopy, a still dot.
 - **Purpose:** Sets tone; never blocks navigation.
 
 ### Hero search
@@ -209,8 +209,8 @@ Large panels (settings, terminal) use inset highlights (`0 8px 40px rgba(0,0,0,0
 - **Background:** Semi-opaque deep blue (`rgba(0,12,24,0.82)`).
 - **Border:** 1px `--border` default; hover uses `--card-glow-border` (per card).
 - **Layout:** Flex column, 12px gap, 28px padding; icon row 44px rounded square (`border-radius: 12px`) with subtle border.
-- **Domain row:** Uppercase micro label in `--card-accent`.
-- **Tags:** `.card-tag` uses `color-mix` with accent for border/background at 30% / 8%.
+- **Domain row:** Uppercase micro label in `--card-ink` (the accent lifted to a readable lightness).
+- **Tags:** `.card-tag` text in `--card-ink`; border and background mix the accent at 30% / 8%.
 - **Preview layer:** Full-bleed `#0a0e1a` under GIF with bottom gradient scrim to text.
 
 ### Multi-tool cards
@@ -227,7 +227,7 @@ Large panels (settings, terminal) use inset highlights (`0 8px 40px rgba(0,0,0,0
 
 ### Navigation (site header)
 
-- **Layout:** Logo + wordmark left, GitHub icon link right; bottom hairline `rgba(255,255,255,0.05)`.
+- **Layout:** Logo + wordmark left; settings and GitHub icon links right; bottom hairline `rgba(255,255,255,0.05)`. Settings opens a panel under the bar.
 - **Icon link:** 40px circle, transparent border → subtle surface on hover.
 
 ### Motion tokens (reference)
@@ -303,3 +303,25 @@ source line names every recognized tool linked by the story, each with its local
 favicon at 13px. Repeated destinations appear once. These are labels inside the
 story link, so the entire row remains one keyboard target. Unknown destinations
 never borrow another tool's artwork; stories with no match keep the satellite.
+
+
+## October 2026 accessibility and motion pass
+
+Card text in a tool's own colour uses `--card-ink`: the accent lifted to an oklch
+lightness floor of .74, hue and chroma kept, so light accents are unchanged and
+dark ones become readable. Icons, borders and glows keep `--card-accent`.
+`scripts/contrast-lint.py` holds every accent to 4.5:1 as text. Soon and Archived
+cards dim only their icon tile; their text stays at full contrast. The trade-off: some
+neighbouring dark accents lift to nearly the same ink, so a tool's text colour is a
+family resemblance, and its icon carries the exact hue. On the L background's
+paper cards the rule runs the other way, a lightness ceiling of .45.
+
+The fold has a motion budget of one ambient layer, the starfield. The headline is
+static and matches the page title, its three-stop gradient holds still and does
+not glow, and the badge, the shipped dots and the scroll cue no longer animate.
+Under reduced motion the starfield is one still frame rather than hidden.
+
+Settings opens from the header (the Header Kit keeps it in the bar on phones) and
+holds the ambient music control as its first row. Nothing floats over the catalog
+except the Antenne dock. Closed layers (settings, terminal, multi-tool popups, the
+secret section) are hidden from the tab order, not just transparent.

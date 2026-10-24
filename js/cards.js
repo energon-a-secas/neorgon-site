@@ -2,8 +2,19 @@
 document.querySelectorAll('.site-card.multi-tool').forEach(card => {
   const popup = card.querySelector('.card-subtool-popup');
 
+  /* A disclosure: the card is a button that shows a set of links. Not
+     aria-haspopup, which announces a menu with arrow-key items this is not.
+     The links leave the tab order while it is closed (visibility in
+     style.css). */
+  if (popup) {
+    popup.id = popup.id || 'subtools-' + card.dataset.cardId;
+    card.setAttribute('aria-controls', popup.id);
+  }
+  card.setAttribute('aria-expanded', 'false');
+
   function openPopup() {
     card.classList.add('popup-open');
+    card.setAttribute('aria-expanded', 'true');
     if (popup) {
       const first = popup.querySelector('.subtool-item');
       if (first) first.focus();
@@ -12,6 +23,7 @@ document.querySelectorAll('.site-card.multi-tool').forEach(card => {
 
   function closePopup() {
     card.classList.remove('popup-open');
+    card.setAttribute('aria-expanded', 'false');
     card.focus();
   }
 
@@ -48,6 +60,7 @@ document.querySelectorAll('.site-card.multi-tool').forEach(card => {
     requestAnimationFrame(() => {
       if (!card.contains(document.activeElement)) {
         card.classList.remove('popup-open');
+        card.setAttribute('aria-expanded', 'false');
       }
     });
   });
