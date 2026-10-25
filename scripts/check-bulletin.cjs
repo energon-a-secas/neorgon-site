@@ -106,7 +106,13 @@ function check(value, message) { assert.ok(value, message); checks++; }
     await fallback.route('**/data/posts.json', route => route.abort());
     await prepareLocalWebkit(fallback);
     await fallback.goto(base); await fallback.waitForTimeout(2800);
-    check(await fallback.locator('.dispatch-pop, .dispatch-dock').count() === 0, 'unavailable feed fails quietly');
+    // Since 00c770e a failed feed leaves the dock rather than nothing: no popup
+    // interrupts the page, and the dock opens the bulletin on its retry state.
+    check(await fallback.locator('.dispatch-pop').count() === 0, 'unavailable feed opens no popup');
+    check(await fallback.locator('.dispatch-dock').isVisible(), 'unavailable feed leaves the dock');
+    await fallback.locator('.dispatch-dock').click();
+    check(await fallback.locator('.dispatch-pop').isVisible(), 'the dock opens the bulletin after a failed feed');
+    await fallback.keyboard.press('Escape');
     await fallback.locator('#heroSearch').fill('parla');
     await fallback.waitForTimeout(400);
     check(await fallback.locator('#tools .site-card[data-card-id="parla"]').isVisible(), 'catalog search works without feed');
