@@ -10,6 +10,7 @@ Neorgon tools cover planning and strategy, developer utilities, hiring and inter
 - [Autopilot](https://autopilot.neorgon.com/): Visual idle-schedule builder, generates macOS shell commands
 - [Awesome Sites](https://awesomesites.neorgon.com/): Curated external sites with labeled lists, plus a JSON API of the catalog
 - [BattleCard](https://battlecard.neorgon.com/): Sales battle card builder — internal cheat sheets that help sales teams win deals; templates, branding, JSON import/export, share links with game icons, resizable sections, and PNG export
+- [Botbench](https://botbench.neorgon.com/): Plan LEGO 51515 and EV3 31313 robot builds, rehearse them in a 2D simulator and export Pybricks code
 - [BuyHacks](https://buyhacks.neorgon.com/): Curated product showcase with community votes and life-hack tips
 - [CardForge](https://cardforge.neorgon.com/): Drag-and-drop card designer for the Rush Q game with live preview and cards.json export
 - [Character Sheet](https://charactersheet.neorgon.com/): RPG-style personality interview + card export
