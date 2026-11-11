@@ -5,12 +5,12 @@
 import { cleanPrefs, deviceDefaults, zone, country, STORAGE_KEY, COOKIE_ME } from '../../js/neorgon-workspace-core.js'
 import { showToast } from '../../js/neorgon-dom.js'
 import { state, load, commit, clearAll, prefs, setPrefs, resetPrefs } from './store.js'
-import { renderEditor, renderPrefs } from './editor.js'
+import { renderEditor, renderPrefs, PEOPLE_PAGE, TEAM_PAGE } from './editor.js'
 import {
   openPerson, savePerson, removePerson, openTeam, saveTeam, removeTeam, renderMembers, memberInput, confirm, restoreFocus,
 } from './forms.js'
 import { route, leave, inFlow, startImport, saveFlow, replaceFlow, shareFlow, exportFile, banner } from './flow.js'
-import { $, $$, minutesOf, plural } from './util.js'
+import { $, $$, minutesOf, plural, ZONE_ERROR, HOURS_ERROR } from './util.js'
 
 const MAX_FILE = 5 * 1024 * 1024
 const toast = (msg) => showToast(msg, { id: 'wsToast', className: 'ws-toast', visibleClass: 'is-on', duration: 2400 })
@@ -23,11 +23,11 @@ function saved(ok, msg) {
 }
 
 const ACTIONS = {
-  'person-new': () => openPerson(),
-  'person-edit': (el) => openPerson(el.dataset.id),
+  'person-new': (el) => openPerson('', el),
+  'person-edit': (el) => openPerson(el.dataset.id, el),
   'person-remove': async () => { if (await removePerson()) { $('#personDialog').close(); saved(true, 'Removed') } },
-  'team-new': () => openTeam(),
-  'team-edit': (el) => openTeam(el.dataset.id),
+  'team-new': (el) => openTeam('', el),
+  'team-edit': (el) => openTeam(el.dataset.id, el),
   'team-remove': async () => { if (await removeTeam()) { $('#teamDialog').close(); saved(true, 'Team deleted') } },
   'dialog-cancel': (el) => el.closest('dialog').close(),
   'prefs-device-tz': () => { const f = $('#prefsForm'); f.elements.tz.value = deviceDefaults().tz; writePrefs() },
@@ -46,7 +46,27 @@ const ACTIONS = {
   'flow-save': () => saveFlow(),
   'flow-replace': () => replaceFlow(),
   'flow-share': () => shareFlow(),
-  'flow-leave': () => leave(),
+  'flow-leave': () => { leave(); focusHeading() },
+  'teams-all': () => {
+    state.teamsAll = true
+    refresh()
+    const next = $$('#wsTeams [data-act="team-edit"]')[TEAM_PAGE]
+    if (next) next.focus()
+  },
+  'people-more': () => {
+    const from = state.shown
+    state.shown += PEOPLE_PAGE
+    refresh()
+    const next = $$('#peopleList .ws-person-open')[from]
+    if (next) next.focus()
+  },
+}
+
+/** After the round trip's screen goes, focus lands on the editor's heading, not on <body>. */
+function focusHeading() {
+  const h = $('#heroTitle')
+  h.setAttribute('tabindex', '-1')
+  h.focus({ preventScroll: true })
 }
 
 /** Reads the settings form, writes what is valid, and marks what is not. */
@@ -56,21 +76,19 @@ function writePrefs() {
   const next = { ...mine }
   const tzText = f.tz.value.trim()
   const tz = zone(tzText)
-  $('#prefTzErr').textContent = tzText && !tz ? 'Pick a zone from the list, or an offset like +2.' : ''
+  $('#prefTzErr').textContent = tzText && !tz ? ZONE_ERROR : ''
   if (tz) next.tz = tz; else if (!tzText) delete next.tz
   const a = minutesOf(f.start.value), b = minutesOf(f.end.value)
   const end = b === 1439 ? 1440 : b
   const hoursOk = a !== null && end !== null && a < end
-  $('#prefHoursErr').textContent = hoursOk ? '' : 'The start comes before the end.'
+  $('#prefHoursErr').textContent = hoursOk ? '' : HOURS_ERROR
   if (hoursOk) next.h = [a, end]
   const d = $$('input[name="d"]:checked', $('#prefsForm')).map((x) => x.value).join('')
   if (d) next.d = d
   next.w = Number(f.w.value)
   next.c = f.c.value
-  const ccText = f.cc.value.trim()
-  const cc = country(ccText)
-  $('#prefCcErr').textContent = ccText && !cc ? 'Two letters, like CL or DE.' : ''
-  if (cc) next.cc = cc; else if (!ccText) delete next.cc
+  const cc = country(f.cc.value)
+  if (cc) next.cc = cc; else delete next.cc
   // A value the visitor never chose and that equals this device's stays out of the
   // cookie, so a laptop that travels keeps following its own zone and week.
   const device = deviceDefaults()
@@ -102,7 +120,10 @@ export function wire() {
   })
 
   // Settings: write on change (a typed zone is checked when the field is left, not on every key).
-  $('#prefsForm').addEventListener('change', writePrefs)
+  $('#prefsForm').addEventListener('change', (e) => {
+    writePrefs()
+    if (e.target.name === 'w') renderPrefs({ force: true })   // the day chips follow the week start
+  })
   $('#prefsForm').addEventListener('submit', (e) => { e.preventDefault(); writePrefs() })
 
   $('#meSelect').addEventListener('change', (e) => {
@@ -111,7 +132,13 @@ export function wire() {
     saved(commit(ws), e.target.value ? 'Saved who you are' : 'Cleared who you are')
   })
 
-  $('#peopleSearch').addEventListener('input', (e) => { state.filter = e.target.value; refresh() })
+  $('#peopleSearch').addEventListener('input', (e) => { state.filter = e.target.value; state.shown = PEOPLE_PAGE; refresh() })
+
+  // A way out of a review or a pick leaves no #save or #pick behind in this tab's history.
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a.ws-away')
+    if (a && /^#(save=|pick)/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search)
+  })
 
   $('#importFile').addEventListener('change', (e) => { importFile(e.target.files && e.target.files[0]); e.target.value = '' })
 

@@ -6,10 +6,11 @@
 import { str, visible, email, zone, country, color, colorFor, foldName } from '../../js/neorgon-workspace-core.js'
 import { state, commit } from './store.js'
 import { peopleOptions } from './editor.js'
-import { html, paint, $, $$, face, minutesOf, timeValue, plural } from './util.js'
+import { html, paint, $, $$, face, minutesOf, timeValue, plural, countryOptions, ZONE_ERROR } from './util.js'
 
 let editing = { kind: '', id: '' }   // which person or team the open dialog edits ('' = new)
 let opener = null                    // focus goes back here when a dialog closes
+let openerKey = null                 // { act, id }: finds the opener again when a save redrew it
 
 function err(form, id, msg) {
   const el = $('#' + id, form)
@@ -20,15 +21,29 @@ function err(form, id, msg) {
 }
 function clearErrors(form) { for (const el of $$('.ws-error', form)) err(form, el.id, '') }
 
-function show(dialog) {
-  opener = document.activeElement
+function show(dialog, invoker) {
+  opener = invoker || document.activeElement   // Safari does not focus a clicked button: the click handler names it
+  openerKey = opener && opener.dataset && opener.dataset.act ? { act: opener.dataset.act, id: opener.dataset.id || '' } : null
   dialog.showModal()
   const first = dialog.querySelector('input[name="name"]')
   if (first) first.focus()
 }
+/**
+ * Focus goes back to the opener. A save redraws the people list and the team
+ * cards, so the opener may be a new element with the same data-act and data-id;
+ * when that person or team is gone (removed), the list's own add button takes it.
+ */
 export function restoreFocus() {
-  if (opener && opener.isConnected) opener.focus()
+  let target = opener && opener.isConnected ? opener : null
+  if (!target && openerKey) {
+    const sel = (act, id) => `[data-act="${act}"]` + (id ? `[data-id="${CSS.escape(id)}"]` : '')
+    target = document.querySelector(sel(openerKey.act, openerKey.id)) ||
+      document.querySelector(sel(openerKey.act.startsWith('team') ? 'team-new' : 'person-new', ''))
+    if (target && target.hidden) target = document.querySelector('[data-act="person-new"]')
+  }
+  if (target) target.focus()
   opener = null
+  openerKey = null
 }
 
 function setColor(form, entity) {
@@ -39,7 +54,7 @@ function setColor(form, entity) {
 }
 
 // ── People ───────────────────────────────────────────────────
-export function openPerson(id = '') {
+export function openPerson(id = '', invoker = null) {
   const form = $('#personForm')
   const p = id ? state.ws.people.find((x) => x.id === id) : null
   if (id && !p) return
@@ -52,7 +67,7 @@ export function openPerson(id = '') {
   f.title.value = (p && p.title) || ''
   f.email.value = (p && p.email) || ''
   f.tz.value = (p && p.tz) || ''
-  f.country.value = (p && p.country) || ''
+  paint(f.country, countryOptions((p && p.country) || ''))
   f.location.value = (p && p.location) || ''
   f.start.value = p && p.hours ? timeValue(p.hours[0]) : ''
   f.end.value = p && p.hours ? timeValue(p.hours[1]) : ''
@@ -63,7 +78,7 @@ export function openPerson(id = '') {
   setColor(form, p)
   paint($('#personFace'), face(p || { name: '' }, { size: 'lg' }))
   $('[data-act="person-remove"]', form).hidden = !p
-  show($('#personDialog'))
+  show($('#personDialog'), invoker)
 }
 
 /** Reads the person form. Returns the person, or null after marking each bad field. */
@@ -87,12 +102,12 @@ function readPerson(form) {
       else out.email = e
     }
   }
-  if (f.tz.value.trim()) { const z = zone(f.tz.value.trim()); if (z) out.tz = z; else bad('pf-tz', 'Pick a zone from the list, or an offset like +2 or -3:30.') }
-  if (f.country.value.trim()) { const c = country(f.country.value.trim()); if (c) out.country = c; else bad('pf-country', 'Two letters, like CL or DE.') }
+  if (f.tz.value.trim()) { const z = zone(f.tz.value.trim()); if (z) out.tz = z; else bad('pf-tz', ZONE_ERROR) }
+  if (f.country.value) { const c = country(f.country.value); if (c) out.country = c; else bad('pf-country', 'Pick a country from the list.') }
   const a = minutesOf(f.start.value), b = minutesOf(f.end.value)
   if (f.start.value || f.end.value) {
     const end = b === 1439 ? 1440 : b
-    if (a === null || end === null || a >= end) bad('pf-hours', 'Both times, and the start before the end.')
+    if (a === null || end === null || a >= end) bad('pf-hours', 'Both times, and the day must end after it starts.')
     else out.hours = [a, end]
   }
   const days = $$('input[name="d"]:checked', form).map((x) => x.value).join('')
@@ -140,7 +155,7 @@ export async function removePerson() {
 // ── Teams ────────────────────────────────────────────────────
 let picked = new Map()   // person id -> pct, while the team dialog is open
 
-export function openTeam(id = '') {
+export function openTeam(id = '', invoker = null) {
   const form = $('#teamForm')
   const t = id ? state.ws.teams.find((x) => x.id === id) : null
   if (id && !t) return
@@ -156,7 +171,7 @@ export function openTeam(id = '') {
   renderMembers()
   paint($('#teamFace'), face(t || { name: '' }, { size: 'lg' }))
   $('[data-act="team-remove"]', form).hidden = !t
-  show($('#teamDialog'))
+  show($('#teamDialog'), invoker)
 }
 
 /** The member list: members first, then everyone else, filtered by the search box. */

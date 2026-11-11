@@ -91,7 +91,7 @@ function renderSave() {
   if (!pv) {
     showFlow(html`<div class="ws-flow-card"><p class="ws-eyebrow">Review</p><h2>${who} sent nothing this page can read.</h2>
       <p class="ws-help">The link or file may be cut short. Nothing was saved.</p>${returnNote(p)}
-      <div class="ws-flow-actions">${p && p.returnUrl ? html`<a class="ws-btn ws-btn--primary" href="${p.returnUrl}">Back to ${toolLabel(p.tool)}</a>` : ''}<button type="button" class="ws-btn" data-act="flow-leave">Open your workspace</button></div></div>`)
+      <div class="ws-flow-actions">${p && p.returnUrl ? html`<a class="ws-away ws-btn ws-btn--primary" href="${p.returnUrl}">Back to ${toolLabel(p.tool)}</a>` : ''}<button type="button" class="ws-btn" data-act="flow-leave">Open your workspace</button></div></div>`)
     return
   }
   flow.preview = pv
@@ -111,7 +111,7 @@ function renderSave() {
       ${!empty ? html`<button type="button" class="ws-btn ws-btn--quiet" data-act="flow-replace">Replace the whole workspace</button>` : ''}
       <span class="ws-spacer"></span>
       ${p && p.returnUrl
-        ? html`<a class="ws-btn" href="${p.returnUrl}">${nothing ? 'Back to ' + toolLabel(p.tool) : 'Not now'}</a>`
+        ? html`<a class="ws-away ws-btn" href="${p.returnUrl}">${nothing ? 'Back to ' + toolLabel(p.tool) : 'Not now'}</a>`
         : html`<button type="button" class="ws-btn" data-act="flow-leave">${nothing ? 'Open your workspace' : 'Not now'}</button>`}
     </div>
     ${returnNote(p)}
@@ -128,7 +128,7 @@ function renderSaved(summary) {
     <h2>${summary}</h2>
     <p class="ws-help">Every planning tool on this browser now sees it.</p>
     <div class="ws-flow-actions">
-      ${p && p.returnUrl ? html`<a class="ws-btn ws-btn--primary" href="${p.returnUrl}">Back to ${toolLabel(p.tool)}</a>` : ''}
+      ${p && p.returnUrl ? html`<a class="ws-away ws-btn ws-btn--primary" href="${p.returnUrl}">Back to ${toolLabel(p.tool)}</a>` : ''}
       <button type="button" class="ws-btn${p && p.returnUrl ? '' : ' ws-btn--primary'}" data-act="flow-leave">Open your workspace</button>
     </div>
     ${returnNote(p)}
@@ -193,7 +193,7 @@ function renderPick() {
     <div class="ws-flow-actions" id="pickActions">
       ${p.returnUrl ? html`<button type="button" class="ws-btn ws-btn--primary" data-act="flow-share">Share with ${name}</button>` : ''}
       <span class="ws-spacer"></span>
-      ${p.returnUrl ? html`<a class="ws-btn" href="${p.returnUrl}">Not now</a>` : ''}
+      ${p.returnUrl ? html`<a class="ws-away ws-btn" href="${p.returnUrl}">Not now</a>` : ''}
       <button type="button" class="ws-btn ws-btn--quiet" data-act="flow-leave">Edit your workspace</button>
     </div>
     ${returnNote(p)}
@@ -210,7 +210,14 @@ export async function shareFlow() {
   const name = toolLabel(flow.parsed.tool)
   paint($('#pickActions'), html`<p class="ws-help">Your workspace is too large to travel in a link. Download it, then import the file in ${name}.</p>
     <button type="button" class="ws-btn ws-btn--primary" data-act="export">Download neorgon-workspace.json</button>
-    <a class="ws-btn" href="${flow.parsed.returnUrl}">Back to ${name}</a>`)
+    <a class="ws-away ws-btn" href="${flow.parsed.returnUrl}">Back to ${name}</a>`)
 }
 
 export const exportFile = () => downloadText(JSON.stringify(state.ws, null, 2), 'neorgon-workspace.json', 'application/json')
+
+/** Inside another page's frame: nothing is read from the fragment and nothing can be saved. */
+export function refuseFramed() {
+  paint($('#main'), html`<div class="ws-flow-card"><h2>Your workspace opens only as its own page.</h2>
+    <p class="ws-help">This page was shown inside another site, so it reads nothing and saves nothing here.</p>
+    <div class="ws-flow-actions"><a class="ws-btn ws-btn--primary" href="${location.pathname}" target="_top" rel="noopener">Open your workspace</a></div></div>`)
+}

@@ -39,6 +39,7 @@
 </head>
 <body>
 <a class="ws-skip" href="#main">Skip to your workspace</a>
+<a class="ws-skip" href="#prefsPanel">Skip to your settings</a>
 
 <header class="header-bar" data-header-mode="app">
   <div class="header-logo">
@@ -67,7 +68,8 @@
 
   <!-- A tool's round trip: the review of a save (#save=), the share of a pick (#pick),
        or a file's import. Built by js/flow.js; the editor below is hidden meanwhile. -->
-  <section class="ws-flow" id="wsFlow" hidden aria-live="polite"></section>
+  <!-- Not a live region: showFlow moves focus to its heading, and a diff read out in full would bury it. -->
+  <section class="ws-flow" id="wsFlow" hidden></section>
 
   <div class="ws-editor" id="wsEditor">
     <section class="ws-hero" aria-labelledby="heroTitle">
@@ -76,7 +78,7 @@
           <p class="ws-eyebrow" id="heroMeta">Your workspace</p>
           <h2 class="ws-hero-title" id="heroTitle">Your team</h2>
         </div>
-        <button type="button" class="ws-btn ws-btn--primary" data-act="team-new">New team</button>
+        <button type="button" class="ws-btn ws-btn--primary" data-act="team-new" id="heroNewTeam">New team</button>
       </div>
       <div class="ws-teams" id="wsTeams"></div>
     </section>
@@ -90,11 +92,13 @@
             <button type="button" class="ws-btn" data-act="person-new">Add person</button>
           </div>
         </div>
+        <p class="ws-visually-hidden" id="peopleStatus" role="status"></p>
         <ul class="ws-people-list" id="peopleList" aria-labelledby="peopleTitle"></ul>
+        <button type="button" class="ws-btn ws-more" id="peopleMore" data-act="people-more" hidden></button>
       </section>
 
       <aside class="ws-side">
-        <section class="ws-panel" aria-labelledby="youTitle">
+        <section class="ws-panel" id="prefsPanel" tabindex="-1" aria-labelledby="youTitle">
           <h2 class="ws-panel-title" id="youTitle">You</h2>
           <p class="ws-help">Every planning tool reads these on load. They never hold your name or your email.</p>
           <form class="ws-form ws-prefs" id="prefsForm" novalidate>
@@ -118,13 +122,13 @@
             <fieldset class="ws-field ws-days" name="days">
               <legend class="ws-label">Work days</legend>
               <span class="ws-day-row">
-                <label><input type="checkbox" name="d" value="1"><span>Mon</span></label>
-                <label><input type="checkbox" name="d" value="2"><span>Tue</span></label>
-                <label><input type="checkbox" name="d" value="3"><span>Wed</span></label>
-                <label><input type="checkbox" name="d" value="4"><span>Thu</span></label>
-                <label><input type="checkbox" name="d" value="5"><span>Fri</span></label>
-                <label><input type="checkbox" name="d" value="6"><span>Sat</span></label>
-                <label><input type="checkbox" name="d" value="7"><span>Sun</span></label>
+                <label title="Monday"><input type="checkbox" name="d" value="1" aria-label="Monday"><span aria-hidden="true">Mo</span></label>
+                <label title="Tuesday"><input type="checkbox" name="d" value="2" aria-label="Tuesday"><span aria-hidden="true">Tu</span></label>
+                <label title="Wednesday"><input type="checkbox" name="d" value="3" aria-label="Wednesday"><span aria-hidden="true">We</span></label>
+                <label title="Thursday"><input type="checkbox" name="d" value="4" aria-label="Thursday"><span aria-hidden="true">Th</span></label>
+                <label title="Friday"><input type="checkbox" name="d" value="5" aria-label="Friday"><span aria-hidden="true">Fr</span></label>
+                <label title="Saturday"><input type="checkbox" name="d" value="6" aria-label="Saturday"><span aria-hidden="true">Sa</span></label>
+                <label title="Sunday"><input type="checkbox" name="d" value="7" aria-label="Sunday"><span aria-hidden="true">Su</span></label>
               </span>
             </fieldset>
             <label class="ws-field">
@@ -138,15 +142,15 @@
             <label class="ws-field">
               <span class="ws-label">Time format</span>
               <select class="ws-input" name="c">
-                <option value="">Your language's</option>
-                <option value="h23">24-hour</option>
-                <option value="h12">12-hour</option>
+                <option value="">This device's</option>
+                <option value="h23">24-hour (17:30)</option>
+                <option value="h12">12-hour (5:30 pm)</option>
               </select>
             </label>
             <label class="ws-field">
               <span class="ws-label">Country</span>
-              <input class="ws-input ws-input--short" name="cc" maxlength="2" autocomplete="off" spellcheck="false" placeholder="CL" aria-describedby="prefCcErr">
-              <span class="ws-error" id="prefCcErr"></span>
+              <select class="ws-input" name="cc" aria-describedby="prefCcHint"></select>
+              <span class="ws-help" id="prefCcHint">For public holidays.</span>
             </label>
           </form>
           <div class="ws-row-end">
@@ -203,7 +207,7 @@
       <label class="ws-field"><span class="ws-label">Time zone</span>
         <input class="ws-input" name="tz" list="zoneList" autocomplete="off" spellcheck="false" aria-describedby="pf-tz"><span class="ws-error" id="pf-tz"></span></label>
       <label class="ws-field"><span class="ws-label">Country</span>
-        <input class="ws-input ws-input--short" name="country" maxlength="2" autocomplete="off" spellcheck="false" aria-describedby="pf-country"><span class="ws-error" id="pf-country"></span></label>
+        <select class="ws-input" name="country" aria-describedby="pf-country"></select><span class="ws-error" id="pf-country"></span></label>
       <label class="ws-field ws-field--wide"><span class="ws-label">Location</span>
         <input class="ws-input" name="location" maxlength="120" autocomplete="off"></label>
       <div class="ws-field"><span class="ws-label" id="pfHoursLabel">Working hours</span>
@@ -215,13 +219,13 @@
       <fieldset class="ws-field ws-field--wide ws-days">
         <legend class="ws-label">Work days</legend>
         <span class="ws-day-row">
-          <label><input type="checkbox" name="d" value="1"><span>Mon</span></label>
-          <label><input type="checkbox" name="d" value="2"><span>Tue</span></label>
-          <label><input type="checkbox" name="d" value="3"><span>Wed</span></label>
-          <label><input type="checkbox" name="d" value="4"><span>Thu</span></label>
-          <label><input type="checkbox" name="d" value="5"><span>Fri</span></label>
-          <label><input type="checkbox" name="d" value="6"><span>Sat</span></label>
-          <label><input type="checkbox" name="d" value="7"><span>Sun</span></label>
+          <label title="Monday"><input type="checkbox" name="d" value="1" aria-label="Monday"><span aria-hidden="true">Mo</span></label>
+          <label title="Tuesday"><input type="checkbox" name="d" value="2" aria-label="Tuesday"><span aria-hidden="true">Tu</span></label>
+          <label title="Wednesday"><input type="checkbox" name="d" value="3" aria-label="Wednesday"><span aria-hidden="true">We</span></label>
+          <label title="Thursday"><input type="checkbox" name="d" value="4" aria-label="Thursday"><span aria-hidden="true">Th</span></label>
+          <label title="Friday"><input type="checkbox" name="d" value="5" aria-label="Friday"><span aria-hidden="true">Fr</span></label>
+          <label title="Saturday"><input type="checkbox" name="d" value="6" aria-label="Saturday"><span aria-hidden="true">Sa</span></label>
+          <label title="Sunday"><input type="checkbox" name="d" value="7" aria-label="Sunday"><span aria-hidden="true">Su</span></label>
         </span>
       </fieldset>
       <label class="ws-field"><span class="ws-label">Manager</span>

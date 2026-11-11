@@ -4,15 +4,20 @@
  */
 import { state, load, refreshPrefs } from './store.js'
 import { renderEditor, fillZones } from './editor.js'
-import { route, banner } from './flow.js'
+import { route, banner, refuseFramed } from './flow.js'
 import { wire } from './events.js'
 import { plural } from './util.js'
 
-load()
-refreshPrefs()
-fillZones()
-wire()
-renderEditor()
-if (!state.canStore) banner('This browser is not keeping anything for this page (private browsing, or site data is blocked). You can look, but nothing you change will stay.')
-else if (state.issues.length) banner(`The stored workspace had ${plural(state.issues.length, 'problem')}; what could be read is shown.`)
-route(renderEditor)
+// A <meta> CSP cannot send frame-ancestors, so the page refuses to work inside another page's
+// frame itself: a framed #save could otherwise be clicked through by a page the visitor cannot see.
+if (window.top !== window.self) refuseFramed()
+else {
+  load()
+  refreshPrefs()
+  fillZones()
+  wire()
+  renderEditor()
+  if (!state.canStore) banner('This browser is not keeping anything for this page (private browsing, or site data is blocked). You can look, but nothing you change will stay.')
+  else if (state.issues.length) banner(`The stored workspace had ${plural(state.issues.length, 'problem')}; what could be read is shown.`)
+  route(renderEditor)
+}

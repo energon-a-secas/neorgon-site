@@ -22,6 +22,8 @@ export const state = {
   issues: [],              // what was wrong with the stored copy when it was read
   canStore: true,
   filter: '',              // the people search
+  shown: 50,               // people rows drawn before "Show more"; reset by a new search
+  teamsAll: false,         // every team card, or the first few
 }
 
 export const where = () => ({ protocol: location.protocol, hostname: location.hostname })

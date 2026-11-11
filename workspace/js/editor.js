@@ -5,9 +5,11 @@
  */
 import { foldName, toolName, colorFor } from '../../js/neorgon-workspace-core.js'
 import { state, prefs } from './store.js'
-import { html, paint, $, $$, plural, face, clock, dayList, when, byId, timeValue } from './util.js'
+import { html, paint, $, $$, plural, face, clock, dayList, when, byId, timeValue, countryOptions } from './util.js'
 
 const MAX_CHIPS = 14
+export const TEAM_PAGE = 6      // team cards before "Show all": twenty teams of chips are a phone's whole height
+export const PEOPLE_PAGE = 50   // rows drawn at a time: 400 people must not bury the settings under 55,000px
 
 export function renderEditor() {
   renderHero()
@@ -42,6 +44,8 @@ function renderHero() {
   $('#heroMeta').textContent = heroMeta(ws)
   $('#heroTitle').textContent = ws.teams.length === 1 ? ws.teams[0].name : ws.teams.length ? 'Your teams' : 'Your team'
   const box = $('#wsTeams')
+  // With no teams the empty card carries the one action; a second primary button beside it only competes.
+  $('#heroNewTeam').hidden = !ws.teams.length
   if (!ws.teams.length) {
     paint(box, html`<div class="ws-empty">
       <p class="ws-empty-title">${ws.people.length ? 'Group your people into a team' : 'Nobody here yet'}</p>
@@ -54,7 +58,12 @@ function renderHero() {
     </div>`)
     return
   }
-  paint(box, ws.teams.map((t) => {
+  // Your own teams first, then the stored order.
+  const isMine = (t) => !!me && t.members.some((m) => m.person === me.id)
+  const ordered = [...ws.teams.filter(isMine), ...ws.teams.filter((t) => !isMine(t))]
+  const shown = state.teamsAll ? ordered : ordered.slice(0, TEAM_PAGE)
+  const rest = ws.teams.length - shown.length
+  paint(box, [...shown.map((t) => {
     const lead = t.lead ? people.get(t.lead) : null
     const mine = me && t.members.some((m) => m.person === me.id)
     return html`<article class="ws-team" style="--team:${colorFor(t)}">
@@ -68,7 +77,7 @@ function renderHero() {
       </header>
       ${t.members.length ? memberChips(t, people) : html`<p class="ws-help">No members yet.</p>`}
     </article>`
-  }))
+  }), rest > 0 ? html`<button type="button" class="ws-btn ws-teams-more" data-act="teams-all">Show all ${ws.teams.length} teams</button>` : ''])
 }
 
 function personLine(p, prefsAll) {
@@ -89,24 +98,32 @@ function renderPeople() {
   for (const t of ws.teams) for (const m of t.members) teamsOf.set(m.person, [...(teamsOf.get(m.person) || []), t.name])
   const list = q ? ws.people.filter((p) => foldName([p.name, p.title, p.email, p.location, ...(p.tags || [])].filter(Boolean).join(' ')).includes(q)) : ws.people
   $('#peopleCount').textContent = q ? `${list.length} of ${ws.people.length}` : String(ws.people.length)
+  const status = q ? (list.length ? `${plural(list.length, 'person', 'people')} match.` : 'Nobody matches that.') : ''
+  if ($('#peopleStatus').textContent !== status) $('#peopleStatus').textContent = status
   const { all } = prefs()
+  const more = $('#peopleMore')
   if (!list.length) {
     paint($('#peopleList'), html`<li class="ws-people-empty">${ws.people.length ? 'Nobody matches that.' : 'No people yet.'}</li>`)
+    more.hidden = true
     return
   }
-  paint($('#peopleList'), list.map((p) => {
+  const rest = list.length - state.shown
+  more.hidden = rest <= 0
+  more.textContent = `Show ${Math.min(rest, PEOPLE_PAGE)} more of ${rest}`
+  paint($('#peopleList'), list.slice(0, state.shown).map((p) => {
     const mgr = p.manager ? people.get(p.manager) : null
     const isMe = ws.me && ws.me.person === p.id
     const line = personLine(p, all)
     const teams = teamsOf.get(p.id) || []
+    // The button is named by its action; the rest of the row describes it.
     return html`<li class="ws-person">
-      <button type="button" class="ws-person-open" data-act="person-edit" data-id="${p.id}">
+      <button type="button" class="ws-person-open" data-act="person-edit" data-id="${p.id}" aria-label="Edit ${p.name}${isMe ? ' (you)' : ''}" aria-describedby="ps-${p.id} pm-${p.id}">
         ${face(p, { title: false })}
         <span class="ws-person-main">
           <span class="ws-person-name">${p.name}${isMe ? html` <span class="ws-tag">you</span>` : ''}</span>
-          <span class="ws-person-sub">${[p.title, mgr ? `reports to ${mgr.name}` : '', p.email].filter(Boolean).join(' · ')}</span>
+          <span class="ws-person-sub" id="ps-${p.id}">${[p.title, mgr ? `reports to ${mgr.name}` : '', p.email].filter(Boolean).join(' · ')}</span>
         </span>
-        <span class="ws-person-meta">
+        <span class="ws-person-meta" id="pm-${p.id}">
           ${line ? html`<span>${line}</span>` : ''}
           ${teams.length ? html`<span class="ws-person-teams">${teams.join(', ')}</span>` : ''}
         </span>
@@ -141,7 +158,13 @@ export function renderPrefs({ force = false } = {}) {
   for (const box of $$('input[name="d"]', form)) box.checked = all.d.includes(box.value)
   form.elements.w.value = String(all.w)
   form.elements.c.value = all.c
-  form.elements.cc.value = all.cc
+  paint(form.elements.cc, countryOptions(all.cc))
+  // The day chips run from the week start, as in the Settings sheet.
+  const row = $('.ws-day-row', form)
+  for (let i = 0; i < 7; i++) {
+    const d = ((all.w - 1 + i) % 7) + 1
+    row.append($(`input[name="d"][value="${d}"]`, form).closest('label'))
+  }
   form.dataset.stored = Object.keys(mine).length ? 'yes' : 'no'
   $('#prefsSaved').textContent = Object.keys(mine).length ? '' : 'From this device'
 }

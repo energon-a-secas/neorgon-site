@@ -5,7 +5,7 @@
  * other way into innerHTML on this page.
  */
 import { escHtml } from '../../js/neorgon-dom.js'
-import { colorFor, inkOn, initials, toolName } from '../../js/neorgon-workspace-core.js'
+import { colorFor, inkOn, initials, toolName, country } from '../../js/neorgon-workspace-core.js'
 
 class Html { constructor(s) { this.s = s } toString() { return this.s } }
 
@@ -78,3 +78,29 @@ export function face(entity, { size = '', title = true } = {}) {
 
 /** Index a workspace's people by id. A Map, never an object: "constructor" is a valid id. */
 export const byId = (list) => new Map(list.map((x) => [x.id, x]))
+
+// The same words and lists as the kit's Settings sheet, so a setting reads alike in both places.
+export const ZONE_ERROR = 'Not a time zone. Try a city, like America/Santiago, or an offset, like +2.'
+export const HOURS_ERROR = 'The day must end after it starts.'
+export const DAY_FULL = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+let countries = null
+/** Every country the kit accepts, by English name: [[code, name]]. */
+function countryList() {
+  if (countries) return countries
+  let names = null
+  try { names = new Intl.DisplayNames(['en'], { type: 'region' }) } catch { names = null }
+  countries = []
+  for (let a = 65; a <= 90; a++) for (let b = 65; b <= 90; b++) {
+    const code = String.fromCharCode(a, b)
+    if (country(code) !== code) continue
+    let name = code
+    try { name = (names && names.of(code)) || code } catch { name = code }
+    countries.push([code, name])
+  }
+  countries.sort((x, y) => x[1].localeCompare(y[1]))
+  return countries
+}
+/** A country <select>'s options, as the sheet has them: "Not set", then "Chile (CL)". */
+export const countryOptions = (selected) => html`<option value="">Not set</option>${countryList().map(([c, n]) =>
+  html`<option value="${c}"${c === selected ? ' selected' : ''}>${n} (${c})</option>`)}`

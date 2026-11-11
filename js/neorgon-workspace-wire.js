@@ -61,13 +61,33 @@ export function originAllowed(origin, { selfHostname = '', adopters = ADOPTERS }
  * own state, which its client keeps in sessionStorage, so it never travels.
  */
 export function safeReturnUrl(url, opts = {}) {
-  if (typeof url !== 'string' || url.length > 2048) return ''
+  const bare = withoutFragment(url)
+  if (!bare || bare.length > 2048) return ''
   let u
-  try { u = new URL(url) } catch { return '' }
+  try { u = new URL(bare) } catch { return '' }
   if ((u.protocol !== 'https:' && u.protocol !== 'http:') || u.username || u.password) return ''
   if (!originAllowed(u.origin, opts)) return ''
   u.hash = ''
   return u.href
+}
+
+/** The text before the first #, or '' for a non-string: a fragment is the tool's own state and never counts toward a length cap. */
+function withoutFragment(url) {
+  if (typeof url !== 'string' || url.length > MAX_LINK) return ''
+  const i = url.indexOf('#')
+  return i < 0 ? url : url.slice(0, i)
+}
+
+/**
+ * True when a return URL is where `tool` lives: https://<tool>.neorgon.com on
+ * the fleet, any local origin in development. Binds the name a page shows
+ * ("Share with Client Says") to where it sends the workspace.
+ */
+export function returnFitsTool(returnUrl, tool) {
+  let u
+  try { u = new URL(returnUrl) } catch { return false }
+  if (isLocalOrigin(u.origin)) return true
+  return typeof tool === 'string' && /^[a-z0-9-]{1,63}$/.test(tool) && u.origin === `https://${tool}.neorgon.com`
 }
 
 /**
@@ -131,9 +151,10 @@ export function unpackPayload(text) {
 
 /** A tool's own address without the fragment: what it sends as `return`. */
 export function returnUrlOf(href) {
-  if (typeof href !== 'string' || href.length > 2048) return ''
+  const bare = withoutFragment(href)
+  if (!bare || bare.length > 2048) return ''
   try {
-    const u = new URL(href)
+    const u = new URL(bare)
     if (u.protocol !== 'https:' && u.protocol !== 'http:') return ''
     u.hash = ''
     return u.href
@@ -176,7 +197,8 @@ const FIELDS = { save: ['tool', 'return'], pick: ['tool', 'return'], 'neo-ws': [
  *   { op: 'save', payload, tool, returnUrl, returnText }
  *   { op: 'pick', tool, returnUrl, returnText }
  *   { op: 'answer', payload, stamp }
- * returnUrl is '' when the page may not follow it (opts as safeReturnUrl);
+ * returnUrl is '' when the page may not follow it (opts as safeReturnUrl) or
+ * it is not the named tool's own address (returnFitsTool);
  * returnText is the address as given, cleaned and capped, to show instead.
  * The payload is still only text: previewPayload or decodePayload reads it.
  */
@@ -201,7 +223,9 @@ export function parseFragment(hash, { selfHostname = '', adopters = ADOPTERS } =
   if (!Array.isArray(adopters) || !adopters.includes(tool) || (op === 'save' && !isPayloadText(value))) return null
   let text = got.get('return') ?? ''
   try { text = decodeURIComponent(text) } catch { /* shown as given, never followed */ }
-  const out = { op, tool, returnUrl: safeReturnUrl(text, { selfHostname, adopters }), returnText: str(text, 300) }
+  // The return must be the named tool's own address, or a page could say "Share with Floorplan" and send to Rama.
+  const allowed = safeReturnUrl(text, { selfHostname, adopters })
+  const out = { op, tool, returnUrl: allowed && returnFitsTool(allowed, tool) ? allowed : '', returnText: str(text, 300) }
   if (op === 'save') out.payload = value
   return out
 }
