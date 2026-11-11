@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="dark">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Strict on purpose: links into this page carry people's names and emails in the
+       fragment, so nothing here may run a script it did not ship, or talk to anyone.
+       connect-src 'none': the page makes no requests beyond its own assets and the
+       header kit's season stylesheet. No frame-ancestors: a <meta> CSP ignores it. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.neorgon.org; img-src 'self' data:; font-src 'self'; connect-src 'none'; frame-src 'none'; worker-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="neo-analytics" content="off">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Neorgon">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="neo-mark" content="on">
+  <title>Workspace | Neorgon</title>
+  <meta name="description" content="Your settings, your people and your teams, kept in this browser and shared with the Neorgon planning tools. Nothing is sent anywhere.">
+  <meta property="og:title" content="Neorgon Workspace">
+  <meta property="og:description" content="Your settings, your people and your teams, kept in this browser and shared with the Neorgon planning tools.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://neorgon.com/workspace/">
+  <meta property="og:site_name" content="Neorgon">
+  <meta property="og:image" content="https://neorgon.com/og-preview.jpg">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://neorgon.com/workspace/">
+  <meta name="neo-repo" content="https://github.com/energon-a-secas/neorgon-site">
+  <meta name="theme-color" content="#000912">
+  <link rel="stylesheet" href="/css/neorgon-header.css">
+  <link rel="stylesheet" href="/css/neorgon-themes.css">
+  <link rel="stylesheet" href="/css/neorgon-footer.css">
+  <link rel="stylesheet" href="css/workspace.css">
+  <script defer src="/js/neorgon-header.js"></script>
+  <script defer src="/js/neorgon-footer.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+<a class="ws-skip" href="#main">Skip to your workspace</a>
+
+<header class="header-bar" data-header-mode="app">
+  <div class="header-logo">
+    <a href="/workspace/" class="header-title-link">
+      <img class="header-logo-img" src="/energon-classic-logo.png" alt="" width="36" height="36">
+      <div class="header-title-wrap"><h1>Workspace</h1><div class="header-subtitle">You and your team, for every planning tool</div></div>
+    </a>
+  </div>
+  <div class="header-right">
+    <a class="header-home" href="https://neorgon.com/" title="neorgon.com" aria-label="Neorgon home">
+      <svg class="nh-hub-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M12 4.4 18.58 8.2 18.58 15.8 12 19.6 5.42 15.8 5.42 8.2Z" fill="currentColor" stroke="none"/>
+        <g class="nh-orbit">
+          <path d="M2.47 17.50 A11.0 11.0 0 0 1 14.85 1.37" fill="none" stroke="currentColor" stroke-width="1.05" stroke-linecap="round"/>
+          <path d="M21.53 6.50 A11.0 11.0 0 0 1 9.15 22.63" fill="none" stroke="currentColor" stroke-width="1.05" stroke-linecap="round"/>
+          <circle cx="21.71" cy="6.84" r="1.25" fill="currentColor"/>
+          <circle cx="2.29" cy="17.16" r="1.25" fill="currentColor"/>
+        </g>
+      </svg>
+    </a>
+  </div>
+</header>
+
+<main id="main" class="ws-main" tabindex="-1">
+  <div class="ws-banner" id="wsBanner" hidden></div>
+
+  <!-- A tool's round trip: the review of a save (#save=), the share of a pick (#pick),
+       or a file's import. Built by js/flow.js; the editor below is hidden meanwhile. -->
+  <section class="ws-flow" id="wsFlow" hidden aria-live="polite"></section>
+
+  <div class="ws-editor" id="wsEditor">
+    <section class="ws-hero" aria-labelledby="heroTitle">
+      <div class="ws-hero-head">
+        <div>
+          <p class="ws-eyebrow" id="heroMeta">Your workspace</p>
+          <h2 class="ws-hero-title" id="heroTitle">Your team</h2>
+        </div>
+        <button type="button" class="ws-btn ws-btn--primary" data-act="team-new">New team</button>
+      </div>
+      <div class="ws-teams" id="wsTeams"></div>
+    </section>
+
+    <div class="ws-grid">
+      <section class="ws-panel ws-people" aria-labelledby="peopleTitle">
+        <div class="ws-panel-head">
+          <h2 class="ws-panel-title" id="peopleTitle">People <span class="ws-count" id="peopleCount"></span></h2>
+          <div class="ws-panel-tools">
+            <input class="ws-input ws-search" id="peopleSearch" type="search" placeholder="Find a person" aria-label="Find a person" autocomplete="off" spellcheck="false">
+            <button type="button" class="ws-btn" data-act="person-new">Add person</button>
+          </div>
+        </div>
+        <ul class="ws-people-list" id="peopleList" aria-labelledby="peopleTitle"></ul>
+      </section>
+
+      <aside class="ws-side">
+        <section class="ws-panel" aria-labelledby="youTitle">
+          <h2 class="ws-panel-title" id="youTitle">You</h2>
+          <p class="ws-help">Every planning tool reads these on load. They never hold your name or your email.</p>
+          <form class="ws-form ws-prefs" id="prefsForm" novalidate>
+            <label class="ws-field ws-field--wide">
+              <span class="ws-label">Time zone</span>
+              <span class="ws-inline">
+                <input class="ws-input" name="tz" list="zoneList" autocomplete="off" spellcheck="false" aria-describedby="prefTzErr">
+                <button type="button" class="ws-btn ws-btn--quiet" data-act="prefs-device-tz">Use this device's</button>
+              </span>
+              <span class="ws-error" id="prefTzErr"></span>
+            </label>
+            <div class="ws-field">
+              <span class="ws-label" id="prefHoursLabel">Working hours</span>
+              <span class="ws-inline" role="group" aria-labelledby="prefHoursLabel">
+                <input class="ws-input" type="time" name="start" aria-label="Start">
+                <span aria-hidden="true">to</span>
+                <input class="ws-input" type="time" name="end" aria-label="End">
+              </span>
+              <span class="ws-error" id="prefHoursErr"></span>
+            </div>
+            <fieldset class="ws-field ws-days" name="days">
+              <legend class="ws-label">Work days</legend>
+              <span class="ws-day-row">
+                <label><input type="checkbox" name="d" value="1"><span>Mon</span></label>
+                <label><input type="checkbox" name="d" value="2"><span>Tue</span></label>
+                <label><input type="checkbox" name="d" value="3"><span>Wed</span></label>
+                <label><input type="checkbox" name="d" value="4"><span>Thu</span></label>
+                <label><input type="checkbox" name="d" value="5"><span>Fri</span></label>
+                <label><input type="checkbox" name="d" value="6"><span>Sat</span></label>
+                <label><input type="checkbox" name="d" value="7"><span>Sun</span></label>
+              </span>
+            </fieldset>
+            <label class="ws-field">
+              <span class="ws-label">Week starts on</span>
+              <select class="ws-input" name="w">
+                <option value="1">Monday</option>
+                <option value="6">Saturday</option>
+                <option value="7">Sunday</option>
+              </select>
+            </label>
+            <label class="ws-field">
+              <span class="ws-label">Time format</span>
+              <select class="ws-input" name="c">
+                <option value="">Your language's</option>
+                <option value="h23">24-hour</option>
+                <option value="h12">12-hour</option>
+              </select>
+            </label>
+            <label class="ws-field">
+              <span class="ws-label">Country</span>
+              <input class="ws-input ws-input--short" name="cc" maxlength="2" autocomplete="off" spellcheck="false" placeholder="CL" aria-describedby="prefCcErr">
+              <span class="ws-error" id="prefCcErr"></span>
+            </label>
+          </form>
+          <div class="ws-row-end">
+            <span class="ws-saved" id="prefsSaved" role="status"></span>
+            <button type="button" class="ws-btn ws-btn--quiet" data-act="prefs-reset">Reset to this device's</button>
+          </div>
+        </section>
+
+        <section class="ws-panel" aria-labelledby="meTitle">
+          <h2 class="ws-panel-title" id="meTitle">Which person are you?</h2>
+          <p class="ws-help">Tools use it to find your card and your team.</p>
+          <div class="ws-me">
+            <span id="meFace"></span>
+            <select class="ws-input" id="meSelect" aria-labelledby="meTitle"></select>
+          </div>
+        </section>
+
+        <section class="ws-panel" aria-labelledby="fileTitle">
+          <h2 class="ws-panel-title" id="fileTitle">File</h2>
+          <p class="ws-help">Move your workspace to another browser, or keep a copy.</p>
+          <div class="ws-inline">
+            <button type="button" class="ws-btn" data-act="export">Export</button>
+            <label class="ws-btn ws-file">Import<input type="file" id="importFile" accept=".json,application/json"></label>
+          </div>
+        </section>
+
+        <section class="ws-panel ws-panel--danger" aria-labelledby="clearTitle">
+          <h2 class="ws-panel-title" id="clearTitle">Clear</h2>
+          <p class="ws-help">Removes every person and team from this browser. Your settings stay.</p>
+          <button type="button" class="ws-btn ws-btn--danger" data-act="clear">Clear workspace</button>
+        </section>
+
+        <p class="ws-trust"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Kept in this browser. Nothing is sent anywhere.</p>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<datalist id="zoneList"></datalist>
+
+<dialog class="ws-dialog" id="personDialog" aria-labelledby="personDialogTitle">
+  <form class="ws-form" id="personForm" method="dialog" novalidate>
+    <header class="ws-dialog-head">
+      <span id="personFace"></span>
+      <h2 class="ws-dialog-title" id="personDialogTitle">Add person</h2>
+    </header>
+    <div class="ws-dialog-body ws-form-grid">
+      <label class="ws-field ws-field--wide"><span class="ws-label">Name</span>
+        <input class="ws-input" name="name" required maxlength="120" autocomplete="off" aria-describedby="pf-name"><span class="ws-error" id="pf-name"></span></label>
+      <label class="ws-field"><span class="ws-label">Title</span>
+        <input class="ws-input" name="title" maxlength="120" autocomplete="off"></label>
+      <label class="ws-field"><span class="ws-label">Email</span>
+        <input class="ws-input" name="email" type="email" maxlength="254" autocomplete="off" spellcheck="false" aria-describedby="pf-email"><span class="ws-error" id="pf-email"></span></label>
+      <label class="ws-field"><span class="ws-label">Time zone</span>
+        <input class="ws-input" name="tz" list="zoneList" autocomplete="off" spellcheck="false" aria-describedby="pf-tz"><span class="ws-error" id="pf-tz"></span></label>
+      <label class="ws-field"><span class="ws-label">Country</span>
+        <input class="ws-input ws-input--short" name="country" maxlength="2" autocomplete="off" spellcheck="false" aria-describedby="pf-country"><span class="ws-error" id="pf-country"></span></label>
+      <label class="ws-field ws-field--wide"><span class="ws-label">Location</span>
+        <input class="ws-input" name="location" maxlength="120" autocomplete="off"></label>
+      <div class="ws-field"><span class="ws-label" id="pfHoursLabel">Working hours</span>
+        <span class="ws-inline" role="group" aria-labelledby="pfHoursLabel">
+          <input class="ws-input" type="time" name="start" aria-label="Start"><span aria-hidden="true">to</span><input class="ws-input" type="time" name="end" aria-label="End">
+        </span><span class="ws-error" id="pf-hours"></span></div>
+      <label class="ws-field"><span class="ws-label">Plannable time (%)</span>
+        <input class="ws-input ws-input--short" name="load" type="number" min="0" max="100" step="any" aria-describedby="pf-load"><span class="ws-error" id="pf-load"></span></label>
+      <fieldset class="ws-field ws-field--wide ws-days">
+        <legend class="ws-label">Work days</legend>
+        <span class="ws-day-row">
+          <label><input type="checkbox" name="d" value="1"><span>Mon</span></label>
+          <label><input type="checkbox" name="d" value="2"><span>Tue</span></label>
+          <label><input type="checkbox" name="d" value="3"><span>Wed</span></label>
+          <label><input type="checkbox" name="d" value="4"><span>Thu</span></label>
+          <label><input type="checkbox" name="d" value="5"><span>Fri</span></label>
+          <label><input type="checkbox" name="d" value="6"><span>Sat</span></label>
+          <label><input type="checkbox" name="d" value="7"><span>Sun</span></label>
+        </span>
+      </fieldset>
+      <label class="ws-field"><span class="ws-label">Manager</span>
+        <select class="ws-input" name="manager"></select></label>
+      <label class="ws-field"><span class="ws-label">Tags</span>
+        <input class="ws-input" name="tags" autocomplete="off" placeholder="backend, on call"></label>
+      <div class="ws-field ws-field--wide"><span class="ws-label" id="pfColorLabel">Colour</span>
+        <span class="ws-inline" role="group" aria-labelledby="pfColorLabel">
+          <label class="ws-check"><input type="checkbox" name="ownColor"><span>Own colour</span></label>
+          <input class="ws-color" type="color" name="color" aria-label="Colour">
+        </span></div>
+    </div>
+    <footer class="ws-dialog-foot">
+      <button type="button" class="ws-btn ws-btn--danger ws-btn--quiet" data-act="person-remove">Remove</button>
+      <span class="ws-spacer"></span>
+      <button type="button" class="ws-btn" data-act="dialog-cancel">Cancel</button>
+      <button type="submit" class="ws-btn ws-btn--primary" value="save">Save</button>
+    </footer>
+  </form>
+</dialog>
+
+<dialog class="ws-dialog" id="teamDialog" aria-labelledby="teamDialogTitle">
+  <form class="ws-form" id="teamForm" method="dialog" novalidate>
+    <header class="ws-dialog-head">
+      <span id="teamFace"></span>
+      <h2 class="ws-dialog-title" id="teamDialogTitle">New team</h2>
+    </header>
+    <div class="ws-dialog-body ws-form-grid">
+      <label class="ws-field ws-field--wide"><span class="ws-label">Name</span>
+        <input class="ws-input" name="name" required maxlength="120" autocomplete="off" aria-describedby="tf-name"><span class="ws-error" id="tf-name"></span></label>
+      <label class="ws-field"><span class="ws-label">Lead</span>
+        <select class="ws-input" name="lead"></select></label>
+      <div class="ws-field"><span class="ws-label" id="tfColorLabel">Colour</span>
+        <span class="ws-inline" role="group" aria-labelledby="tfColorLabel">
+          <label class="ws-check"><input type="checkbox" name="ownColor"><span>Own colour</span></label>
+          <input class="ws-color" type="color" name="color" aria-label="Colour">
+        </span></div>
+      <fieldset class="ws-field ws-field--wide ws-members">
+        <legend class="ws-label">Members <span class="ws-count" id="memberCount"></span></legend>
+        <input class="ws-input ws-search" id="memberSearch" type="search" placeholder="Find a person" aria-label="Find a person to add" autocomplete="off" spellcheck="false">
+        <ul class="ws-member-pick" id="memberPick"></ul>
+        <p class="ws-help">The share is how much of their time belongs to this team, from 1 to 100.</p>
+      </fieldset>
+    </div>
+    <footer class="ws-dialog-foot">
+      <button type="button" class="ws-btn ws-btn--danger ws-btn--quiet" data-act="team-remove">Delete team</button>
+      <span class="ws-spacer"></span>
+      <button type="button" class="ws-btn" data-act="dialog-cancel">Cancel</button>
+      <button type="submit" class="ws-btn ws-btn--primary" value="save">Save</button>
+    </footer>
+  </form>
+</dialog>
+
+<dialog class="ws-dialog ws-dialog--small" id="confirmDialog" aria-labelledby="confirmTitle" aria-describedby="confirmBody">
+  <form method="dialog">
+    <div class="ws-dialog-body">
+      <h2 class="ws-dialog-title" id="confirmTitle"></h2>
+      <p class="ws-help" id="confirmBody"></p>
+    </div>
+    <footer class="ws-dialog-foot">
+      <span class="ws-spacer"></span>
+      <button class="ws-btn" value="cancel">Cancel</button>
+      <button class="ws-btn ws-btn--danger" value="ok" id="confirmOk">Confirm</button>
+    </footer>
+  </form>
+</dialog>
+
+<div class="ws-toast" id="wsToast"></div>
+
+<footer class="neo-footer" data-footer-mode="app">
+  Neorgon Workspace &middot; Kept in this browser &middot;
+  <a href="/privacy/">Privacy</a>
+</footer>
+</body>
+</html>

@@ -2141,6 +2141,21 @@ body.settings-open .dispatch-dock { visibility: hidden; }
   background: rgba(255,255,255,.06);
   margin: 10px 0;
 }
+/* The link to the Workspace page: a row, not a control, so it reads as a way out. */
+.settings-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 -8px;
+  padding: 8px;
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+.settings-link:hover { background: rgba(255,255,255,.06); }
+.settings-link-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.settings-link-sub { font-size: .72rem; line-height: 1.4; color: var(--text-muted); }
+.settings-link svg { width: 16px; height: 16px; flex: none; opacity: .6; }
 .settings-hint {
   font-size: .7rem;
   color: rgba(255,255,255,.55);

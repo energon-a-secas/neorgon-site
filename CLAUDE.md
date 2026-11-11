@@ -113,8 +113,26 @@ moves there answers a state (hover, focus, a matched search), and `scripts/check
 fails on any infinite CSS animation at rest.
 
 Not in this table because they are **vendored kit files**: `neorgon-header.js`,
-`neorgon-footer.js`, `neorgon-auth.js`, `neorgon-auth-sites.js`. Never edit them here;
+`neorgon-footer.js`, `neorgon-auth.js`, `neorgon-auth-sites.js`, `neorgon-persist.js`,
+`neorgon-dom.js` and `neorgon-workspace-{core,codec,wire,inflate}.js`. Never edit them here;
 edit `packages/neorgon-ui/` and re-run that kit's sync script.
+
+### The Workspace page (`workspace/`)
+
+`neorgon.com/workspace/` is the one place a visitor edits their settings (the `neo_me`
+cookie), who they are, their people and teams, imports and exports `neorgon-workspace.json`,
+and clears it; it also serves the planning tools' round trips (`#save=` review, `#pick`
+share). Contract: `docs/plans/2026-11-03-neorgon-workspace.md` in the monorepo; kit:
+`packages/neorgon-ui/workspace/README.md`. **The one part of this repo that uses ES modules**
+(`workspace/js/`, entry `app.js`), importing the vendored kits from `/js/`.
+
+- Storage is neorgon.com's `neo-ws:workspace` (Persist Kit envelope of `{ stamp, ws }`); every
+  write takes a new stamp and rewrites the `neo_ws` cookie (`workspace/js/store.js`).
+- Every value is untrusted: workspace data reaches HTML only through the `html` tagged template in
+  `workspace/js/util.js`, which escapes each interpolation. Do not add another `innerHTML` path.
+- Its CSP is stricter than the hub's (`script-src 'self'`, `connect-src 'none'`) and
+  `neo-analytics` is off: review links carry names and emails in the fragment.
+- The hub's Settings panel links it with a plain `.settings-link` row in `index.html`.
 
 ### Global window flags (cross-module communication)
 
