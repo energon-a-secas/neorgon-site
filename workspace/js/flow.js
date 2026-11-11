@@ -97,13 +97,17 @@ function renderSave() {
   flow.preview = pv
   const ta = byId(pv.next.teams)
   const teamNames = [...pv.teams.added, ...pv.teams.updated, ...pv.teams.unchanged].map((id) => ta.get(id)).filter(Boolean).map((t) => t.name)
-  const nothing = !pv.added.length && !pv.updated.length && !pv.teams.added.length && !pv.teams.updated.length
+  // A payload may also say who the visitor is; the merge fills an empty me from it, so the review says so.
+  const meId = (pv.next.me && pv.next.me.person) || ''
+  const meNew = meId && meId !== ((state.ws.me && state.ws.me.person) || '') ? byId(pv.next.people).get(meId) : null
+  const nothing = !pv.added.length && !pv.updated.length && !pv.teams.added.length && !pv.teams.updated.length && !meNew
   const empty = !state.ws.people.length && !state.ws.teams.length
   showFlow(html`<div class="ws-flow-card">
     <p class="ws-eyebrow">${flow.kind === 'import' ? 'Import' : `From ${toolLabel(p.tool)}`} · review before saving</p>
     <h2>${headline(who, pv, teamNames)}</h2>
     <p class="ws-help">${nothing ? 'Saving would change nothing.' : 'Nothing is saved until you choose. Saving never removes anyone already here.'}</p>
     <div class="ws-legend" aria-hidden="true"><span class="ws-legend-added">added</span><span class="ws-legend-updated">updated</span><span class="ws-legend-unchanged">unchanged</span></div>
+    ${meNew ? html`<p class="ws-help ws-flow-me">Saving also marks ${meNew.name} as you.</p>` : ''}
     ${renderDiff(state.ws, pv)}
     ${issueList(pv.issues)}
     <div class="ws-flow-actions">
