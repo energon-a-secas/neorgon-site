@@ -60,7 +60,7 @@
       <h2 class="section-title">The short version</h2>
       <p class="section-content">Neorgon is a collection of free, open-source tools run by one person. There is no advertising, nothing is sold, and nothing follows you between sites to profile you. The one record that spans sites is a list, kept in your own account and shown only to you, of which Neorgon sites you have used while signed in. Most tools need no account at all. The few that ask you to sign in do so because they store something you created and want it back later.</p>
       <p class="section-content">Vitrina lets you publish your shelf when public shelves are open there, which shows part of it to anyone who has or guesses its address. That is described in its own section below.</p>
-      <p class="section-content">Last updated 14 September 2026.</p>
+      <p class="section-content">Last updated 11 November 2026.</p>
     </section>
 
     <section class="story-section">
@@ -123,8 +123,21 @@
     </section>
 
     <section class="story-section">
+      <h2 class="section-title">Your workspace for the planning tools</h2>
+      <p class="section-content">The <a href="/workspace/">Workspace page</a> keeps the people and teams you add there, or save there from one of the planning tools, in your browser's local storage for neorgon.com (the key <code>neo-ws:workspace</code>). It needs no account and is never sent to Neorgon or anyone else: no server receives it, and the page loads no analytics.</p>
+      <p class="section-content">A planning tool reads your workspace through a hidden page from neorgon.com that can only read it, or, in browsers that keep such pages apart (Safari and every iOS browser), when you press Load your team. The tool then keeps its own copy in its own local storage (<code>neo-ws:cache</code>). A tool adds people to your workspace only through a review on the Workspace page, and only when you press Save.</p>
+      <p class="section-content">Saving from a tool, and sharing your team with a tool, carry the people in the part of the address after <code>#</code>. That part is never sent to a server, analytics never read it, and the Workspace page and the tool remove it from the tab's history once they have read it. Your browser's history can still keep the address it opened, as it keeps every address you visit; clearing your browsing history removes it.</p>
+      <p class="section-content">To delete your workspace, use Clear workspace on the Workspace page. A tool's copy goes when you clear that site's data in your browser.</p>
+    </section>
+
+    <section class="story-section">
       <h2 class="section-title">Cookies and local storage</h2>
-      <p class="section-content">One first-party cookie is set: <code>neo_theme</code>, which remembers a colour theme you picked and is shared across neorgon.com subdomains so the choice follows you between tools. It contains a theme name and nothing else. It is not used for tracking.</p>
+      <p class="section-content">Six first-party cookies can be set. Each is shared across neorgon.com and its subdomains so a choice follows you between tools, each holds only what is listed here, and none is used for tracking. None holds a name, an email or an account identifier.</p>
+      <p class="section-content"><code>neo_theme</code> remembers a colour theme you picked: a theme name and nothing else.</p>
+      <p class="section-content"><code>neo_chrome</code> remembers that you hid a tool's header and footer with the H key: the word <code>off</code>, and it is removed when you show them again.</p>
+      <p class="section-content"><code>neo_character</code> is the pixel character you made in Pixeldoll, as a short code that describes how it looks, so other tools can draw it. <code>neo_unlocks</code> is the list of character parts you have unlocked there.</p>
+      <p class="section-content"><code>neo_me</code> holds your settings for the planning tools (Rama, Floorplan, Reparto, Loadout, Client Says): time zone, working hours, work days, the day your week starts, time format and country. It is set when you change a setting, rewritten with the same value on each visit, and lasts a year.</p>
+      <p class="section-content"><code>neo_ws</code> is a stamp (a time and some random characters) that the Workspace page rewrites on every save, so a planning tool can tell whether its copy of your team is the latest. It carries no data about you or your team, and lasts a year.</p>
       <p class="section-content">Signing in sets session cookies from Clerk, which are what keep you signed in. Sessions on the free plan last seven days.</p>
       <p class="section-content">Many tools keep your preferences and drafts in your browser's local storage. That data stays on your device and is not readable by Neorgon. On Vitrina, if you are signed in and press a button that copies your browser shelf into your account, those books and their details are uploaded to Vitrina's database, as described above.</p>
     </section>
