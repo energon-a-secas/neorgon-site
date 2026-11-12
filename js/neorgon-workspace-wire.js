@@ -240,6 +240,14 @@ export const PROTOCOL = 'neo-workspace/1'
 export const FRAME_TIMEOUT = 1500                       // ms without an answer means no frame
 export const FRAME_STATUSES = Object.freeze(['shared', 'stale', 'empty'])
 
+/**
+ * Whether a save should warn before it leaves for the Workspace page: the
+ * browser says it is offline, or the frame never answered (the page's origin
+ * did not load). A frame still looking ('pending') does not count, nor does
+ * one that answered without sharing (Safari): the page is reachable there.
+ */
+export const saveUnsure = ({ online = true, frame = 'pending' } = {}) => online === false || frame === 'none'
+
 const isRequestId = (id) => (typeof id === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(id)) || (Number.isSafeInteger(id) && id >= 0)
 
 /** What a client posts to the frame, or null for a bad id or op. */
